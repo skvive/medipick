@@ -1,5 +1,25 @@
 {
-  "name": "medipick-edge",
+  "name": "medipick",
+  "version": "3.3.0",
   "private": true,
-  "description": "Vercel edge proxy for medipick.lexid.site → Render API"
+  "scripts": {
+    "sync-public": "node scripts/sync-public.mjs",
+    "dev": "npm run sync-public && next dev",
+    "build": "npm run sync-public && next build",
+    "start": "next start",
+    "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql",
+    "db:seed": "node scripts/seed-neon.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "next": "^15.1.0",
+    "pg": "^8.13.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
 }

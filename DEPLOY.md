@@ -1,48 +1,51 @@
 # MEDIPICK · medipick.lexid.site
 
-**목적:** 병·의원·약국 **입점·마케팅·의료정보 탐색** 데모 플랫폼 (MEDIPICK v3.3). 가상 시연 데이터·AI 상담·예약 운영·의사 Blogger 연동·구독 광고 등을 **단일 Python 서버**로 제공합니다.
+**Vercel (Next.js) + Neon Postgres** — Render 사용하지 않습니다.
 
-| 레이어 | 호스트 | 역할 |
-|--------|--------|------|
-| Edge | **Vercel** `medipick.lexid.site` | 도메인·HTTPS·전 경로 리버스 프록시 |
-| API + UI | **Render** `medipick-api` | `server.py` + `web/` 정적 파일, SQLite on disk |
-| Postgres | **Neon** `medipick-lexid` | 배포 메타·향후 SQLite 이전용 (`db/neon/`) |
+| 레이어 | 역할 |
+|--------|------|
+| **Vercel** | `web/` 정적 UI + `app/api/*` API Routes |
+| **Neon** | `DATABASE_URL` — providers·content·예약 등 전체 데이터 |
+
+Python `server.py`는 로컬 개발·레거시 참고용으로 리포에 유지합니다.
+
+## 환경 변수 (Vercel)
+
+- `DATABASE_URL` — Neon pooled connection string
+- `MEDIPICK_ADMIN_PASSWORD` — `/admin` 로그인
+- `MEDIPICK_SECRET` — 세션 HMAC (64+ chars 권장)
+- `MEDIPICK_COOKIE_SECURE=1` — 프로덕션
+- `GOOGLE_MAPS_BROWSER_KEY` — 선택
+- `MEDIPICK_GA_ID` — 선택
+
+## DB 초기화 (1회)
+
+```powershell
+$env:DATABASE_URL="postgresql://..."
+npm run db:migrate
+node scripts/seed-neon.mjs
+```
 
 ## 로컬
 
 ```powershell
-cd medipick-repo
-python -m pip install -r requirements.txt
-$env:MEDIPICK_ADMIN_PASSWORD="local-dev-only"
-python server.py
-# http://127.0.0.1:8765
+npm install
+npm run dev
+# http://localhost:3000
 ```
 
-## Neon (project `medipick-lexid` · id `sparkling-surf-06199778`)
+## 배포
 
 ```powershell
-# SQL 적용: Neon MCP run_sql 또는 psql + connection string
-# 스키마: db/neon/001_deploy_meta.sql
-```
-
-`DATABASE_URL`은 Render 환경변수에 설정됨 (v3.3 런타임 DB는 SQLite).
-
-## Vercel (edge 프록시)
-
-배포 루트는 **`edge/`** 디렉터리입니다 (Python 루트 자동 감지 방지).
-
-```powershell
-cd edge
-vercel link --yes --project medipick-lexid
+vercel link --project medipick-lexid
+vercel env pull .env.local
 vercel --prod --yes
-vercel domains add medipick.lexid.site medipick-lexid
 ```
 
-## 관리자
+도메인: `medipick.lexid.site` → 프로젝트 **medipick-lexid**, Root Directory **`.`** (edge/ 폴더 사용 안 함)
 
-- 경로: `/admin`
-- 프로덕션: `MEDIPICK_ADMIN_PASSWORD` 필수 (데모 기본값 `medipick-demo-2026`은 외부 바인딩 불가)
+## API 범위 (Vercel 1차)
 
-## 법·안전
-
-README.md § 상용화 전 필수 과제 준수. 본 배포는 **제품 데모**입니다.
+- ✅ 메인: config, home, search, content, provider, nearby, events, reviews, appointments, ai/answer
+- ✅ 관리자: login, stats, providers/content/doctors/ads/appointments/reviews 조회
+- ⏳ billing·clinic·doctor POST 등 — Python parity 이전 예정 (501)
