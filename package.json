@@ -8,7 +8,8 @@
     "build": "npm run sync-public && next build",
     "start": "next start",
     "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql && node scripts/run-sql.mjs sql/002_extensions.sql",
-    "db:seed": "node scripts/seed-neon.mjs"
+    "db:seed": "node scripts/seed-neon.mjs",
+    "content:linkr": "node scripts/build-livelinkr-manifest.mjs && node scripts/import-livelinkr-content.mjs"
   },
   "dependencies": {
     "@neondatabase/auth": "^0.6.0-beta",

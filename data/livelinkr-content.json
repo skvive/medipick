@@ -1,0 +1,611 @@
+{
+  "generatedAt": "2026-10-29T09:44:56.297Z",
+  "source": "goobl/lib/discover (Linkr Live catalog)",
+  "counts": {
+    "blog": 20,
+    "shorts": 20,
+    "video": 20
+  },
+  "items": [
+    {
+      "kind": "blog",
+      "title": "중소기업을 위한 Gemini 기능 등 10월 넷째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 10월 넷째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning 소규모 비즈니스 성장을 돕는 새로운 Gemini 기능 ( New Gemini tools for…",
+      "url": "https://developers-kr.googleblog.com/2026/10/weeklyupdate-week4.html",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-1"
+    },
+    {
+      "kind": "blog",
+      "title": "Gemini 4 Argon 성능 등 10월 셋째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 10월 셋째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning Gemini 4 Argon: 가장 까다로운 난제를 해결하도록 설계된 모델 ( 국문 ) Gemi…",
+      "url": "https://developers-kr.googleblog.com/2026/10/weeklyupdate-week3.html",
+      "category": "내과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-2"
+    },
+    {
+      "kind": "blog",
+      "title": "ML Drift 출시 등 10월 둘째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 10월 둘째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning ML Drift: 차세대 GPU 기반 엣지 AI/ML 추론 ( ML Drift: Next-Ge…",
+      "url": "https://developers-kr.googleblog.com/2026/10/weeklyupdate-week2.html",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-3"
+    },
+    {
+      "kind": "blog",
+      "title": "Gemini 4 Argon 공개 등 10월 첫째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 9월 넷째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning Gemini 4 Argon: 프론티어 인텔리전스의 새로운 시대 ( 국문 ) Android Goo…",
+      "url": "https://developers-kr.googleblog.com/2026/10/weeklyupdate-week1.html",
+      "category": "치과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-4"
+    },
+    {
+      "kind": "blog",
+      "title": "Antigravity SDK 로컬 AI 모델 지원 등 9월 넷째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 9월 넷째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning Antigravity SDK로 기기 내 로컬 AI 모델 연동하기 ( Introducing Sup…",
+      "url": "https://developers-kr.googleblog.com/2026/09/weeklyupdate-week.html",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-5"
+    },
+    {
+      "kind": "blog",
+      "title": "Gemini 3.8 Live’ 및 ‘3.8 Extended Thinking’ 모델 등 9월 셋째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 9월 셋째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning ‘Gemini 3.8 Live’ 및 ‘3.8 Extended Thinking’ 모델을 소개합니다…",
+      "url": "https://developers-kr.googleblog.com/2026/09/weeklyupdate-week3.html",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-6"
+    },
+    {
+      "kind": "blog",
+      "title": "Kotlin용 ADK 1.0 발표 등 9월 둘째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 9월 둘째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning Kotlin용 ADK 1.0 발표: Kotlin과 Android 생태계 전반을 위한 프로덕션 레…",
+      "url": "https://developers-kr.googleblog.com/2026/09/weeklyupdate-week2.html",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-7"
+    },
+    {
+      "kind": "blog",
+      "title": "Gemini 3.8 Flash와 3.8 Flash Cyber 등 9월 첫째 주 Google for Developers 위클리 업데이트를 지금 확인하세요!",
+      "summary": "개발자 여러분, 안녕하세요! 9월 첫째 주 블로그에 발표된 Google의 주요 개발자 제품별 최신 소식을 살펴보세요. [주요 개발자 블로그 업데이트] AI & Machine Learning ‘Gemini 3.8 플래시’와 ‘3.8 플래시 사이버’를 소개합니다 ( 국문 ) 더 정밀하고 …",
+      "url": "https://developers-kr.googleblog.com/2026/09/weeklyupdate-week1.html",
+      "category": "안과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-8"
+    },
+    {
+      "kind": "blog",
+      "title": "Android Developers Blog is moving",
+      "summary": "Posted by the Android Developers Team Today, we are closing this chapter on Blogger and moving all official news and engineering insights directly to developer…",
+      "url": "https://android-developers.googleblog.com/2026/10/android-developers-blog-is-moving.html",
+      "category": "정신건강의학과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-9"
+    },
+    {
+      "kind": "blog",
+      "title": "New ways to drive smarter discovery, deeper engagement, and business growth on Google Play",
+      "summary": "Posted by Paul Feng, VP of Product Management, Google Play, Google Play Today, we shared how we’re taking our “More than a store” vision into its next chapter.…",
+      "url": "https://android-developers.googleblog.com/2026/10/new-tools-for-discovery-and-engagement.html",
+      "category": "건강검진",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-10"
+    },
+    {
+      "kind": "blog",
+      "title": "Bringing our latest frontier model to Android Developers",
+      "summary": "Posted by Jason Buchel, Creative Technologist, Platform & Devices As agentic development accelerates, Android engineering is reaching an exciting new frontier:…",
+      "url": "https://android-developers.googleblog.com/2026/10/bringing-gemini-4-argon-to-android-agentic-engineering-antigravity-cli.html",
+      "category": "성형외과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-11"
+    },
+    {
+      "kind": "blog",
+      "title": "Introducing the Googlebook Linux Terminal Preview: A VM-Backed Environment for AI and Development",
+      "summary": "Posted by Cyrus Stoller, Group Product Manager, Laptops & Tablets Today, getting the most out of AI workflows requires access to a terminal with a command line…",
+      "url": "https://android-developers.googleblog.com/2026/10/googlebook-linux-terminal-preview-vm.html",
+      "category": "약국",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-12"
+    },
+    {
+      "kind": "blog",
+      "title": "Device Streaming and Android skills - available in Android CLI",
+      "summary": "Posted by Simona Milanovic, Developer Relations Engineer As Android developers, you have many choices when it comes to the agents, LLMs, tools, and command-lin…",
+      "url": "https://android-developers.googleblog.com/2026/10/android-cli-device-streaming-and-skills.html",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-13"
+    },
+    {
+      "kind": "blog",
+      "title": "How Instagram Direct engineers built AI-native UI architecture with Jetpack Compose and reduced token cost per agent session by 33%",
+      "summary": "Posted by Pavlo Stavytskyi, Software Engineer, Meta and Rebecca Franks, Developer Relations Engineer, Google This blog post is written in collaboration with th…",
+      "url": "https://android-developers.googleblog.com/2026/09/jetpack-compose-ai-native-ui-instagram-direct.html",
+      "category": "내과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-14"
+    },
+    {
+      "kind": "blog",
+      "title": "Driving growth on Google Play: The next era of subscriptions",
+      "summary": "Posted by Sheenam Mittal, Senior Product Manager, Google Play The subscription landscape is evolving rapidly, especially with the surge of generative AI and in…",
+      "url": "https://android-developers.googleblog.com/2026/09/unlocking-Google-play-subscription-growth.html",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-15"
+    },
+    {
+      "kind": "blog",
+      "title": "Build intelligent Android apps: In-app agentic workflows",
+      "summary": "Posted by Jolanda Verhoef, Senior Developer Relations Engineer, Android Developer Relations Welcome back to the blog post series \"Build intelligent Android app…",
+      "url": "https://android-developers.googleblog.com/2026/09/android-agentic-workflows.html",
+      "category": "치과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-16"
+    },
+    {
+      "kind": "blog",
+      "title": "This Week in Open Source for October 23, 2026",
+      "summary": "by Daryl Ducharme , Open Source Programs Office A look around the world of open source What actually sustains an open source community when the cost of generat…",
+      "url": "https://opensource.googleblog.com/2026/10/this-week-in-open-source-for-october-23.html",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-17"
+    },
+    {
+      "kind": "blog",
+      "title": "Introducing the Elephant-Goldfish Model plugin: scaling design-driven AI software development",
+      "summary": "by Brian Suchy , Jim Quinn , Elise Ewing , Oliver Newth and Dave Rensin on behalf of the Elephant-Goldfish Model team Shifting left in the AI coding era AI-pow…",
+      "url": "https://opensource.googleblog.com/2026/10/introducing-elephant-goldfish-model-plugin.html",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-18"
+    },
+    {
+      "kind": "blog",
+      "title": "Announcing the verifiable quantum circuit compilation competition on Kaggle",
+      "summary": "by Tanuj Khattar and Ryan Babbush , Google Quantum AI While quantum computing holds the key to solving some of our most complex scientific challenges, current …",
+      "url": "https://opensource.googleblog.com/2026/10/announcing-verifiable-quantum-circuit-compilation-competition-on-kaggle.html",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-19"
+    },
+    {
+      "kind": "blog",
+      "title": "This Week in Open Source for October 15, 2026",
+      "summary": "by Daryl Ducharme , Open Source Programs Office This Week in Open Source for October 15, 2026 A look around the world of open source After speaking about the A…",
+      "url": "https://opensource.googleblog.com/2026/10/this-week-in-open-source-for-october-15.html",
+      "category": "안과",
+      "author_label": "Linkr Discover · Google Blog",
+      "source": "livelinkr",
+      "external_key": "linkr-blog-20"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · I'M A FATHER! | MYCHONNY",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/ORJ1L9uG9ac",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-1"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · LIFE WITHOUT INTERNET",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/wQdShBYMaA0",
+      "category": "내과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-2"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · Asian Gangsters - Chinese vs Vietnamese",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/dZqDGwEp7tg",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-3"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · Asian Weddings - The Reception",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/A2VaVjFeIaI",
+      "category": "치과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-4"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · Mychonny Moves In (trailer)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/DpGp7ZMSp0I",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-5"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · How I Met Your Mudda (A Refugee Story)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/9ON0kRPij-E",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-6"
+    },
+    {
+      "kind": "shorts",
+      "title": "Chonnyday · MOST EMBARRASSING PARENTS (Asians)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/8TLKYRztnao",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-7"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · Best Camera for filming family moments",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/nvozv5vfEio",
+      "category": "안과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-8"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · Flying over the Pyramids 😱",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/MZ8c6_AvP80",
+      "category": "정신건강의학과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-9"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · The only way to beat the Turkish ice cream man 🍦🇹🇷",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/JMDbhawrOZI",
+      "category": "건강검진",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-10"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · POV You Booked a Dream Aussie Trip",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/C_ZJpT0o-o8",
+      "category": "성형외과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-11"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · Can’t believe this is Australia 🏝️😍",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/MoDZsmqjwqA",
+      "category": "약국",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-12"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · First Time in Vietnam (We Didn't Expect It To Be Like This)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/4oMn2OtfTqU",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-13"
+    },
+    {
+      "kind": "shorts",
+      "title": "Flying The Nest · 6 Days on Board the Disney Destiny (part 2)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/OS2vy24s_6w",
+      "category": "내과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-14"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · My Transfer Is Confirmed By Fabrizio Romano.. 🤣",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/RoN5RFuJUYk",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-15"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · I Felt The Atmosphere Before El Clásico 😍",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/ehEXxEVHUTE",
+      "category": "치과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-16"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · Who Can Name A Player Faster? (Barcelona vs Real Madrid) 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/YrrfwmBtXAE",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-17"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · Who Can Eliminate Everyone? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/wTOlr9KwrRM",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-18"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · Who Wins Ballon d'Or? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/ASfFhgdVCq8",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-19"
+    },
+    {
+      "kind": "shorts",
+      "title": "Celine Dept · Can Michiel Survive Every Level? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube Shorts 원문 링크입니다.",
+      "url": "https://www.youtube.com/shorts/TMGsTxy713A",
+      "category": "안과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-shorts-20"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · I'M A FATHER! | MYCHONNY",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=ORJ1L9uG9ac",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-1"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · LIFE WITHOUT INTERNET",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=wQdShBYMaA0",
+      "category": "내과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-2"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · Asian Gangsters - Chinese vs Vietnamese",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=dZqDGwEp7tg",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-3"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · Asian Weddings - The Reception",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=A2VaVjFeIaI",
+      "category": "치과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-4"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · Mychonny Moves In (trailer)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=DpGp7ZMSp0I",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-5"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · How I Met Your Mudda (A Refugee Story)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=9ON0kRPij-E",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-6"
+    },
+    {
+      "kind": "video",
+      "title": "Chonnyday · MOST EMBARRASSING PARENTS (Asians)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=8TLKYRztnao",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Chonnyday",
+      "source": "livelinkr",
+      "external_key": "linkr-video-7"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · Best Camera for filming family moments",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=nvozv5vfEio",
+      "category": "안과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-8"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · Flying over the Pyramids 😱",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=MZ8c6_AvP80",
+      "category": "정신건강의학과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-9"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · The only way to beat the Turkish ice cream man 🍦🇹🇷",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=JMDbhawrOZI",
+      "category": "건강검진",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-10"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · POV You Booked a Dream Aussie Trip",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=C_ZJpT0o-o8",
+      "category": "성형외과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-11"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · Can’t believe this is Australia 🏝️😍",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=MoDZsmqjwqA",
+      "category": "약국",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-12"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · First Time in Vietnam (We Didn't Expect It To Be Like This)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=4oMn2OtfTqU",
+      "category": "피부과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-13"
+    },
+    {
+      "kind": "video",
+      "title": "Flying The Nest · 6 Days on Board the Disney Destiny (part 2)",
+      "summary": "Linkr Discover 채널(Australia)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=OS2vy24s_6w",
+      "category": "내과",
+      "author_label": "Linkr Discover · Flying The Nest",
+      "source": "livelinkr",
+      "external_key": "linkr-video-14"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · My Transfer Is Confirmed By Fabrizio Romano.. 🤣",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=RoN5RFuJUYk",
+      "category": "정형외과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-15"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · I Felt The Atmosphere Before El Clásico 😍",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=ehEXxEVHUTE",
+      "category": "치과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-16"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · Who Can Name A Player Faster? (Barcelona vs Real Madrid) 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=YrrfwmBtXAE",
+      "category": "산부인과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-17"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · Who Can Eliminate Everyone? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=wTOlr9KwrRM",
+      "category": "소아청소년과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-18"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · Who Wins Ballon d'Or? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=ASfFhgdVCq8",
+      "category": "이비인후과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-19"
+    },
+    {
+      "kind": "video",
+      "title": "Celine Dept · Can Michiel Survive Every Level? 😳",
+      "summary": "Linkr Discover 채널(Belgium)에서 수집한 YouTube 영상 원문 링크입니다.",
+      "url": "https://www.youtube.com/watch?v=TMGsTxy713A",
+      "category": "안과",
+      "author_label": "Linkr Discover · Celine Dept",
+      "source": "livelinkr",
+      "external_key": "linkr-video-20"
+    }
+  ]
+}

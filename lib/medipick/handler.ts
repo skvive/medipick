@@ -268,7 +268,7 @@ export async function handleMedipickRequest(
         FROM content x JOIN providers p ON p.id = x.provider_id
         LEFT JOIN doctors d ON x.doctor_id = d.id
         WHERE x.approved = 1 AND p.status = 'active'
-        ORDER BY x.id DESC LIMIT 120
+        ORDER BY x.id DESC LIMIT 200
       `;
       return json({ items });
     }
