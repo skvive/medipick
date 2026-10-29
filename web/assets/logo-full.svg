@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 44" role="img" aria-labelledby="title">
+<title id="title">MEDIPICK T=</title>
+<defs>
+<linearGradient id="mpg" x1="0" y1="0" x2="1" y2="1">
+<stop stop-color="#ff2d6a"/>
+<stop offset="1" stop-color="#ff6b4a"/>
+</linearGradient>
+</defs>
+<rect x="0" y="4" width="36" height="36" rx="11" fill="url(#mpg)"/>
+<text x="18" y="29" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">P</text>
+<text x="46" y="30" fill="#111111" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="800" letter-spacing="-1.2">medi</text>
+<text x="108" y="30" fill="#ff2d6a" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="800" letter-spacing="-1.2">pick</text>
+<text x="46" y="41" fill="#9ca3af" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="1.4">HONEST MEDICAL PICK</text>
+</svg>

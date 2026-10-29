@@ -1,0 +1,336 @@
+/**
+ * MEDIPICK Site Shell v2 — spacing rhythm + unified chrome
+ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --mp-pink: #ff2d6a;
+  --mp-pink-dark: #e91558;
+  --mp-pink-soft: #fff5f8;
+  --mp-ink: #111111;
+  --mp-muted: #6b7280;
+  --mp-line: #f0e6ea;
+  --mp-container: 1120px;
+  --mp-gutter: 20px;
+  --mp-header-h: 60px;
+  --mp-section-y: 44px;
+  --mp-section-y-lg: 56px;
+  --mp-stack-sm: 12px;
+  --mp-stack-md: 20px;
+  --mp-stack-lg: 28px;
+}
+
+/* —— Global rhythm overrides —— */
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+}
+
+.wrap {
+  width: min(var(--mp-container), calc(100% - var(--mp-gutter) * 2)) !important;
+}
+
+.section {
+  padding: var(--mp-section-y-lg) 0 !important;
+}
+
+.section-heading {
+  margin-bottom: var(--mp-stack-md) !important;
+}
+
+.section-heading h2,
+.directory-head h2 {
+  margin: 4px 0 8px !important;
+}
+
+.section-heading p,
+.directory-head p {
+  line-height: 1.55 !important;
+  max-width: 42em;
+}
+
+/* —— Unified site header —— */
+.mp-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  height: var(--mp-header-h);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--mp-line);
+  box-shadow: 0 4px 24px rgba(17, 17, 17, 0.04);
+}
+
+.mp-site-header__inner {
+  width: min(var(--mp-container), calc(100% - var(--mp-gutter) * 2));
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: var(--mp-ink);
+  min-width: 148px;
+}
+
+.mp-brand__logo {
+  width: auto;
+  height: 34px;
+  display: block;
+}
+
+.mp-brand__logo--full {
+  height: 36px;
+  width: auto;
+  max-width: 168px;
+}
+
+.mp-site-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.mp-site-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.mp-nav-link {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  padding: 8px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mp-muted);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mp-nav-link:hover {
+  color: var(--mp-ink);
+  background: var(--mp-pink-soft);
+}
+
+.mp-nav-link.is-active {
+  color: var(--mp-pink-dark);
+  background: var(--mp-pink-soft);
+}
+
+.mp-site-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mp-btn-ghost,
+.mp-btn-pink {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mp-btn-ghost {
+  border: 1px solid #ffd6e3;
+  color: var(--mp-pink-dark);
+  background: #fff;
+}
+
+.mp-btn-pink {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(135deg, #ff2d6a, #ff5088);
+}
+
+.mp-notice-bar {
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.5;
+  background: #111;
+  color: #ffb8cc;
+}
+
+.mp-notice-bar strong {
+  color: #fff;
+  background: var(--mp-pink);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-right: 8px;
+  font-size: 10px;
+}
+
+/* Home header: brand lockup */
+.header .logo.mp-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 170px;
+}
+
+.header .logo.mp-brand-lockup .logo-mark,
+.header .logo.mp-brand-lockup > span:not(.mp-brand-tagline) {
+  display: none;
+}
+
+.header .logo.mp-brand-lockup .mp-brand-svg {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.header .logo.mp-brand-lockup .mp-brand-tagline {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: #9ca3af;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Legacy mast → align with shell when not replaced */
+.mast {
+  height: var(--mp-header-h) !important;
+  padding: 0 !important;
+  border-bottom: 1px solid var(--mp-line) !important;
+  background: #fff !important;
+}
+
+.mast .brand {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.mast .brand-logo,
+.mast .brand > span:first-child:not(.mp-brand-svg-wrap) {
+  display: none;
+}
+
+.mast .brand::before {
+  content: '';
+  width: 36px;
+  height: 36px;
+  background: url('/assets/logo-mark.jpg') center/cover no-repeat;
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+
+/* Portal / v3 pages spacing */
+.portal-page,
+.chat-layout {
+  padding-top: 0 !important;
+}
+
+.portal-hero,
+.join-hero {
+  padding: var(--mp-stack-lg) var(--mp-gutter) !important;
+  gap: var(--mp-stack-md) !important;
+}
+
+.portal-hero img,
+.join-grid img,
+.integration-hero img {
+  border-radius: 16px;
+  object-fit: cover;
+  max-height: 280px;
+}
+
+.columns,
+.opsgrid {
+  gap: var(--mp-stack-md) !important;
+}
+
+.card {
+  padding: var(--mp-stack-md) !important;
+}
+
+.opswrap {
+  padding: var(--mp-section-y) var(--mp-gutter) !important;
+  max-width: var(--mp-container) !important;
+}
+
+/* Integration header brand */
+.integration-header .brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.integration-header .brand-symbol {
+  display: none;
+}
+
+.integration-header .brand-lockup::before {
+  content: '';
+  width: 34px;
+  height: 34px;
+  background: url('/assets/logo-mark.jpg') center/cover no-repeat;
+  border-radius: 10px;
+}
+
+/* Admin login brand */
+.login-mark {
+  background: url('/assets/logo-mark.jpg') center/cover no-repeat !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.admin-logo .logo-mark {
+  display: none;
+}
+
+.admin-logo::before {
+  content: '';
+  width: 34px;
+  height: 34px;
+  background: url('/assets/logo-mark.jpg') center/cover no-repeat;
+  border-radius: 10px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@media (max-width: 900px) {
+  .mp-site-nav .mp-nav-link:not(.is-active):nth-child(n + 5) {
+    display: none;
+  }
+
+  .header-ops {
+    display: none !important;
+  }
+
+  .verified-tag {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --mp-section-y-lg: 36px;
+    --mp-gutter: 16px;
+  }
+
+  .mp-site-actions .mp-btn-ghost {
+    display: none;
+  }
+}
