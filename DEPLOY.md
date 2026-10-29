@@ -18,31 +18,25 @@ python server.py
 # http://127.0.0.1:8765
 ```
 
-## Neon
+## Neon (project `medipick-lexid` · id `sparkling-surf-06199778`)
 
 ```powershell
-neonctl sql --project-id sparkling-surf-06199778 --file db/neon/001_deploy_meta.sql
+# SQL 적용: Neon MCP run_sql 또는 psql + connection string
+# 스키마: db/neon/001_deploy_meta.sql
 ```
 
-`DATABASE_URL`은 Render/Vercel 환경변수에 설정 (v3.3 런타임 DB는 SQLite).
+`DATABASE_URL`은 Render 환경변수에 설정됨 (v3.3 런타임 DB는 SQLite).
 
-## Render (Blueprint)
+## Vercel (edge 프록시)
 
-1. GitHub `skvive/medipick` 연결 → Blueprint `render.yaml` 적용
-2. Secret env: `MEDIPICK_ADMIN_PASSWORD`, `MEDIPICK_SECRET`, `DATABASE_URL`
-3. Health: `GET /api/health`
-
-## Vercel
+배포 루트는 **`edge/`** 디렉터리입니다 (Python 루트 자동 감지 방지).
 
 ```powershell
-cd medipick-repo
-vercel link --project medipick --yes
-vercel env add MEDIPICK_RENDER_ORIGIN production   # https://medipick-api.onrender.com
+cd edge
+vercel link --yes --project medipick-lexid
 vercel --prod --yes
-vercel domains add medipick.lexid.site
+vercel domains add medipick.lexid.site medipick-lexid
 ```
-
-`vercel.json`은 Render 오리진으로 rewrite 합니다. Render URL 변경 시 `vercel.json`의 `destination`을 갱신하세요.
 
 ## 관리자
 
