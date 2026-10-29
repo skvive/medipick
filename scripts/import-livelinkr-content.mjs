@@ -38,6 +38,7 @@ if (!prov.rows.length) {
 }
 const defaultProviderId = prov.rows[0].id;
 
+await client.query(`DELETE FROM content WHERE kind IN ('blog', 'shorts', 'video') AND author_label NOT LIKE 'Linkr Discover%'`);
 await client.query(`DELETE FROM content WHERE author_label LIKE 'Linkr Discover%'`);
 
 let inserted = 0;
