@@ -400,3 +400,107 @@
     min-width: calc(33% - 10px);
   }
 }
+
+/* —— 병원 상세 드로어 (디테일) —— */
+.detail-drawer {
+  border-radius: 24px 0 0 24px;
+  background: linear-gradient(180deg, #f8fcfa 0%, #f2f8f5 120px, #fafcfb 100%);
+}
+
+.drawer-cover.drawer-cover-photo {
+  min-height: 260px;
+  align-items: flex-end;
+  padding: 0 0 18px;
+}
+
+.drawer-cover-badge {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f5c4f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.drawer-photo-note {
+  margin: 0;
+  padding: 10px 22px;
+  font-size: 11px;
+  color: #5a7a70;
+  background: #e8f3ee;
+  border-bottom: 1px solid #d5e8df;
+}
+
+.drawer-inner {
+  padding: 22px 22px 48px;
+}
+
+.drawer-inner h2 {
+  font-size: clamp(22px, 4vw, 28px);
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+.drawer-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+
+.drawer-action-row .primary-action {
+  flex: 1 1 160px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.info-box {
+  background: #fff;
+  border: 1px solid #dce9e4;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.info-box small {
+  display: block;
+  font-size: 10px;
+  color: #6d8a80;
+  margin-bottom: 4px;
+}
+
+.provider-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.provider-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(8, 60, 50, 0.12);
+}
+
+.cat-photo {
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+}
+
+@media (max-width: 600px) {
+  .detail-drawer {
+    border-radius: 0;
+  }
+
+  .drawer-cover.drawer-cover-photo {
+    min-height: 200px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
