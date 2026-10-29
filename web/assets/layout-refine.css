@@ -1,0 +1,402 @@
+/**
+ * MEDIPICK layout density · 강남언니형 병원플랫폼 리듬
+ * 여백 축소 · 카드 밀도 · 헤더/히어로/지도 컴팩트
+ */
+
+/* —— 글로벌 리듬 —— */
+.wrap {
+  width: min(1080px, calc(100% - 32px));
+}
+
+.section {
+  padding: 52px 0;
+}
+
+.section-heading {
+  margin-bottom: 18px;
+  align-items: flex-end;
+}
+
+.section-heading p,
+.directory-head p {
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 36em;
+}
+
+.section-heading h2,
+.directory-head h2 {
+  margin: 4px 0 6px;
+}
+
+.mp-header-cta {
+  background: var(--brand-pink-soft);
+  border-color: #ffc2d4;
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+/* —— 헤더: 소비자 화면 우선 —— */
+.header {
+  height: 58px;
+}
+
+.header-inner {
+  gap: 12px;
+}
+
+.main-nav {
+  gap: 14px;
+  margin-left: 8px;
+}
+
+.nav-link {
+  padding: 18px 0;
+  font-size: 13px;
+}
+
+.header-right {
+  gap: 10px;
+}
+
+.header-ops {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .header-ops {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-ops .header-admin {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}
+
+.verified-tag {
+  font-size: 11px;
+}
+
+.menu-toggle {
+  margin-left: 4px;
+}
+
+/* —— 히어로: 검색 우선, 세로 여백 절반 —— */
+.hero-flex {
+  min-height: 0;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 20px;
+  align-items: center;
+  padding: 28px 0 32px;
+}
+
+.hero-copy {
+  padding: 0;
+}
+
+.hero-copy > p {
+  margin: 0 0 18px;
+  line-height: 1.65;
+}
+
+.hero h1 {
+  margin-bottom: 12px;
+}
+
+.search-shell {
+  max-width: 100%;
+  padding: 12px;
+}
+
+.hero-subtext {
+  margin-top: 12px;
+  gap: 14px;
+}
+
+.mp-hero-stats {
+  margin-top: 16px;
+  padding-top: 14px;
+  gap: 20px;
+}
+
+.mp-hero-stats strong {
+  font-size: 22px;
+}
+
+.mp-stat-note {
+  margin-top: 6px;
+}
+
+.hero-visual {
+  position: relative;
+  max-width: 380px;
+  margin-left: auto;
+  justify-self: end;
+  min-height: 400px;
+  align-self: center;
+}
+
+.hero-photo {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  right: auto;
+  bottom: auto;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(255, 45, 106, 0.18);
+  aspect-ratio: 3 / 4;
+  max-height: 420px;
+}
+
+.hero-photo img {
+  min-height: 0;
+  border-radius: 24px;
+}
+
+.halo-one,
+.halo-two {
+  display: none;
+}
+
+.float-left {
+  left: 4px;
+  top: 28px;
+}
+
+.float-bottom {
+  right: 4px;
+  bottom: 28px;
+}
+
+.float-card {
+  transform: scale(0.92);
+  box-shadow: 0 12px 32px rgba(17, 17, 17, 0.12);
+}
+
+.decor-cross {
+  display: none;
+}
+
+/* —— 트러스트 바 슬림 —— */
+.trust-inner {
+  min-height: 64px;
+  gap: 8px;
+}
+
+.trust-inner > div {
+  gap: 2px;
+}
+
+.trust-sep {
+  height: 24px;
+}
+
+/* —— 진료과: 가로 스크롤 PICK 칩 —— */
+.category-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 4px 2px 12px;
+  margin: 0 -2px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.category-grid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-grid::-webkit-scrollbar-thumb {
+  background: #ffc2d4;
+  border-radius: 4px;
+}
+
+.category-item {
+  flex: 0 0 auto;
+  width: 92px;
+  min-height: 0;
+  padding: 14px 10px 12px;
+  scroll-snap-align: start;
+  text-align: center;
+}
+
+.cat-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+}
+
+.category-item b {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+/* —— 스폰서 카드: 3열 고정 + 타이트 gap —— */
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.provider-cover.with-photo {
+  min-height: 132px;
+}
+
+.card-body {
+  padding: 14px 16px 16px;
+}
+
+.card-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* —— 콘텐츠 그리드 —— */
+.media-grid {
+  gap: 14px;
+}
+
+.media-cover.with-photo {
+  min-height: 140px;
+}
+
+/* —— 지식 배너 + 이미지 —— */
+.knowledge-banner {
+  padding: 28px 32px;
+  gap: 24px;
+  align-items: center;
+}
+
+.knowledge-art {
+  position: relative;
+  min-width: 200px;
+  flex: 0 0 min(42%, 320px);
+}
+
+.knowledge-art .book-illus {
+  display: none;
+}
+
+.knowledge-art::after {
+  content: '';
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  background: url('/assets/photos/knowledge-visual.jpg') center / cover no-repeat;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.knowledge-tag {
+  font-size: 10px;
+}
+
+/* —— 내 주변: 지도 높이 축소 —— */
+.near-controls {
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.near-layout {
+  gap: 14px;
+}
+
+.near-map,
+.near-map-empty {
+  min-height: 260px;
+}
+
+.near-results-head {
+  margin-bottom: 10px;
+}
+
+.near-list {
+  gap: 10px;
+}
+
+.near-card img {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+}
+
+/* —— 혜택 · 야간 —— */
+.benefit-grid {
+  gap: 14px;
+}
+
+.benefits-section .section-heading.centered {
+  margin-bottom: 22px;
+}
+
+.night-banner {
+  padding: 22px 28px;
+  gap: 16px;
+}
+
+.benefit {
+  padding: 20px 18px;
+}
+
+/* —— 플로팅 링크: FAB 축소 —— */
+.mp-global-link {
+  padding: 10px 14px;
+  font-size: 11px;
+  bottom: 16px;
+  right: 14px;
+  opacity: 0.94;
+}
+
+@media (max-width: 820px) {
+  .section {
+    padding: 40px 0;
+  }
+
+  .hero-flex {
+    padding: 24px 0 8px;
+  }
+
+  .category-item {
+    width: 84px;
+  }
+
+  .provider-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .knowledge-art {
+    display: none;
+  }
+
+  .near-map,
+  .near-map-empty {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    width: min(100% - 24px, 1080px);
+  }
+
+  .section {
+    padding: 32px 0;
+  }
+
+  .mp-hero-stats {
+    gap: 14px;
+  }
+
+  .mp-hero-stats > div {
+    min-width: calc(33% - 10px);
+  }
+}
