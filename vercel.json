@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "name": "medipick",
+  "installCommand": "echo edge-proxy",
+  "buildCommand": "node -e \"require('fs').mkdirSync('public',{recursive:true}); require('fs').writeFileSync('public/index.html','<!DOCTYPE html><meta http-equiv=refresh content=0;url=/api/config>')\"",
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/(.*)",

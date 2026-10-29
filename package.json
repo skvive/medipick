@@ -1,0 +1,5 @@
+{
+  "name": "medipick-edge",
+  "private": true,
+  "description": "Vercel edge proxy for medipick.lexid.site → Render API"
+}
