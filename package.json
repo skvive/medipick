@@ -11,6 +11,7 @@
     "db:seed": "node scripts/seed-neon.mjs"
   },
   "dependencies": {
+    "@neondatabase/auth": "^0.6.0-beta",
     "@neondatabase/serverless": "^0.10.4",
     "next": "^15.1.0",
     "pg": "^8.13.1",

@@ -15,6 +15,8 @@ Python `server.py`는 로컬 개발·레거시 참고용으로 리포에 유지�
 - `MEDIPICK_ADMIN_PASSWORD` — `/admin` 로그인
 - `MEDIPICK_SECRET` — 세션 HMAC (64+ chars 권장)
 - `MEDIPICK_COOKIE_SECURE=1` — 프로덕션
+- **`NEON_AUTH_BASE_URL`** — Neon Console → Branch → Auth → Project Info (예: `https://ep-….neonauth….neon.tech/neondb/auth`)
+- **`NEON_AUTH_COOKIE_SECRET`** — 32+ bytes (`openssl rand -base64 32`)
 - `GOOGLE_MAPS_BROWSER_KEY` — 선택
 - `MEDIPICK_GA_ID` — 선택
 
@@ -43,6 +45,20 @@ vercel --prod --yes
 ```
 
 도메인: `medipick.lexid.site` → 프로젝트 **medipick-lexid**, Root Directory **`.`** (edge/ 폴더 사용 안 함)
+
+Neon Console → Auth → **Trusted domains**에 `https://medipick.lexid.site` 추가 (OAuth callback용).
+
+## 사용자 로그인 (Neon Auth)
+
+| URL | 설명 |
+|-----|------|
+| `/auth/sign-in` | Google·GitHub·Vercel OAuth + 이메일 로그인 |
+| `/auth/sign-up` | 회원가입 |
+| `/account` | 로그인 후 계정·로그아웃 |
+
+Google OAuth는 Neon **공유 개발용** 자격으로 즉시 테스트 가능. GitHub/Vercel은 Neon Console → Auth → OAuth providers에 Client ID/Secret 등록.
+
+관리자 HTML(`/admin`) 비밀번호 로그인은 기존 `MEDIPICK_ADMIN_PASSWORD`와 별도입니다.
 
 ## API 범위 (Vercel 1차)
 
