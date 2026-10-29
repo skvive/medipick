@@ -1,0 +1,10 @@
+data/*.sqlite3
+data/*.sqlite3-*
+data/.secret
+__pycache__/
+**/__pycache__/
+.env
+*.pyc
+
+.deploy-secrets.local
+

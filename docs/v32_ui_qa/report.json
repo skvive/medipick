@@ -1,0 +1,423 @@
+{
+  "test_scope": "real HTML/CSS image static rendering, scripts omitted; live API covered separately; external OAuth/payment untested",
+  "pages": [
+    {
+      "page": "index",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "MEDIPICK 메디픽 | 의료정보를 선택하는 새로운 기준",
+      "h1": [
+        "궁금한 진료부터믿을 만한 정보까지."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "consult",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "메디픽 AI 사진·증상 안내 | MEDIPICK",
+      "h1": [
+        "사진과 질문으로의료정보를 쉽게."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 2
+    },
+    {
+      "page": "my-health",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "나의 건강 데이터 · 메디픽",
+      "h1": [
+        "내 건강정보, 내가 직접 관리."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "doctor-finance",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "MEDIPICK Doctor Business · 청구·정산",
+      "h1": [
+        "진료 청구 준비부터, 정산·장부까지."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "doctors",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "메디픽 | 의사 Blogger 연동",
+      "h1": [
+        "의사가 만든 지식이환자의 선택으로 이어집니다."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "premium-admin",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "MEDIPICK | 구독·지도·Blogger 운영",
+      "h1": [
+        "광고 구독 · 지도 등록 · 의사 블로그 검수"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "admin",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "MEDIPICK | 운영자 콘솔",
+      "h1": [
+        "메디픽 관리자 로그인",
+        "한눈에 보는 메디픽",
+        "예약 요청 관리",
+        "병원·약국 등록",
+        "의료진 등록",
+        "블로그 · 쇼츠 · 의학정보",
+        "카테고리 상단 광고",
+        "이용자 정보 후기 검수",
+        "알림 발송 대기함"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "advertiser",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "MEDIPICK | 광고주 성과 리포트",
+      "h1": [
+        "광고 성과를 한눈에 확인하세요.",
+        "광고주 성과 리포트"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "marketing-console",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "메디픽 마케팅 콘솔 · 광고주 운영",
+      "h1": [
+        "검수 중심 캠페인 스튜디오."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "integrations",
+      "mode": "pc",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "title": "메디픽 | 공식 연동 센터",
+      "h1": [
+        "공식 계정 연결을한곳에서 안전하게."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "index",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "MEDIPICK 메디픽 | 의료정보를 선택하는 새로운 기준",
+      "h1": [
+        "궁금한 진료부터믿을 만한 정보까지."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "consult",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "메디픽 AI 사진·증상 안내 | MEDIPICK",
+      "h1": [
+        "사진과 질문으로의료정보를 쉽게."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 2
+    },
+    {
+      "page": "my-health",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "나의 건강 데이터 · 메디픽",
+      "h1": [
+        "내 건강정보, 내가 직접 관리."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "doctor-finance",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "MEDIPICK Doctor Business · 청구·정산",
+      "h1": [
+        "진료 청구 준비부터, 정산·장부까지."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "doctors",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "메디픽 | 의사 Blogger 연동",
+      "h1": [
+        "의사가 만든 지식이환자의 선택으로 이어집니다."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "premium-admin",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "MEDIPICK | 구독·지도·Blogger 운영",
+      "h1": [
+        "광고 구독 · 지도 등록 · 의사 블로그 검수"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "admin",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "MEDIPICK | 운영자 콘솔",
+      "h1": [
+        "메디픽 관리자 로그인",
+        "한눈에 보는 메디픽",
+        "예약 요청 관리",
+        "병원·약국 등록",
+        "의료진 등록",
+        "블로그 · 쇼츠 · 의학정보",
+        "카테고리 상단 광고",
+        "이용자 정보 후기 검수",
+        "알림 발송 대기함"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "advertiser",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "MEDIPICK | 광고주 성과 리포트",
+      "h1": [
+        "광고 성과를 한눈에 확인하세요.",
+        "광고주 성과 리포트"
+      ],
+      "imageLoaded": 0,
+      "imageTotal": 0
+    },
+    {
+      "page": "marketing-console",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "메디픽 마케팅 콘솔 · 광고주 운영",
+      "h1": [
+        "검수 중심 캠페인 스튜디오."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    },
+    {
+      "page": "integrations",
+      "mode": "mobile",
+      "broken_asset_references": [],
+      "images_without_alt": [],
+      "horizontal_overflow": false,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "title": "메디픽 | 공식 연동 센터",
+      "h1": [
+        "공식 계정 연결을한곳에서 안전하게."
+      ],
+      "imageLoaded": 1,
+      "imageTotal": 1
+    }
+  ],
+  "js_errors": [],
+  "photos": [
+    {
+      "file": "cat01.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat02.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat03.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat04.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat05.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat06.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat07.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat08.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat09.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat10.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat11.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    },
+    {
+      "file": "cat12.webp",
+      "pixel_dimensions": [
+        352,
+        352
+      ],
+      "format": "WEBP"
+    }
+  ],
+  "all_passed": true
+}

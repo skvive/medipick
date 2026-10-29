@@ -1,0 +1,346 @@
+{
+  "version": "2.0",
+  "created": "2026-10-29",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "5a6043cc74fea720ec842443f353f80e29c11e5bcd8e80fcf25e6f60f76a1176",
+      "size": 1316
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "1d82401c71f6ec6d35c514bf8253d9124b29340efcbddc6276512e7751f5ce7a",
+      "size": 85
+    },
+    {
+      "path": "README.md",
+      "sha256": "93790f3266fc873d31010b71283d00911d7f89dec6305e6917bbb743b8c7a80e",
+      "size": 8007
+    },
+    {
+      "path": "ai_service.py",
+      "sha256": "458ace06f75bf7f6c2fe3142e04b824e99ca07d86608c6454784630d2bdcbace",
+      "size": 5211
+    },
+    {
+      "path": "build_investor.py",
+      "sha256": "aef487178019edb82061524495a3f849e65e26f7c187144f5a41d92c061025aa",
+      "size": 23384
+    },
+    {
+      "path": "data/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "2d458cf4f6dfbef0a07e2380a1e3cf90121034997c5e980c5e4035f5cd80a12b",
+      "size": 7752
+    },
+    {
+      "path": "docs/MARKETING_GTM_KO.md",
+      "sha256": "319165770dff64ffa17e6e29e9d079f887d671074b33a02fc52516ae6ef35355",
+      "size": 10693
+    },
+    {
+      "path": "docs/OFFLINE_UI_QA.json",
+      "sha256": "a9da532337d3b7b25bad4ceac1c40fe40673ada065d2706f9ae232dcfc6a663b",
+      "size": 427
+    },
+    {
+      "path": "docs/QA_REPORT.md",
+      "sha256": "e0a7c0a423e871c6a4d83a6e7d8e7bbd9f1b3a34743fb84601d92bea33beb6f2",
+      "size": 3750
+    },
+    {
+      "path": "docs/QA_REPORT_V2.md",
+      "sha256": "3b908069835306d600ec341981022f07bf16a22c91fda4816109d042ab3b7e13",
+      "size": 3654
+    },
+    {
+      "path": "docs/README_V1_ARCHIVE.md",
+      "sha256": "a7cb91a895490b8504ec5d4ae75fb312ce25b7ba8570b9c8ba35d81e7cd4c32c",
+      "size": 17036
+    },
+    {
+      "path": "docs/TECHNICAL_V2.md",
+      "sha256": "96634dfd4ccb25f75cdc7d820fc351707d4fe3e1aa209e0876ed31ed3f410d00",
+      "size": 6604
+    },
+    {
+      "path": "docs/admin-desktop.png",
+      "sha256": "63ecd673f0b552bd38fdeb6e1f76624f6f361352bb19ff891deb41f41370bf94",
+      "size": 85348
+    },
+    {
+      "path": "docs/concept-v2-ai.png",
+      "sha256": "60703d79ce03c6693d4c47936ebe3c6ce6e5775ce8447e3e53483699dd7ed1c0",
+      "size": 2075912
+    },
+    {
+      "path": "docs/detail-desktop.png",
+      "sha256": "87bb543ef2d92d440c480dca2778d89f2bad683680735b06065b4d7d09e861f8",
+      "size": 220297
+    },
+    {
+      "path": "docs/home-desktop.png",
+      "sha256": "8125d74033f46fcaf3f83916dbff51d2f427d42530b30f0a363944b87b4a4bab",
+      "size": 904094
+    },
+    {
+      "path": "docs/home-mobile.png",
+      "sha256": "3a23052695800af50f8a7cc4d5cece1533e79ff4d3ffe75ec5c94e90a2bb5288",
+      "size": 465756
+    },
+    {
+      "path": "docs/investor/MEDIPICK_Investor_Deck_EN.html",
+      "sha256": "956791271342dbbb3c2d92334bb8d40fecf38eea7f7d38fdc5d48ae35f7c2c65",
+      "size": 19138
+    },
+    {
+      "path": "docs/investor/MEDIPICK_Investor_Deck_EN.pdf",
+      "sha256": "7c16555a2f4060447775fa4a4980654c16ac65207f02e51647f9ccc3415d8a4c",
+      "size": 1863723
+    },
+    {
+      "path": "docs/investor/MEDIPICK_Investor_Deck_KO.html",
+      "sha256": "474a857e58fb4bb9909c5b631429c79217827d5c8399803811543f4e191c18db",
+      "size": 20098
+    },
+    {
+      "path": "docs/investor/MEDIPICK_Investor_Deck_KO.pdf",
+      "sha256": "a35f908260be55cf30ef3d247dd46b77d932520a77a6ab5e79ae4921073e8049",
+      "size": 2002545
+    },
+    {
+      "path": "docs/investor/deck-en-cover.png",
+      "sha256": "58894c8967c82e9398d82659aeb05e8f007a62b498964b26b10ec6f91235de37",
+      "size": 577631
+    },
+    {
+      "path": "docs/investor/deck-ko-cover.png",
+      "sha256": "bdb29a6c6ac3adaea1827fcd5440e8cd6dbfc3bf83d139f5acda6114238a0240",
+      "size": 562582
+    },
+    {
+      "path": "docs/investor/qa/en-close.png",
+      "sha256": "ca2e0d932e1e5728bc21a3c3fa12077945353fb6dbd2f425e8ddf0eb5e6bfbf3",
+      "size": 108830
+    },
+    {
+      "path": "docs/investor/qa/ko-cover.png",
+      "sha256": "a21aa160caacf2cc8c7d45a8a89c508f0bd38dcaa3e44ac13524fed5833d0a1f",
+      "size": 269719
+    },
+    {
+      "path": "docs/investor/qa/ko-finance.png",
+      "sha256": "d2858282ed2aa98ce4462bb0dd20d49de43e2cb60876b72d56c10d1355b75df3",
+      "size": 74308
+    },
+    {
+      "path": "docs/v2-ai-search.png",
+      "sha256": "5f87911e7a8f421461c22f62bbb184bb7d39fbdda1f2349fec98f399e68894d4",
+      "size": 291838
+    },
+    {
+      "path": "docs/v2-home-desktop.png",
+      "sha256": "f9cc623238f9f5384b985b6683985be69b1bbc78d851ccf17a3880bd2404f69d",
+      "size": 1711621
+    },
+    {
+      "path": "docs/v2-home-mobile.png",
+      "sha256": "051a062be878ca68602f59f2677f4d22266cbc0feed067e6e349a4ba4b9b7bb0",
+      "size": 120210
+    },
+    {
+      "path": "docs/v2-nearby-desktop.png",
+      "sha256": "b83c7a8de7508dca544a3c0415c2f1ee23d0ad4d4e070b95b44ddf90687bc070",
+      "size": 294076
+    },
+    {
+      "path": "google_places.py",
+      "sha256": "9e06c200c47ec48fdbc1ab796f4ad63946f537afb18749e80f00a0b585c969ce",
+      "size": 2192
+    },
+    {
+      "path": "make_pdfs.py",
+      "sha256": "65de85a3c9c4637fad544002ae47214487cfb91d9ff3b8283309607ae59bb4fc",
+      "size": 1116
+    },
+    {
+      "path": "premium.py",
+      "sha256": "8a5b4b562d0853251919a1acdfdf4959290cf1d5f04e13de05ef47f95f572ee1",
+      "size": 10373
+    },
+    {
+      "path": "qa_visual_offline.py",
+      "sha256": "62529109ec2a454911884542ea9641f9d11a0d33f3b104e209758ff6e6fc4b71",
+      "size": 5759
+    },
+    {
+      "path": "run_linux_mac.sh",
+      "sha256": "90f12f86f9bb36af133b838656a5b20b9294961f53b1b876e118e94fd8af9ee2",
+      "size": 66
+    },
+    {
+      "path": "run_windows.bat",
+      "sha256": "28b844fce65c1b53766089e2fd307586313cc102ce285ae14ae9049c2013a032",
+      "size": 127
+    },
+    {
+      "path": "scripts/import_blogger.py",
+      "sha256": "05c6071f11569a26cfe53d4bad1fb050eef1e5bbc4e2c42425b9e66962a4de6b",
+      "size": 3008
+    },
+    {
+      "path": "scripts/import_public.py",
+      "sha256": "d9471df066a2a7218dec4e1a274e324da5fa32f79d650024d189106f351d9b39",
+      "size": 6482
+    },
+    {
+      "path": "scripts/import_youtube.py",
+      "sha256": "0afe1a9c540261aa5c70eda95fb7542ab073a8178a6cf7cd841f55b03860a799",
+      "size": 2295
+    },
+    {
+      "path": "scripts/process_notifications.py",
+      "sha256": "466de6584b35cc6c9d30972c4e7b35e22e3277dedc9a3484e224dc55e69fb387",
+      "size": 2804
+    },
+    {
+      "path": "server.py",
+      "sha256": "45e8f7bd8886664cd195e0b0de12597d63cb3664e56b0ec16dd1e77c87e6bb6c",
+      "size": 50554
+    },
+    {
+      "path": "tests/test_platform.py",
+      "sha256": "8b4129902b6456d73018e3c6abac8437cddd4f7dbe89eaff80a1f1f486accd78",
+      "size": 16641
+    },
+    {
+      "path": "web/admin.html",
+      "sha256": "4d740af7f555336bdf553e4fd1a9c1830e254422ee5f9bde65c22a1e6ea3e1e7",
+      "size": 11781
+    },
+    {
+      "path": "web/advertiser.html",
+      "sha256": "4c76449f76b9ad5ae9266f58a8610bbf685b90bd0eeb9b83d55b57ce8d948d52",
+      "size": 2513
+    },
+    {
+      "path": "web/assets/admin.js",
+      "sha256": "3f2bd347c274c700862a89aaf2258779b0a26e54ab4077bec3336a5716e3eee4",
+      "size": 12004
+    },
+    {
+      "path": "web/assets/advertiser.js",
+      "sha256": "c2e93356d08064b3f39230a26156cde55e07680a51e5d820c8907cf2e674a9f2",
+      "size": 2036
+    },
+    {
+      "path": "web/assets/app.js",
+      "sha256": "0b52e5f2633585e673c628b5ce0a84303cb94c0578558bbb5a45f6a8877baec5",
+      "size": 26163
+    },
+    {
+      "path": "web/assets/doctors.js",
+      "sha256": "eca443cb7bff89810d9cad189879b2af389b0e04a9abcb01353c2e8eaf3dbc8b",
+      "size": 1391
+    },
+    {
+      "path": "web/assets/favicon.svg",
+      "sha256": "83f55000f8a14fa74c3bd09f86586e91eb5af60e0eb5ce8df37e1ce6ec166a81",
+      "size": 277
+    },
+    {
+      "path": "web/assets/hero-doctor.svg",
+      "sha256": "53227a512ca64b0fe772fff213e8f8388998cff309c60da8e87d70400eb88f1a",
+      "size": 2687
+    },
+    {
+      "path": "web/assets/photos/cat01.webp",
+      "sha256": "df318a52b14e184fe43367dd2812837f02d09de0caeff7e78730fb9483766b46",
+      "size": 11274
+    },
+    {
+      "path": "web/assets/photos/cat02.webp",
+      "sha256": "f955fcf030aeba38916d1cfcdb54a5957f113b643e3d725e0fda66040f6dc8db",
+      "size": 17514
+    },
+    {
+      "path": "web/assets/photos/cat03.webp",
+      "sha256": "ae0567570ebf76aa5b26b5870c0d73015703a7c0831c2c9cdc391d875fdc11a5",
+      "size": 19198
+    },
+    {
+      "path": "web/assets/photos/cat04.webp",
+      "sha256": "0c97d136d7813a33ff919f7fa82de55250fdd2ccaf6ccb9319269eaa4998936b",
+      "size": 14074
+    },
+    {
+      "path": "web/assets/photos/cat05.webp",
+      "sha256": "07f4903dc29d625cc0b172fec1a0ef4d261f22018ab29bf26c0959e5c6c04b27",
+      "size": 20106
+    },
+    {
+      "path": "web/assets/photos/cat06.webp",
+      "sha256": "199df8850322d668769f2c24866938f90597ac979ae797a5f542e66f47033d9e",
+      "size": 17706
+    },
+    {
+      "path": "web/assets/photos/cat07.webp",
+      "sha256": "799eb90972d58814a3ea7c5d9127a1cd95d6fee3cd814958f0e76cc8a13e1c04",
+      "size": 21652
+    },
+    {
+      "path": "web/assets/photos/cat08.webp",
+      "sha256": "e0f6a0ab427d1a5d185cc4827bab96ef947a68c8e132728a7c39476df319baa5",
+      "size": 19052
+    },
+    {
+      "path": "web/assets/photos/cat09.webp",
+      "sha256": "29d59cb37a8d4eee0720cc165fdd4261441182964452f979330e6ec8e6af1d20",
+      "size": 19274
+    },
+    {
+      "path": "web/assets/photos/cat10.webp",
+      "sha256": "e21ded31d992609c6d352056ee31ff2334b7b4cec221bbcca75e7348b4eeae9b",
+      "size": 15510
+    },
+    {
+      "path": "web/assets/photos/cat11.webp",
+      "sha256": "6218ac9dedcdd27264c875d0776b052cfe9b8576f0e12a4c34f79ffa4b6ccd9a",
+      "size": 12680
+    },
+    {
+      "path": "web/assets/photos/cat12.webp",
+      "sha256": "feb62627a0e08ad1d6a77c12d5790ee9f70bd251bdaceddd3ddb978dbd733e30",
+      "size": 36072
+    },
+    {
+      "path": "web/assets/premium-admin.js",
+      "sha256": "3cc3db0f6d4e82ba4f785ec6568e18404ae0086ba60d2553f027b047386bb285",
+      "size": 3200
+    },
+    {
+      "path": "web/assets/style.css",
+      "sha256": "225c57fe759f0c98f47d5f9771b9441184a10cba7175dfe08c9279dfbfa386a7",
+      "size": 41563
+    },
+    {
+      "path": "web/doctors.html",
+      "sha256": "40f7f829201c0c68b7f05f75ba8de6cd36658218c6d70517ee937bd2cfc79177",
+      "size": 3411
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "2e9866d7b10618b4995f4ca4ed67a591132f1e847bce2c896e8a65daa6267f40",
+      "size": 15753
+    },
+    {
+      "path": "web/premium-admin.html",
+      "sha256": "27ecf0f749c86c811f0867ad7f3a0c47d1a882255e25a8479bdb9358f84d9834",
+      "size": 3480
+    }
+  ]
+}

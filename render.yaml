@@ -1,0 +1,31 @@
+# MEDIPICK v3.3 — Python API (SQLite on persistent disk)
+# Frontend domain: medipick.lexid.site (Vercel reverse proxy → this service)
+services:
+  - type: web
+    name: medipick-api
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: MEDIPICK_HOST
+        value: "0.0.0.0"
+      - key: MEDIPICK_COOKIE_SECURE
+        value: "1"
+      - key: MEDIPICK_DB
+        value: /var/data/medipick.sqlite3
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: MEDIPICK_ADMIN_PASSWORD
+        sync: false
+      - key: MEDIPICK_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+    disk:
+      name: medipick-sqlite
+      mountPath: /var/data
+      sizeGB: 1

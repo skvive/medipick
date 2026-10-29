@@ -1,0 +1,42 @@
+{
+  "method": "offline Chromium static layout; actual HTTP API tests separate",
+  "checks": [
+    {
+      "page": "clinic-ops",
+      "viewport": "desktop",
+      "horizontal_overflow": false,
+      "js_errors": []
+    },
+    {
+      "page": "clinic-access",
+      "viewport": "desktop",
+      "horizontal_overflow": false,
+      "js_errors": []
+    },
+    {
+      "page": "doctor-finance",
+      "viewport": "desktop",
+      "horizontal_overflow": false,
+      "js_errors": []
+    },
+    {
+      "page": "clinic-ops",
+      "viewport": "mobile",
+      "horizontal_overflow": false,
+      "js_errors": []
+    },
+    {
+      "page": "clinic-access",
+      "viewport": "mobile",
+      "horizontal_overflow": false,
+      "js_errors": []
+    },
+    {
+      "page": "doctor-finance",
+      "viewport": "mobile",
+      "horizontal_overflow": false,
+      "js_errors": []
+    }
+  ],
+  "result": "pass"
+}

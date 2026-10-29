@@ -1,0 +1,16 @@
+{
+  "mode": "offline API snapshot DOM test, not live HTTP or Google SDK",
+  "errors": [],
+  "desktop_cat_images": 12,
+  "desktop_cards": 3,
+  "desktop_horizontal_overflow": 0,
+  "desktop_nearby_cards": 4,
+  "desktop_nearby_all_paid": true,
+  "ai_sponsors": 1,
+  "ai_section": true,
+  "mobile_cat_images": 12,
+  "mobile_cards": 3,
+  "mobile_horizontal_overflow": 0,
+  "mobile_nearby_cards": 4,
+  "mobile_nearby_all_paid": true
+}

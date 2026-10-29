@@ -1,0 +1,59 @@
+{
+  "test_type": "offline API mock browser UI + separate live server API unittest",
+  "results": [
+    {
+      "scenario": "chat send and sponsor cards",
+      "messages": 3,
+      "provider_sections": 1
+    },
+    {
+      "page": "consult",
+      "mode": "desktop",
+      "horizontal_overflow": false,
+      "title": "메디픽 AI 사진·증상 안내 | MEDIPICK"
+    },
+    {
+      "page": "my-health",
+      "mode": "desktop",
+      "horizontal_overflow": false,
+      "title": "나의 건강 데이터 · 메디픽"
+    },
+    {
+      "page": "doctor-finance",
+      "mode": "desktop",
+      "horizontal_overflow": false,
+      "title": "MEDIPICK Doctor Business · 청구·정산"
+    },
+    {
+      "page": "marketing-console",
+      "mode": "desktop",
+      "horizontal_overflow": false,
+      "title": "메디픽 마케팅 콘솔 · 광고주 운영"
+    },
+    {
+      "page": "consult",
+      "mode": "mobile",
+      "horizontal_overflow": false,
+      "title": "메디픽 AI 사진·증상 안내 | MEDIPICK"
+    },
+    {
+      "page": "my-health",
+      "mode": "mobile",
+      "horizontal_overflow": false,
+      "title": "나의 건강 데이터 · 메디픽"
+    },
+    {
+      "page": "doctor-finance",
+      "mode": "mobile",
+      "horizontal_overflow": false,
+      "title": "MEDIPICK Doctor Business · 청구·정산"
+    },
+    {
+      "page": "marketing-console",
+      "mode": "mobile",
+      "horizontal_overflow": false,
+      "title": "메디픽 마케팅 콘솔 · 광고주 운영"
+    }
+  ],
+  "js_errors": []
+}
