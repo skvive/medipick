@@ -12,3 +12,4 @@ __pycache__/
 .deploy-secrets.local
 /node_modules
 /.next
+.vercel

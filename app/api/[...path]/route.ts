@@ -9,7 +9,7 @@ async function pathFrom(ctx: Ctx) {
 
 export async function GET(req: Request, ctx: Ctx) {
   const url = new URL(req.url);
-  return handleMedipickRequest('GET', await pathFrom(ctx), url.searchParams, null, req.headers.get('cookie'));
+  return handleMedipickRequest('GET', await pathFrom(ctx), url.searchParams, null, req.headers.get('cookie'), req.headers);
 }
 
 export async function POST(req: Request, ctx: Ctx) {
@@ -20,5 +20,5 @@ export async function POST(req: Request, ctx: Ctx) {
   } catch {
     body = null;
   }
-  return handleMedipickRequest('POST', await pathFrom(ctx), url.searchParams, body, req.headers.get('cookie'));
+  return handleMedipickRequest('POST', await pathFrom(ctx), url.searchParams, body, req.headers.get('cookie'), req.headers);
 }

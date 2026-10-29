@@ -65,3 +65,5 @@ Google OAuth는 Neon **공유 개발용** 자격으로 즉시 테스트 가능. 
 - ✅ 메인: config, home, search, content, provider, nearby, events, reviews, appointments, ai/answer
 - ✅ 관리자: login, stats, providers/content/doctors/ads/appointments/reviews 조회
 - ⏳ billing·clinic·doctor POST 등 — Python parity 이전 예정 (501)
++- ✅ Vercel handler: admin CRUD·moderate·keys·subscriptions·locations·clinic/doctor API·advertiser·integrations (501 제거)
++- DB: `npm run db:migrate` = `001_schema.sql` + `002_extensions.sql`

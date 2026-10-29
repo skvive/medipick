@@ -1,6 +1,8 @@
 import { db, dbQuery } from '@/lib/db';
 import { CATEGORIES, SYNONYMS, nowKst } from '@/lib/medipick/constants';
 import { passwordOk, sessionOk, makeSession, sessionCookie, clearSessionCookie } from '@/lib/medipick/auth';
+import { isSubscribed } from '@/lib/medipick/handler-shared';
+import { adminStats, handleExtendedRoutes } from '@/lib/medipick/extended-api';
 import { randomBytes } from 'node:crypto';
 
 type Row = Record<string, unknown>;
@@ -17,20 +19,6 @@ function json(data: unknown, init: ResponseInit = {}) {
 
 function err(msg: string, status = 400) {
   return json({ error: msg }, { status });
-}
-
-async function isSubscribed(providerId: number): Promise<boolean> {
-  const sql = db();
-  const rows = await sql<{ expires_at: string; status: string; paid: number; compliance_approved: number }>`
-    SELECT expires_at, status, paid, compliance_approved FROM subscriptions WHERE provider_id = ${providerId}
-  `;
-  const r = rows[0];
-  if (!r || r.status !== 'active' || !r.paid || !r.compliance_approved) return false;
-  try {
-    return new Date(r.expires_at).getTime() > Date.now();
-  } catch {
-    return false;
-  }
 }
 
 function matchIntent(q: string) {
@@ -225,6 +213,7 @@ export async function handleMedipickRequest(
   params: URLSearchParams,
   body: unknown,
   cookie: string | null,
+  headers: Headers | null = null,
 ): Promise<Response> {
   try {
     if (!process.env.DATABASE_URL) return err('DATABASE_URL not configured', 503);
@@ -313,22 +302,9 @@ export async function handleMedipickRequest(
     }
 
     if (method === 'GET' && apiPath === '/api/admin/stats') {
-      const sql = db();
-      const events = await sql<{ kind: string; num: number }>`
-        SELECT kind, count(*)::int AS num FROM events GROUP BY kind
-      `;
-      const counts: Record<string, number> = {};
-      for (const e of events) counts[e.kind] = e.num;
-      const bookings = await sql<{ c: number }>`SELECT count(*)::int AS c FROM appointments`;
-      return json({
-        events: counts,
-        bookings: bookings[0]?.c ?? 0,
-        searches: counts.search || 0,
-        views: counts.provider_view || 0,
-        ad_impressions: counts.ad_impression || 0,
-        ad_clicks: counts.ad_click || 0,
-        click_through_rate: Math.round(((counts.ad_click || 0) / Math.max(counts.ad_impression || 0, 1)) * 1000) / 10,
-      });
+      const prov = params.get('provider_id');
+      const pid = prov && /^\d+$/.test(prov) ? Number(prov) : undefined;
+      return json(await adminStats(pid));
     }
 
     if (method === 'GET' && apiPath === '/api/admin/providers') {
@@ -451,9 +427,8 @@ export async function handleMedipickRequest(
       });
     }
 
-    if (apiPath.startsWith('/api/admin/') || apiPath.startsWith('/api/doctor/') || apiPath.startsWith('/api/clinic/')) {
-      return err('고급 운영 API는 Vercel+Neon 1차 배포에서 Python parity 이전 중입니다. 메인·검색·예약·관리자 조회는 지원합니다.', 501);
-    }
+    const extended = await handleExtendedRoutes(method, apiPath, params, body, cookie, headers);
+    if (extended) return extended;
 
     return err('API가 없습니다', 404);
   } catch (e) {

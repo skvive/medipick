@@ -7,7 +7,7 @@
     "dev": "npm run sync-public && next dev",
     "build": "npm run sync-public && next build",
     "start": "next start",
-    "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql",
+    "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql && node scripts/run-sql.mjs sql/002_extensions.sql",
     "db:seed": "node scripts/seed-neon.mjs"
   },
   "dependencies": {
