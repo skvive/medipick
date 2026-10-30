@@ -43,3 +43,11 @@ export const SYNONYMS: Record<string, string> = {
 export function nowKst(): string {
   return new Date(Date.now() + 9 * 3600_000).toISOString().replace('Z', '+09:00').slice(0, 19);
 }
+
+/** 위치 미확인 시 지도·주변 검색 기본 중심 (가락시장역) */
+export const DEFAULT_MAP_CENTER = {
+  lat: 37.492422,
+  lng: 127.118234,
+  label: '가락시장역',
+  address: '서울 송파구 가락동 (가락시장역)',
+} as const;

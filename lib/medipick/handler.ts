@@ -1,5 +1,5 @@
 import { db, dbQuery } from '@/lib/db';
-import { CATEGORIES, SYNONYMS, nowKst } from '@/lib/medipick/constants';
+import { CATEGORIES, DEFAULT_MAP_CENTER, SYNONYMS, nowKst } from '@/lib/medipick/constants';
 import { passwordOk, sessionOk, makeSession, sessionCookie, clearSessionCookie } from '@/lib/medipick/auth';
 import { isSubscribed } from '@/lib/medipick/handler-shared';
 import {
@@ -235,6 +235,7 @@ export async function handleMedipickRequest(
         categories: CATEGORIES,
         ga_id: process.env.MEDIPICK_GA_ID || '',
         google_maps_browser_key: process.env.GOOGLE_MAPS_BROWSER_KEY || '',
+        default_map_center: DEFAULT_MAP_CENTER,
         demo: true,
         source_notice: '초기 데이터는 가상의 시연용 샘플입니다. 공공데이터를 가져오면 출처가 분리되어 표기됩니다.',
       });

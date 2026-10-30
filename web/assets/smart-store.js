@@ -25,8 +25,23 @@ let items = [];
 let center = null;
 let activeId = null;
 
+function defaultCenter() {
+  const d = config?.default_map_center;
+  return {
+    lat: Number(d?.lat) || 37.492422,
+    lng: Number(d?.lng) || 127.118234,
+    label: d?.label || '가락시장역',
+  };
+}
+
 function mapReady() {
   return config?.google_maps_browser_key && window.google?.maps;
+}
+
+function searchAtDefault(reason) {
+  const d = defaultCenter();
+  if (reason) showToast(reason);
+  return searchNearby(d.lat, d.lng);
 }
 
 function loadMaps(cb) {
@@ -104,7 +119,7 @@ function ensureMap() {
   box.classList.remove('mp-smart-map-empty');
   box.replaceChildren();
   map = new google.maps.Map(box, {
-    center: center || { lat: 37.4979, lng: 127.0276 },
+    center: center || defaultCenter(),
     zoom: 14,
     streetViewControl: false,
     mapTypeControl: false,
@@ -246,21 +261,30 @@ function bindUi() {
   $('#smartSearchForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!center) {
-      showToast('먼저 현위치 또는 시연 위치를 선택하세요.');
+      searchAtDefault('위치 미설정 · ' + defaultCenter().label + ' 기준으로 검색합니다.');
       return;
     }
     searchNearby(center.lat, center.lng).catch((err) => showToast(err.message));
   });
   $('#smartLocate')?.addEventListener('click', () => {
-    if (!navigator.geolocation) return showToast('위치 서비스를 지원하지 않습니다.');
+    if (!navigator.geolocation) {
+      searchAtDefault('위치를 알 수 없어 ' + defaultCenter().label + ' 기준으로 표시합니다.').catch((e) =>
+        showToast(e.message),
+      );
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => searchNearby(pos.coords.latitude, pos.coords.longitude).catch((e) => showToast(e.message)),
-      () => showToast('위치 접근이 거절되었습니다.'),
-      { timeout: 12000, maximumAge: 60000 }
+      () =>
+        searchAtDefault('위치 접근이 거절되어 ' + defaultCenter().label + ' 기준으로 표시합니다.').catch((e) =>
+          showToast(e.message),
+        ),
+      { timeout: 12000, maximumAge: 60000 },
     );
   });
   $('#smartDemo')?.addEventListener('click', () => {
-    searchNearby(37.4979, 127.0276).catch((e) => showToast(e.message));
+    const d = defaultCenter();
+    searchNearby(d.lat, d.lng).catch((e) => showToast(e.message));
   });
   ['smartPlatform', 'smartRadius'].forEach((id) => {
     $('#' + id)?.addEventListener('change', () => {
@@ -280,6 +304,8 @@ async function init() {
     const lng = Number(params.get('lng'));
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
       await searchNearby(lat, lng);
+    } else {
+      await searchAtDefault();
     }
   } catch (e) {
     showToast('초기화 실패: ' + e.message);
