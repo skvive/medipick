@@ -2,6 +2,12 @@ import { db, dbQuery } from '@/lib/db';
 import { CATEGORIES, SYNONYMS, nowKst } from '@/lib/medipick/constants';
 import { passwordOk, sessionOk, makeSession, sessionCookie, clearSessionCookie } from '@/lib/medipick/auth';
 import { isSubscribed } from '@/lib/medipick/handler-shared';
+import {
+  publicCatalogNearby,
+  publicCatalogSearch,
+  publicCatalogStats,
+  publicCatalogStore,
+} from '@/lib/medipick/public-catalog';
 import { adminStats, handleExtendedRoutes } from '@/lib/medipick/extended-api';
 import { randomBytes } from 'node:crypto';
 
@@ -257,6 +263,39 @@ export async function handleMedipickRequest(
         return json(await nearby(params));
       } catch (e) {
         return err(e instanceof Error ? e.message : 'nearby error');
+      }
+    }
+
+    if (method === 'GET' && apiPath === '/api/public-catalog/stats') {
+      try {
+        return json(await publicCatalogStats());
+      } catch (e) {
+        return err(e instanceof Error ? e.message : 'catalog stats error');
+      }
+    }
+
+    if (method === 'GET' && apiPath === '/api/public-catalog/search') {
+      try {
+        return json(await publicCatalogSearch(params));
+      } catch (e) {
+        return err(e instanceof Error ? e.message : 'catalog search error');
+      }
+    }
+
+    if (method === 'GET' && apiPath === '/api/public-catalog/nearby') {
+      try {
+        return json(await publicCatalogNearby(params));
+      } catch (e) {
+        return err(e instanceof Error ? e.message : 'catalog nearby error');
+      }
+    }
+
+    const catalogMatch = apiPath.match(/^\/api\/public-catalog\/store\/(\d+)$/);
+    if (method === 'GET' && catalogMatch) {
+      try {
+        return json(await publicCatalogStore(Number(catalogMatch[1])));
+      } catch (e) {
+        return err(e instanceof Error ? e.message : 'not found', 404);
       }
     }
 
