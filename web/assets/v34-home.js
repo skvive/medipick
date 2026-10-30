@@ -1,0 +1,1 @@
+document.querySelectorAll('[data-editorial]').forEach(a=>{a.addEventListener('click',e=>{const tab=a.dataset.editorial;if(typeof setNav==='function'){e.preventDefault();setNav(tab);document.getElementById(tab==='explore'?'directoryPage':'contentPage')?.scrollIntoView({block:'start',behavior:'smooth'});}})});
