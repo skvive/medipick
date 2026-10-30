@@ -11,6 +11,7 @@
     "db:seed": "node scripts/seed-neon.mjs",
     "catalog:import": "python scripts/import-public-hospital-catalog.py",
     "catalog:import:dropbox": "node scripts/run-catalog-import-dropbox.mjs",
+    "catalog:import:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/import-catalog-local.ps1",
     "content:linkr": "node scripts/build-livelinkr-manifest.mjs && node scripts/import-livelinkr-content.mjs"
   },
   "dependencies": {

@@ -13,3 +13,5 @@ __pycache__/
 /node_modules
 /.next
 .vercel
+_import_v4/
+.tmp-cookies.txt
