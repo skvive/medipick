@@ -13,6 +13,7 @@ import {
 } from '@/lib/medipick/helpers';
 import { authenticateClinic, clinicDashboard, clinicSchedule, clinicTransition } from '@/lib/medipick/clinic';
 import * as billing from '@/lib/medipick/billing';
+import { adminSetCatalogMarketing } from '@/lib/medipick/public-catalog';
 import { randomBytes } from 'node:crypto';
 
 type Row = Record<string, unknown>;
@@ -370,6 +371,13 @@ export async function handleExtendedRoutes(
     if (docRevoke) {
       await sql`UPDATE doctor_access SET revoked = 1 WHERE id = ${Number(docRevoke[1])}`;
       return json({ ok: true });
+    }
+
+    const catalogMarketing = apiPath.match(/^\/api\/admin\/public-catalog\/(\d+)\/marketing$/);
+    if (catalogMarketing) {
+      const id = Number(catalogMarketing[1]);
+      if (!Number.isFinite(id) || id < 1) return err('카탈로그 ID 오류');
+      return json(await adminSetCatalogMarketing(id, data));
     }
 
     if (apiPath === '/api/admin/subscriptions') {

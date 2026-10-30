@@ -7,7 +7,7 @@
     "dev": "npm run sync-public && next dev",
     "build": "npm run sync-public && next build",
     "start": "next start",
-    "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql && node scripts/run-sql.mjs sql/002_extensions.sql && node scripts/run-sql.mjs sql/003_public_hospital_catalog.sql",
+    "db:migrate": "node scripts/run-sql.mjs sql/001_schema.sql && node scripts/run-sql.mjs sql/002_extensions.sql && node scripts/run-sql.mjs sql/003_public_hospital_catalog.sql && node scripts/run-sql.mjs sql/004_catalog_marketing_tiers.sql",
     "db:seed": "node scripts/seed-neon.mjs",
     "catalog:import": "python scripts/import-public-hospital-catalog.py",
     "content:linkr": "node scripts/build-livelinkr-manifest.mjs && node scripts/import-livelinkr-content.mjs"

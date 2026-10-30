@@ -96,10 +96,12 @@ def load_unni() -> list[dict]:
             str(r.get("시도", "")),
             str(r.get("시군구", "")),
         )
+        trade = str(r.get("진료과", "") or r.get("공종", "") or r.get("지역명", "") or "의료기관").strip()[:80] or "의료기관"
         rows.append(
             {
                 "external_key": f"unni:{hid or hashlib.sha1(name.encode()).hexdigest()[:12]}",
                 "source_platform": "강남언니",
+                "trade_category": trade,
                 "name": name[:200],
                 "phone": str(r.get("전화번호", ""))[:40],
                 "email": str(r.get("이메일", ""))[:120],
@@ -134,10 +136,12 @@ def load_platforms() -> list[dict]:
         region, district = parse_region_district(addr)
         phone = str(r.get("연락처", "")).strip()
         url = str(r.get("URL", "")).strip()
+        trade = str(r.get("공종", "") or r.get("업종", "") or r.get("비고", "") or "의료기관").strip()[:80] or "의료기관"
         rows.append(
             {
                 "external_key": ext_key_platform(platform, name, phone, url),
                 "source_platform": platform[:80],
+                "trade_category": trade,
                 "name": name[:200],
                 "phone": phone[:40],
                 "email": str(r.get("이메일", ""))[:120],
@@ -284,11 +288,11 @@ def main() -> None:
     INSERT INTO public_hospital_stores (
       external_key, source_platform, store_listing, name, phone, email, address,
       region, district, postal_code, area_label, rating, review_count, event_count,
-      summary, profile_url, collection_method, geocode_status, updated_at, created_at
+      summary, profile_url, collection_method, trade_category, geocode_status, updated_at, created_at
     ) VALUES (
       %(external_key)s, %(source_platform)s, 'listed', %(name)s, %(phone)s, %(email)s, %(address)s,
       %(region)s, %(district)s, %(postal_code)s, %(area_label)s, %(rating)s, %(review_count)s, %(event_count)s,
-      %(summary)s, %(profile_url)s, %(collection_method)s, 'pending', NOW(), NOW()
+      %(summary)s, %(profile_url)s, %(collection_method)s, %(trade_category)s, 'pending', NOW(), NOW()
     )
     ON CONFLICT (external_key) DO UPDATE SET
       name = EXCLUDED.name,
@@ -298,6 +302,7 @@ def main() -> None:
       district = EXCLUDED.district,
       summary = EXCLUDED.summary,
       profile_url = EXCLUDED.profile_url,
+      trade_category = EXCLUDED.trade_category,
       updated_at = NOW()
     """
 

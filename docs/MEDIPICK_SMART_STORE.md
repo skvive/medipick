@@ -1,52 +1,94 @@
 # 메디픽 스마트스토어 (공공병원 카탈로그) 기획
 
-[v1 · 2026-10-30 · MVP `/smart-store` 반영]
+[v2 · 2026-10-30 · 공종·무료/월구독 PRO · Dropbox 원본 import]
 
 ## 네이버 벤치마크 (역할 분리)
 
 | 네이버 | 역할 | 메디픽 대응 |
 |--------|------|-------------|
-| **스마트스토어** | 온라인 상품·주문·배송·리뷰·스토어 SEO | **구독·광고 의료기관** (`providers`) — 예약 요청·콘텐츠·스폰서 |
-| **스마트플레이스** | 지도·주소·전화·영업시간·리뷰·예약·지역 검색 | **메디픽 스마트스토어** (`public_hospital_stores`) — 공공·플랫폼 **주소록** 지도 노출 |
-| 스마트스토어 ↔ 플레이스 연동 | 스토어에 오프라인 매장 연결 | 홈 **내 주변**에서 구독(광고) + 카탈로그 레이어 동시 표시 |
-| 검색·필터·거리순 | 키워드·카테고리·랭킹 | 이름/지역 검색 + **현위치 반경** + 출처(플랫폼) 필터 |
-| 스토어 상세 | 상품·정책·문의 | 카탈로그 **팝업**: 주소·전화·출처·원문 링크 (진료 추천 아님) |
+| **스마트스토어** | 온라인 상품·주문·SEO | **구독·광고 의료기관** (`providers`) |
+| **스마트플레이스** | 지도·주소·리뷰·예약 | **스마트스토어 카탈로그** (`public_hospital_stores`) |
+| 유료 스토어 부가 | 상세페이지·쿠폰·라이브 | **월 구독 PRO** — 지도 팝업·블로그·동영상·우선 노출 |
 
-메디픽은 **의료 “상품” 판매가 아닌 주소록·연락처 카탈로그**이므로, 네이버 기준으로는 **스마트플레이스형 지도 + 스마트스토어형 목록 UI**를 결합한 **하이브리드**로 정의한다.
+## 데이터 원본 (전량 등록)
 
-## MVP 범위 (이번 반영)
+| 파일 | 내용 |
+|------|------|
+| `unni_hospitals.csv` | 강남언니 등 (~1.2k) |
+| `med_platforms_hospitals.xlsx` | 여신티켓·똑닥·바비톡 등 (~3.4만) |
 
-- 전용 화면: **`/smart-store`**
-- **현위치 / 시연 위치** 기준 반경 검색 (`/api/public-catalog/nearby`)
-- **지도 마커 + 좌측 목록** — 목록·마커 클릭 시 **동일 InfoWindow 팝업**
-- **이름 검색**, **출처 플랫폼** 필터, 반경 1~20km
-- DB: `public_hospital_stores` (~3.5만 건, 좌표 매핑 ~2.9만)
-- API 키: `GOOGLE_MAPS_BROWSER_KEY` (Maps JavaScript API)
+로컬 import:
 
-## Phase 2 (미구현)
+```powershell
+cd medipick-repo
+.\scripts\import-catalog-from-dropbox.ps1
+```
 
-- Marker Clusterer (밀집 지역)
-- 구·군 정밀 geocode (`PUBLIC_CATALOG_GEOCODE`)
-- 메디픽 구독 병원과 카탈로그 **통합 상세** (단일 drawer)
-- 즐겨찾기·최근 본 스토어 (로컬/계정)
-- Admin: listing on/off, 출처 배치 재수집
+환경: `DATABASE_URL`, `IMPORT_UNNI_CSV`, `IMPORT_PLATFORMS_XLSX` (스크립트가 Dropbox 경로 기본 설정)
 
-## 법·표시 원칙
+Neon 테이블 `public_hospital_stores` — **공종** `trade_category`, 좌표, `store_listing=listed`.
 
-- 카탈로그는 **플랫폼·공공 주소록 수집** — 진료·광고 **추천·순위 아님**
-- 좌표 **구·군 중심 추정** 가능 — 방문 전 **주소·전화 확인**
-- 유료 구독 병원과 UI·라벨 **분리** (스폰서 vs 주소록)
+## 요금·노출 티어
+
+### 무료 (Free · 공공 주소록)
+
+- **대상**: import된 모든 카탈로그 (광고·월납 없음)
+- **노출**: 지도 마커 + 목록 + **기본 샘플 팝업** (텍스트: 공종·주소·전화·출처·원문 링크)
+- **성격**: 공공·플랫폼 **연락처 정보** — 진료 추천·실력 순위 **아님**
+- **표시**: `공공 주소록 · 무료` 배지
+
+### 월 구독 PRO (Premium · 마케팅 업그레이드)
+
+병원·의원이 **별도 월 구독** 시 (메디픽 구독 병원 `providers`와 연동 가능):
+
+| 기능 | 설명 |
+|------|------|
+| **PRO 지도 팝업** | 히어로 이미지, 소개 요약, **YouTube/동영상 링크** (새 창) |
+| **블로그 연동** | **Google 블로그 · 네이버 블로그** 새 창 링크 (광고·콘텐츠 유입) |
+| **주변 검색 우선** | 같은 반경 내 **목록·마커 정렬 최상단** (`priority_boost` + `marketing_active`) |
+| **시각 구분** | 핑크 PRO 마커·목록 하이라이트, `월구독 · 스마트스토어 PRO` 라벨 |
+
+관리자 API (데모·운영):
+
+```http
+POST /api/admin/public-catalog/:id/marketing
+{
+  "listing_tier": "premium",
+  "marketing_active": true,
+  "marketing_expires_at": "2099-12-31T23:59:59+09:00",
+  "trade_category": "피부과",
+  "hero_image_url": "https://...",
+  "video_url": "https://...",
+  "google_blog_url": "https://...",
+  "naver_blog_url": "https://...",
+  "priority_boost": 50
+}
+```
+
+시연 시드: `node scripts/seed-catalog-marketing-demo.mjs`
+
+## 이용자 UI
+
+- **`/smart-store`**: 현위치·반경·공종·출처 필터, 목록↔지도 팝업 연동
+- **홈 · 내 주변**: 구독(광고) 병원 + 카탈로그 레이어, 카드 클릭 → 지도 팝업
 
 ## API
 
-| Method | Path | 용도 |
-|--------|------|------|
-| GET | `/api/public-catalog/stats` | 전체·매핑 건수·출처별 집계 |
-| GET | `/api/public-catalog/nearby?lat=&lng=&radius=&q=&platform=&limit=` | 위치 기반 (lng/lon 모두 지원) |
-| GET | `/api/public-catalog/search?q=&region=&platform=` | 전국 텍스트 검색 (지도 없을 때) |
-| GET | `/api/public-catalog/store/:id` | 단건 상세 |
+| Method | Path |
+|--------|------|
+| GET | `/api/public-catalog/stats` — `pricing`, `premium_listings` |
+| GET | `/api/public-catalog/nearby?lat&lng&radius&q&platform&trade&limit` |
+| GET | `/api/public-catalog/search?q&region&platform&trade` |
+| GET | `/api/public-catalog/store/:id` — `ui.variant` free \| premium |
+| POST | `/api/admin/public-catalog/:id/marketing` |
 
-## 데이터
+## 법·표시
 
-- `sql/003_public_hospital_catalog.sql`
-- `npm run catalog:import` · `data/catalog/README.md`
+- 무료 카탈로그 = **수집 주소록** · PRO = **유료 정보 강화** (순위·진료 품질 의미 없음)
+- PRO는 **광고 표시** (`sponsored: true` on API) — 이용자에게 라벨 필수
+- 좌표 구·군 추정 가능 → 방문 전 확인
+
+## SQL
+
+- `003_public_hospital_catalog.sql` — 기본 테이블
+- `004_catalog_marketing_tiers.sql` — 공종·PRO 컬럼

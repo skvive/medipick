@@ -135,6 +135,14 @@
   box-shadow: 0 4px 16px #0a503812;
   background: #fff;
 }
+.mp-smart-item--pro {
+  border-color: #ffc9da;
+  background: linear-gradient(180deg, #fffafb 0%, #fff 100%);
+}
+.mp-smart-item--pro small {
+  color: #ff2d6a;
+  background: #fff0f5;
+}
 .mp-smart-item small {
   display: inline-block;
   font-size: 10px;

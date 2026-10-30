@@ -63,17 +63,38 @@ function loadMaps(cb) {
 }
 
 function popupHtml(x) {
+  const ui = x.ui || {};
+  const trade = x.trade_category ? `<p><b>공종</b> ${safe(x.trade_category)}</p>` : '';
   const dist =
     x.distance_km != null ? `<p><b>약 ${Number(x.distance_km).toFixed(2)} km</b></p>` : '';
   const phone = x.phone ? `<p>☎ ${safe(x.phone)}</p>` : '';
+  const summary = x.summary
+    ? `<p style="margin:8px 0;color:#486b57">${safe(String(x.summary).slice(0, 160))}${String(x.summary).length > 160 ? '…' : ''}</p>`
+    : '';
   const link = x.profile_url
     ? `<p><a target="_blank" rel="noopener noreferrer" href="${safe(x.profile_url)}">플랫폼 원문 ↗</a></p>`
     : '';
-  const geo =
-    x.geocode_status && x.geocode_status !== 'ok'
-      ? '<p style="font-size:11px;color:#888">좌표: 구·군 중심 추정</p>'
+  if (ui.variant === 'premium' || x.is_premium) {
+    const img = ui.hero_image
+      ? `<img src="${safe(ui.hero_image)}" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px">`
       : '';
-  return `<div class="mp-store-popup"><span class="badge">${safe(x.source_platform || '카탈로그')}</span><h4>${safe(x.name)}</h4><p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${link}${geo}<p style="font-size:11px;color:#888;margin-top:8px">주소록 · 진료 추천 아님</p></div>`;
+    const vid = ui.video_url
+      ? `<p><a target="_blank" rel="noopener noreferrer" href="${safe(ui.video_url)}">▶ 소개 영상 ↗</a></p>`
+      : '';
+    const blogs = [
+      ui.google_blog_url
+        ? `<a target="_blank" rel="noopener noreferrer" href="${safe(ui.google_blog_url)}">Google 블로그 ↗</a>`
+        : '',
+      ui.naver_blog_url
+        ? `<a target="_blank" rel="noopener noreferrer" href="${safe(ui.naver_blog_url)}">네이버 블로그 ↗</a>`
+        : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    const blogLine = blogs ? `<p>${blogs}</p>` : '';
+    return `<div class="mp-store-popup mp-store-popup--pro"><span class="badge" style="background:#fff0f5;color:#ff2d6a">${safe(ui.badge || '월구독 PRO')}</span>${img}<h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${summary}${vid}${blogLine}${link}<p style="font-size:11px;color:#888">${safe(ui.disclosure || '')}</p></div>`;
+  }
+  return `<div class="mp-store-popup mp-store-popup--free"><span class="badge">${safe(ui.badge || '공공 주소록 · 무료')}</span><h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${summary || '<p style="color:#6b857a;font-size:12px">기본 정보 샘플 화면 — 텍스트·연락처만 표시됩니다.</p>'}${link}<p style="font-size:11px;color:#888;margin-top:8px">${safe(ui.disclosure || '진료·광고 추천 아님')}</p><p style="font-size:11px"><a href="/admin">월 구독으로 PRO 업그레이드 ↗</a></p></div>`;
 }
 
 function ensureMap() {
@@ -130,8 +151,11 @@ function renderList() {
   if (meta) meta.textContent = items.length + '건 표시';
   list.innerHTML = items
     .map(
-      (x) =>
-        `<button type="button" class="mp-smart-item" data-id="${x.id}"><small>${safe(x.source_platform)}</small><h3>${safe(x.name)}</h3><p>${safe(x.region)} ${safe(x.district)} · ${safe(x.address)}</p><div class="dist">약 ${Number(x.distance_km).toFixed(2)} km</div></button>`
+      (x) => {
+        const pro = x.is_premium ? ' mp-smart-item--pro' : '';
+        const badge = x.ui?.badge || x.source_platform;
+        return `<button type="button" class="mp-smart-item${pro}" data-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address)}</p><div class="dist">약 ${Number(x.distance_km).toFixed(2)} km</div></button>`;
+      },
     )
     .join('');
   list.querySelectorAll('.mp-smart-item').forEach((btn) => {
@@ -154,8 +178,8 @@ function renderMapMarkers() {
       title: x.name,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 8,
-        fillColor: '#167764',
+        scale: x.is_premium ? 9 : 8,
+        fillColor: x.is_premium ? '#ff2d6a' : '#167764',
         fillOpacity: 0.92,
         strokeWeight: 2,
         strokeColor: '#fff',
@@ -177,10 +201,12 @@ async function searchNearby(lat, lng) {
   center = { lat, lng };
   const q = ($('#smartQ')?.value || '').trim();
   const platform = $('#smartPlatform')?.value || '';
+  const trade = ($('#smartTrade')?.value || '').trim();
   const radius = $('#smartRadius')?.value || '3';
   const params = new URLSearchParams({ lat, lng, radius, limit: '120' });
   if (q) params.set('q', q);
   if (platform) params.set('platform', platform);
+  if (trade) params.set('trade', trade);
   const res = await api('/api/public-catalog/nearby?' + params.toString());
   items = res.items || [];
   if (res.capped) showToast(`반경 내 ${res.count}건 중 ${res.shown || items.length}건만 지도에 표시합니다.`);

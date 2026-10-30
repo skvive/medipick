@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run sync-public && next build && node scripts/import-livelinkr-content.mjs",
+  "buildCommand": "npm run db:migrate && npm run sync-public && next build && node scripts/import-livelinkr-content.mjs",
   "installCommand": "npm install"
 }
