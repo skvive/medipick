@@ -71,8 +71,11 @@ export async function publicCatalogSearch(params: URLSearchParams) {
 
 export async function publicCatalogNearby(params: URLSearchParams) {
   const lat = Number(params.get('lat'));
-  const lon = Number(params.get('lon'));
+  const lon = Number(params.get('lon') ?? params.get('lng'));
   const radius = Number(params.get('radius') || 5);
+  const limit = Math.min(150, Math.max(1, Number(params.get('limit') || 80)));
+  const q = (params.get('q') || '').trim().slice(0, 80);
+  const platform = (params.get('platform') || '').trim();
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     throw new Error('위도/경도가 필요합니다');
   }
@@ -90,8 +93,14 @@ export async function publicCatalogNearby(params: URLSearchParams) {
     LIMIT 800
   `;
 
+  const qLower = q.toLowerCase();
   const results: Row[] = [];
   for (const row of rows) {
+    if (platform && String(row.source_platform) !== platform) continue;
+    if (qLower) {
+      const hay = `${row.name} ${row.address} ${row.district}`.toLowerCase();
+      if (!hay.includes(qLower)) continue;
+    }
     const d = haversine(lat, lon, Number(row.latitude), Number(row.longitude));
     if (d > radius) continue;
     results.push({
@@ -99,14 +108,19 @@ export async function publicCatalogNearby(params: URLSearchParams) {
       distance_km: Math.round(d * 100) / 100,
       catalog: true,
       sponsored: false,
+      store_type: 'public_catalog',
     });
   }
   results.sort((a, b) => Number(a.distance_km) - Number(b.distance_km));
+  const total = results.length;
   return {
-    items: results.slice(0, 80),
-    count: results.length,
+    items: results.slice(0, limit),
+    count: total,
+    shown: Math.min(limit, total),
+    capped: total > limit,
+    center: { lat, lng: lon },
     notice:
-      '공공·플랫폼 주소록 카탈로그(스마트스토어형). 유료광고·구독 병원과 별도이며 좌표는 구·군 중심 추정일 수 있습니다.',
+      '공공·플랫폼 주소록 카탈로그(메디픽 스마트스토어). 유료광고·구독 병원과 별도이며 좌표는 구·군 중심 추정일 수 있습니다.',
   };
 }
 

@@ -20,4 +20,5 @@ $env:PUBLIC_CATALOG_GEOCODE = "1"
 python scripts/import-public-hospital-catalog.py
 ```
 
-API: `/api/public-catalog/stats`, `/search`, `/nearby`, `/store/:id`
+API: `/api/public-catalog/stats`, `/search`, `/nearby`, `/store/:id`  
+UI: `/smart-store` · 기획 `docs/MEDIPICK_SMART_STORE.md`

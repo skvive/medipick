@@ -12,6 +12,7 @@ const pages = [
   'integrations',
   'clinic-ops',
   'clinic-access',
+  'smart-store',
 ];
 
 const nextConfig: NextConfig = {
