@@ -84,7 +84,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path, help="HIRA hospital CSV or XLSX (WGS84 X/Y)")
     parser.add_argument("--source-tag", required=True, help="HIRA snapshot date, e.g. HIRA-20260930")
-    parser.add_argument("--report", type=Path, default=Path("data/catalog/hira_coordinate_audit.jsonl"))
+    parser.add_argument("--report", type=Path, help="Append-safe audit path; must not already exist")
     parser.add_argument("--apply", action="store_true", help="Explicitly write audited, exact matches")
     parser.add_argument("--max-updates", type=int, default=100, help="Hard upper bound for updates")
     args = parser.parse_args()
@@ -163,10 +163,15 @@ def main() -> None:
         # Never update if there are more candidates than the explicitly capped batch.
         if args.apply and len(proposals) > args.max_updates:
             raise RuntimeError("검증 대상이 상한을 초과했습니다. 범위를 분할하여 재검수하세요.")
-        args.report.parent.mkdir(parents=True, exist_ok=True)
-        if args.apply and args.report.resolve() == args.source.resolve():
+        report = args.report or Path("data/catalog") / (
+            "hira_coordinate_audit_" + args.source_tag + "_" +
+            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ") + ".jsonl"
+        )
+        report.parent.mkdir(parents=True, exist_ok=True)
+        if report.resolve() == args.source.resolve():
             raise RuntimeError("감사 파일 경로가 원본 파일과 같습니다")
-        with args.report.open("w", encoding="utf-8") as audit:
+        # Exclusive create: never overwrite an earlier verification record.
+        with report.open("x", encoding="utf-8") as audit:
             for rec in proposals:
                 audit.write(json.dumps(rec, ensure_ascii=False) + "\n")
         if args.apply:
@@ -190,7 +195,7 @@ def main() -> None:
             conn.rollback()
             counters["updated"] = 0
         print(json.dumps({"mode": "APPLIED" if args.apply else "DRY_RUN",
-                          "source": args.source_tag, "audit": str(args.report),
+                          "source": args.source_tag, "audit": str(report),
                           **counters}, ensure_ascii=False))
     except Exception:
         conn.rollback()
