@@ -1,11 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 216 52" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 52" role="img" aria-labelledby="title desc">
 <title id="title">메디픽 MEDIPICK</title>
-<desc id="desc">내 근처 병원찾기, 메디픽. 블루·바이올렛 위치 핀 의료 로고</desc>
-<defs><linearGradient id="mark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0fb9f4"/><stop offset=".52" stop-color="#176cf1"/><stop offset="1" stop-color="#5039e5"/></linearGradient></defs>
-<rect x="2" y="3" width="46" height="46" rx="15" fill="url(#mark)"/>
-<path d="M25 12c-7.1 0-12.3 5.3-12.3 12.1C12.7 32.8 25 42 25 42s12.3-9.2 12.3-17.9C37.3 17.3 32.1 12 25 12Z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
-<path d="M25 17.5v13.2M18.4 24.1h13.2" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
-<text x="57" y="30" font-family="Pretendard, Noto Sans KR, Segoe UI, Arial, sans-serif" font-size="27" font-weight="850" letter-spacing="-1.25" fill="#0b2b58">medi</text>
-<text x="123" y="30" font-family="Pretendard, Noto Sans KR, Segoe UI, Arial, sans-serif" font-size="27" font-weight="850" letter-spacing="-1.25" fill="#1467ec">pick</text>
-<text x="58" y="45" font-family="Pretendard, Noto Sans KR, Malgun Gothic, sans-serif" font-size="10.2" font-weight="700" fill="#6680a6">내 근처 병원찾기</text>
+<desc id="desc">내 근처 병원찾기, 메디픽. M 문자와 의료 십자가를 결합한 블루 그라데이션 브랜드</desc>
+<defs>
+    <linearGradient id="mpBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13C0F6"/><stop offset=".5" stop-color="#1977EF"/><stop offset="1" stop-color="#5540E8"/></linearGradient>
+    <linearGradient id="mpWord" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#247EFA"/><stop offset="1" stop-color="#493DEC"/></linearGradient>
+    </defs>
+    <rect x="2" y="2" width="48" height="48" rx="15" fill="url(#mpBlue)"/>
+    <path d="M12 34 V20 L23.5 31.8 L35 20 V34" fill="none" stroke="white" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="38" cy="14.5" r="9.8" fill="#EAF7FF" stroke="#0E5CC8" stroke-width=".9"/>
+    <path d="M38 9.7 V19.3 M33.2 14.5 H42.8" fill="none" stroke="#135FCC" stroke-width="2.7" stroke-linecap="round"/>
+    
+<text x="61" y="29.6" font-family="Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="-1.15" fill="#102D5C">medi</text>
+<text x="123" y="29.6" font-family="Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="-1.15" fill="url(#mpWord)">pick</text>
+<text x="61" y="43.5" font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Arial, sans-serif" font-size="11" font-weight="700" fill="#4E76AB">내 근처 병원찾기</text>
 </svg>
