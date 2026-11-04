@@ -347,7 +347,7 @@ function renderList() {
   const title = $('#smartListTitle');
   if (title) title.textContent = '전국 병원 주소록 · 개별 확인 필요';
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">검증된 주변 병원 좌표가 없습니다. 전국 병원명을 검색한 뒤 개별 병원의 Google 주소 위치 조회로 임시 핀을 확인할 수 있습니다. 추정핀은 별도로 선택한 경우에만 표시됩니다.</div>';
+    list.innerHTML = '<div class="empty-state">조건에 맞는 병원 주소록이 없습니다. 지역·진료과 검색 조건을 바꿔 보세요. 실제 지도 핀은 검증된 좌표에만 표시됩니다.</div>';
     if (meta) meta.textContent = '검증된 핀 0건';
     return;
   }
@@ -412,32 +412,51 @@ function renderMapMarkers() {
 
 async function searchNearby(lat, lng) {
   center = { lat, lng };
+  const requestId = ++searchSequence;
   const q = ($('#smartQ')?.value || '').trim();
-  const platform = $('#smartPlatform')?.value || '';
   const trade = ($('#smartTrade')?.value || '').trim();
+  const region = $('#smartRegion')?.value || '';
   const radius = $('#smartRadius')?.value || '20';
-  const params = new URLSearchParams({ lat, lng, radius, limit: '120' });
-  if ($('#smartEstimated')?.checked) params.set('include_estimated', '1');
-  if (q) params.set('q', q);
-  if (platform) params.set('platform', platform);
-  if (trade) params.set('trade', trade);
-  const directorySearch = Boolean(q);
-  const endpoint = directorySearch ? '/api/public-catalog/search' : '/api/public-catalog/nearby';
-  const requestParams = directorySearch
-    ? new URLSearchParams({ q, platform, trade, limit: '100' })
-    : params;
-  const res = await api(endpoint + '?' + requestParams.toString());
-  items = res.items || [];
-  if (directorySearch && items.length === 100) showToast('병원 주소록 후보 첫 100건입니다. 검색어를 구체화해 주세요.');
-  if (!directorySearch && res.capped) showToast(`좌표상 추정 검색 결과 ${res.count}건 중 ${res.shown || items.length}건만 표시합니다.`);
-  renderList();
-  loadMaps(() => {
-    renderMapMarkers();
-  });
+  const usingEstimates = Boolean($('#smartEstimated')?.checked);
   const notice = $('#smartNotice');
-  if (notice) notice.textContent = directorySearch
-    ? '※ 전국 병원명 검색 결과입니다. 추정 좌표는 실제 병원 위치와 다릅니다. 주소 위치 조회는 클릭 시에만 실행되며, 결과는 서버에 저장하지 않습니다.'
-    : '※ ' + (res.notice || '추정 좌표는 실제 병원 위치가 아닙니다.');
+  if (viewMode === 'partners') {
+    const searchParams = new URLSearchParams({ category: trade || '전체' });
+    if (q) searchParams.set('q', q);
+    if (region) searchParams.set('region', region);
+    const res = await api('/api/search?' + searchParams);
+    if (requestId !== searchSequence) return;
+    items = [];
+    partnerItems = Array.isArray(res.items) ? res.items : [];
+    renderPartnerList();
+    clearMarkers();
+    if (map) { map.setCenter(center); map.setZoom(12); }
+    if (notice) notice.textContent =
+      '※ 기존 메디픽 입점·시연 병원은 공공 주소록과 별도로 관리됩니다. 실제 지도 좌표가 검증되지 않은 기관은 핀으로 표시하지 않습니다. 상세 페이지의 예약 요청은 실제 확정 예약이 아닐 수 있습니다.';
+    return;
+  }
+
+  partnerItems = [];
+  resetDetail();
+  const radiusMode = usingEstimates && !q;
+  const endpoint = radiusMode ? '/api/public-catalog/nearby' : '/api/public-catalog/search';
+  const searchParams = radiusMode
+    ? new URLSearchParams({ lat, lng, radius, limit: '120', include_estimated: '1', trade })
+    : new URLSearchParams({ q, region, trade, limit: '80' });
+  const res = await api(endpoint + '?' + searchParams.toString());
+  if (requestId !== searchSequence) return;
+  items = Array.isArray(res.items) ? res.items : [];
+  if (!radiusMode && items.length === 80) {
+    showToast('첫 80건의 병원 주소록 후보입니다. 지역·병원명·진료과를 구체화해 주세요.');
+  }
+  if (radiusMode && res.capped) {
+    showToast('선택하신 추정 범위에서 ' + Number(res.count || 0).toLocaleString() +
+      '건 중 ' + items.length + '건을 표시합니다. 실제 병원 위치·거리가 아닙니다.');
+  }
+  renderList();
+  loadMaps(() => renderMapMarkers());
+  if (notice) notice.textContent = radiusMode
+    ? '※ 선택해 표시한 회색 추정핀은 시·도 중심에 편차를 준 가상 좌표입니다. 실제 병원 위치·직선거리·운영 여부를 뜻하지 않습니다.'
+    : '※ 전국 병원 주소록 검색 결과입니다. 주소록에 있는 좌표는 아직 검증되지 않았습니다. 실제 병원 핀은 검증 좌표만 표시하며 Google 주소 위치 조회는 사용자가 선택한 병원 한 건에 대해서만 실행합니다.';
 }
 
 async function initStats() {
@@ -456,38 +475,68 @@ async function initStats() {
 }
 
 function bindUi() {
-  $('#smartSearchForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!center) {
-      searchAtDefault('위치 미설정 · ' + defaultCenter().label + ' 기준으로 검색합니다.');
-      return;
-    }
-    searchNearby(center.lat, center.lng).catch((err) => showToast(err.message));
+  $('#smartSearchForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const at = center || defaultCenter();
+    searchNearby(at.lat, at.lng).catch((error) => showToast(error.message));
   });
   $('#smartLocate')?.addEventListener('click', () => {
     if (!navigator.geolocation) {
-      searchAtDefault('위치를 알 수 없어 ' + defaultCenter().label + ' 기준으로 표시합니다.').catch((e) =>
-        showToast(e.message),
-      );
+      searchAtDefault('위치 기능을 지원하지 않아 가락시장역 기준으로 조회합니다.').catch((e) => showToast(e.message));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => searchNearby(pos.coords.latitude, pos.coords.longitude).catch((e) => showToast(e.message)),
-      () =>
-        searchAtDefault('위치 접근이 거절되어 ' + defaultCenter().label + ' 기준으로 표시합니다.').catch((e) =>
-          showToast(e.message),
-        ),
+      () => searchAtDefault('현위치를 확인할 수 없어 가락시장역 기준으로 조회합니다.').catch((e) => showToast(e.message)),
       { timeout: 12000, maximumAge: 60000 },
     );
   });
   $('#smartDemo')?.addEventListener('click', () => {
-    const d = defaultCenter();
-    searchNearby(d.lat, d.lng).catch((e) => showToast(e.message));
+    const at = defaultCenter();
+    searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
   });
-  ['smartPlatform', 'smartRadius', 'smartEstimated'].forEach((id) => {
-    $('#' + id)?.addEventListener('change', () => {
-      if (center) searchNearby(center.lat, center.lng).catch((e) => showToast(e.message));
+  const updateMode = () => {
+    viewMode = document.querySelector('input[name="smartMode"]:checked')?.value === 'partners'
+      ? 'partners' : 'catalog';
+    document.querySelectorAll('.mp-smart-modes label').forEach((el) => {
+      el.classList.toggle('is-checked', Boolean(el.querySelector('input:checked')));
     });
+    const estimateControl = $('#smartEstimated')?.closest('label');
+    if (estimateControl) estimateControl.hidden = viewMode === 'partners';
+    const region = $('#smartRegion');
+    if (region) region.disabled = false;
+    const at = center || defaultCenter();
+    searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
+  };
+  document.querySelectorAll('input[name="smartMode"]').forEach((radio) => {
+    radio.addEventListener('change', updateMode);
+  });
+  ['smartRadius', 'smartEstimated', 'smartRegion'].forEach((id) => {
+    $('#' + id)?.addEventListener('change', () => {
+      const at = center || defaultCenter();
+      searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
+    });
+  });
+  document.querySelectorAll('[data-smart-category]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const category = button.getAttribute('data-smart-category') || '';
+      const input = $('#smartTrade');
+      if (input) input.value = input.value === category ? '' : category;
+      document.querySelectorAll('[data-smart-category]').forEach((b) => {
+        b.classList.toggle('is-active', Boolean(input?.value) && b.getAttribute('data-smart-category') === input?.value);
+      });
+      const at = center || defaultCenter();
+      searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
+    });
+  });
+  $('[data-smart-clear]')?.addEventListener('click', () => {
+    if ($('#smartQ')) $('#smartQ').value = '';
+    if ($('#smartTrade')) $('#smartTrade').value = '';
+    if ($('#smartRegion')) $('#smartRegion').value = '서울';
+    if ($('#smartEstimated')) $('#smartEstimated').checked = false;
+    document.querySelectorAll('[data-smart-category]').forEach((b) => b.classList.remove('is-active'));
+    const at = center || defaultCenter();
+    searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
   });
 }
 
@@ -498,6 +547,18 @@ async function init() {
     bindUi();
     loadMaps();
     const params = new URLSearchParams(location.search);
+    if (params.get('q') && $('#smartQ')) $('#smartQ').value = params.get('q').slice(0, 80);
+    if (params.has('region') && $('#smartRegion')) $('#smartRegion').value = params.get('region');
+    if (params.get('mode') === 'partners') {
+      const radio = document.querySelector('input[name="smartMode"][value="partners"]');
+      if (radio) radio.checked = true;
+      viewMode = 'partners';
+      document.querySelectorAll('.mp-smart-modes label').forEach((el) => {
+        el.classList.toggle('is-checked', Boolean(el.querySelector('input:checked')));
+      });
+      const estimate = $('#smartEstimated')?.closest('label');
+      if (estimate) estimate.hidden = true;
+    }
     const hasCoordinates = ['lat', 'lng'].every((key) => params.has(key) && params.get(key)?.trim() !== '');
     const lat = hasCoordinates ? Number(params.get('lat')) : NaN;
     const lng = hasCoordinates ? Number(params.get('lng')) : NaN;
