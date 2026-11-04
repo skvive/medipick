@@ -80,8 +80,17 @@ function loadMaps(cb) {
 function popupHtml(x) {
   const ui = x.ui || {};
   const trade = x.trade_category ? `<p><b>공종</b> ${safe(x.trade_category)}</p>` : '';
-  const dist =
-    x.distance_km != null ? `<p><b>약 ${Number(x.distance_km).toFixed(2)} km</b></p>` : '';
+  const precise = x.geocode_status === 'exact';
+  const dist = x.distance_km != null
+    ? `<p><b>${precise ? '직선거리' : '지도상 추정거리'} 약 ${Number(x.distance_km).toFixed(2)} km</b></p>`
+    : '';
+  const accuracy = precise
+    ? '<p style="color:#167764">주소 기반 검증 좌표</p>'
+    : '<p style="color:#a15f15;font-weight:700">주의: 실제 병원 위치가 아닌 시·도 기준 추정 좌표입니다.</p>';
+  const googleQuery = encodeURIComponent([x.name, x.address].filter(Boolean).join(' '));
+  const mapsLink = x.address
+    ? `<p><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=${googleQuery}">Google 지도에서 주소 확인 ↗</a></p>`
+    : '';
   const phone = x.phone ? `<p>☎ ${safe(x.phone)}</p>` : '';
   const summary = x.summary
     ? `<p style="margin:8px 0;color:#486b57">${safe(String(x.summary).slice(0, 160))}${String(x.summary).length > 160 ? '…' : ''}</p>`
@@ -107,9 +116,9 @@ function popupHtml(x) {
       .filter(Boolean)
       .join(' · ');
     const blogLine = blogs ? `<p>${blogs}</p>` : '';
-    return `<div class="mp-store-popup mp-store-popup--pro"><span class="badge" style="background:#fff0f5;color:#ff2d6a">${safe(ui.badge || '월구독 PRO')}</span>${img}<h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${summary}${vid}${blogLine}${link}<p style="font-size:11px;color:#888">${safe(ui.disclosure || '')}</p></div>`;
+    return `<div class="mp-store-popup mp-store-popup--pro"><span class="badge" style="background:#fff0f5;color:#ff2d6a">${safe(ui.badge || '월구독 PRO')}</span>${img}<h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${accuracy}${mapsLink}${summary}${vid}${blogLine}${link}<p style="font-size:11px;color:#888">${safe(ui.disclosure || '')}</p></div>`;
   }
-  return `<div class="mp-store-popup mp-store-popup--free"><span class="badge">${safe(ui.badge || '공공 주소록 · 무료')}</span><h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${summary || '<p style="color:#6b857a;font-size:12px">기본 정보 샘플 화면 — 텍스트·연락처만 표시됩니다.</p>'}${link}<p style="font-size:11px;color:#888;margin-top:8px">${safe(ui.disclosure || '진료·광고 추천 아님')}</p><p style="font-size:11px"><a href="/admin">월 구독으로 PRO 업그레이드 ↗</a></p></div>`;
+  return `<div class="mp-store-popup mp-store-popup--free"><span class="badge">${safe(ui.badge || '공공 주소록 · 무료')}</span><h4>${safe(x.name)}</h4>${trade}<p>${safe(x.address || x.region + ' ' + x.district)}</p>${phone}${dist}${accuracy}${mapsLink}${summary || '<p style="color:#6b857a;font-size:12px">기본 정보 샘플 화면 — 텍스트·연락처만 표시됩니다.</p>'}${link}<p style="font-size:11px;color:#888;margin-top:8px">${safe(ui.disclosure || '진료·광고 추천 아님')}</p><p style="font-size:11px"><a href="/admin">월 구독으로 PRO 업그레이드 ↗</a></p></div>`;
 }
 
 function ensureMap() {
@@ -169,7 +178,7 @@ function renderList() {
       (x) => {
         const pro = x.is_premium ? ' mp-smart-item--pro' : '';
         const badge = x.ui?.badge || x.source_platform;
-        return `<button type="button" class="mp-smart-item${pro}" data-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address)}</p><div class="dist">약 ${Number(x.distance_km).toFixed(2)} km</div></button>`;
+        return `<button type="button" class="mp-smart-item${pro}" data-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address)}</p><div class="dist">${x.geocode_status === "exact" ? "직선거리" : "지도상 추정거리"} 약 ${Number(x.distance_km).toFixed(2)} km</div></button>`;
       },
     )
     .join('');
@@ -187,16 +196,17 @@ function renderMapMarkers() {
     const lng = Number(x.longitude);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
     const pos = { lat, lng };
+    const precise = x.geocode_status === 'exact';
     const marker = new google.maps.Marker({
       map,
       position: pos,
-      title: x.name,
+      title: x.name + (precise ? '' : ' · 추정 위치'),
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: x.is_premium ? 9 : 8,
-        fillColor: x.is_premium ? '#ff2d6a' : '#167764',
-        fillOpacity: 0.92,
-        strokeWeight: 2,
+        fillColor: precise ? (x.is_premium ? '#ff2d6a' : '#167764') : '#7d8c9b',
+        fillOpacity: precise ? 0.92 : 0.62,
+        strokeWeight: precise ? 2 : 1,
         strokeColor: '#fff',
       },
     });
@@ -217,7 +227,7 @@ async function searchNearby(lat, lng) {
   const q = ($('#smartQ')?.value || '').trim();
   const platform = $('#smartPlatform')?.value || '';
   const trade = ($('#smartTrade')?.value || '').trim();
-  const radius = $('#smartRadius')?.value || '3';
+  const radius = $('#smartRadius')?.value || '20';
   const params = new URLSearchParams({ lat, lng, radius, limit: '120' });
   if (q) params.set('q', q);
   if (platform) params.set('platform', platform);
@@ -300,9 +310,10 @@ async function init() {
     bindUi();
     loadMaps();
     const params = new URLSearchParams(location.search);
-    const lat = Number(params.get('lat'));
-    const lng = Number(params.get('lng'));
-    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    const hasCoordinates = ['lat', 'lng'].every((key) => params.has(key) && params.get(key)?.trim() !== '');
+    const lat = hasCoordinates ? Number(params.get('lat')) : NaN;
+    const lng = hasCoordinates ? Number(params.get('lng')) : NaN;
+    if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
       await searchNearby(lat, lng);
     } else {
       await searchAtDefault();
