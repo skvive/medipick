@@ -22,7 +22,7 @@
 
 ## 3. 중요한 보안·품질 조치
 - 기존 Linkr 라이브커머스 행 60건은 원본 DB에서 삭제하지 않고 공개 건강정보 API에서 제외한다.
-- 빌드 시 반복 실행되는 `scripts/import-livelinkr-content.mjs`은 파괴적 SQL을 포함했다. 해당 삭제 쿼리를 제거하고 기본 실행을 안전하게 건너뛰도록 가드를 추가했다. Vercel Build Command 변경을 요청했지만 미리보기 로그에는 기존 `npm run db:migrate && npm run sync-public && next build && node scripts/import-livelinkr-content.mjs` 명령이 남아 있었다. 다만 소스의 실행 차단 가드는 비의료 콘텐츠 재삽입을 안전하게 건너뛴다. 배포 로그를 통해 빌드 명령 변경 여부를 최종 검증한다.
+- 빌드 시 반복 실행되는 `scripts/import-livelinkr-content.mjs`은 파괴적 SQL을 포함했다. 해당 삭제 쿼리를 제거하고 기본 실행을 안전하게 건너뛰도록 가드를 추가했다. Vercel 프로젝트 설정에만 변경을 요청한 초기 배포에는 기존 명령이 남아 있었다. 원인은 저장소의 `vercel.json`이 동일한 구형 `buildCommand`를 명시적으로 오버라이드한 것이었다. `vercel.json`을 `npm run db:migrate && npm run build`로 수정했고, 비의료 importer는 더 이상 빌드에서 실행하지 않는다. importer 내부의 기본 차단과 삭제 SQL 제거도 별도로 유지한다. 최종 배포 로그에서 확인한다.
 - 내부 콘텐츠 8건은 **의료진 검증 자료가 아닌 데모 안내**. 자료 제목만 소개하며 의료 효능·치료 결과를 생성하지 않는다.
 - 공식기관/외부 서비스 정보는 메디픽의 공식 청구·진단·처방 서비스로 표현하지 않는다.
 - 실손보험 민간 보험금 청구와 의료기관 건강보험 요양급여 청구는 서로 다르다.
