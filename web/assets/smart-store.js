@@ -314,7 +314,7 @@ function renderMapMarkers() {
     bounds.extend(pos);
   }
   if (center) bounds.extend(center);
-  if (items.length) map.fitBounds(bounds, 48);
+  if (markerById.size) map.fitBounds(bounds, 48);
   else if (center) {
     map.setCenter(center);
     map.setZoom(13);
