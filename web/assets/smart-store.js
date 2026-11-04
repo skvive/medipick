@@ -155,7 +155,11 @@ function openStore(id, pan = true) {
   $$listActive();
   const x = items.find((i) => i.id === id);
   const marker = markerById.get(id);
-  if (!x || !marker || !map) return;
+  if (!x || !map) return;
+  if (!marker) {
+    showToast('검증된 좌표가 없습니다. Google 주소 위치 조회를 이용하세요.');
+    return;
+  }
   if (pan) {
     map.panTo(marker.getPosition());
     map.setZoom(Math.max(map.getZoom(), 14));
@@ -254,11 +258,11 @@ function renderList() {
   const meta = $('#smartListMeta');
   if (!list) return;
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">조건에 맞는 카탈로그가 없습니다. 반경·검색어를 바꿔 보세요.</div>';
-    if (meta) meta.textContent = '0건';
+    list.innerHTML = '<div class="empty-state">검증된 주변 병원 좌표가 없습니다. 전국 병원명을 검색한 뒤 개별 병원의 Google 주소 위치 조회로 임시 핀을 확인할 수 있습니다. 추정핀은 별도로 선택한 경우에만 표시됩니다.</div>';
+    if (meta) meta.textContent = '검증된 핀 0건';
     return;
   }
-  if (meta) meta.textContent = items.length + '건 표시';
+  if (meta) meta.textContent = items.length + '건 목록 · ' + items.filter((item) => item.geocode_status === 'exact').length + '건 검증된 좌표';
   list.innerHTML = items
     .map(
       (x) => {
@@ -291,6 +295,7 @@ function renderMapMarkers() {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
     const pos = { lat, lng };
     const precise = x.geocode_status === 'exact';
+    if (!precise && !$('#smartEstimated')?.checked) continue;
     const marker = new google.maps.Marker({
       map,
       position: pos,
@@ -323,6 +328,7 @@ async function searchNearby(lat, lng) {
   const trade = ($('#smartTrade')?.value || '').trim();
   const radius = $('#smartRadius')?.value || '20';
   const params = new URLSearchParams({ lat, lng, radius, limit: '120' });
+  if ($('#smartEstimated')?.checked) params.set('include_estimated', '1');
   if (q) params.set('q', q);
   if (platform) params.set('platform', platform);
   if (trade) params.set('trade', trade);
@@ -399,7 +405,7 @@ function bindUi() {
     const d = defaultCenter();
     searchNearby(d.lat, d.lng).catch((e) => showToast(e.message));
   });
-  ['smartPlatform', 'smartRadius'].forEach((id) => {
+  ['smartPlatform', 'smartRadius', 'smartEstimated'].forEach((id) => {
     $('#' + id)?.addEventListener('change', () => {
       if (center) searchNearby(center.lat, center.lng).catch((e) => showToast(e.message));
     });
