@@ -151,7 +151,7 @@ export async function publicCatalogNearby(params: URLSearchParams) {
     capped: total > limit,
     center: { lat, lng: lon },
     notice:
-      '메디픽 스마트스토어: 무료=공공 주소록 기본 팝업, 월구독=PRO 정보창·블로그·동영상·목록 우선 노출. 좌표는 구·군 추정일 수 있습니다.',
+      '메디픽 스마트스토어: 무료=공공 주소록 기본 팝업, 월구독=PRO 정보창·블로그·동영상·목록 우선 노출. 미검증 좌표는 시·도 중심 추정값으로 실제 병원 위치·거리가 아닙니다. 병원별 주소를 다시 확인하세요.',
   };
 }
 
