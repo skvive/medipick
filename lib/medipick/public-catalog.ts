@@ -1,20 +1,6 @@
 import { db, dbQuery } from '@/lib/db';
-import {
-  catalogPremiumActive,
-  presentCatalogStore,
-  sortCatalogNearby,
-} from '@/lib/medipick/catalog-present';
+import { presentCatalogStore } from '@/lib/medipick/catalog-present';
 import type { Row } from '@/lib/medipick/catalog-types';
-
-function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const r = 6371.0088;
-  const p1 = (lat1 * Math.PI) / 180;
-  const p2 = (lat2 * Math.PI) / 180;
-  const dp = p2 - p1;
-  const dl = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
-  return 2 * r * Math.asin(Math.min(1, Math.sqrt(a)));
-}
 
 const LIST_COLS = `
   id, source_platform, name, phone, address, region, district, summary,
@@ -111,60 +97,88 @@ export async function publicCatalogNearby(params: URLSearchParams) {
   const lat = rawLat?.trim() ? Number(rawLat) : NaN;
   const lon = rawLon?.trim() ? Number(rawLon) : NaN;
   const radius = Number(params.get('radius') || 5);
-  const limit = Math.min(150, Math.max(1, Number(params.get('limit') || 80)));
+  const requestedLimit = Number(params.get('limit') || 80);
+  const limit = Math.min(150, Math.max(1, Math.floor(requestedLimit)));
   const q = (params.get('q') || '').trim().slice(0, 80);
   const platform = (params.get('platform') || '').trim();
   const trade = (params.get('trade') || '').trim();
   const includeEstimated = params.get('include_estimated') === '1';
+
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
     throw new Error('위도/경도가 필요합니다');
   }
-  if (radius < 0.5 || radius > 30) throw new Error('반경은 0.5~30km');
-
-  const sql = db();
-  const rows = await sql<Row>`
-    SELECT id, source_platform, name, phone, address, region, district, summary,
-           rating, review_count, profile_url, latitude, longitude, geocode_status, coordinate_source,
-           trade_category, listing_tier, marketing_active, marketing_expires_at, priority_boost,
-           hero_image_url, video_url, google_blog_url, naver_blog_url
-    FROM public_hospital_stores
-    WHERE store_listing = 'listed'
-      AND latitude IS NOT NULL AND longitude IS NOT NULL
-      AND (${includeEstimated} OR geocode_status = 'exact')
-      AND latitude BETWEEN ${lat - 0.35} AND ${lat + 0.35}
-      AND longitude BETWEEN ${lon - 0.45} AND ${lon + 0.45}
-    LIMIT 800
-  `;
-
-  const qLower = q.toLowerCase();
-  const tradeLower = trade.toLowerCase();
-  const results: Row[] = [];
-  for (const row of rows) {
-    if (platform && String(row.source_platform) !== platform) continue;
-    if (tradeLower && !String(row.trade_category || '').toLowerCase().includes(tradeLower)) continue;
-    if (qLower) {
-      const hay = `${row.name} ${row.address} ${row.district} ${row.trade_category}`.toLowerCase();
-      if (!hay.includes(qLower)) continue;
-    }
-    const d = haversine(lat, lon, Number(row.latitude), Number(row.longitude));
-    if (d > radius) continue;
-    results.push({
-      ...row,
-      distance_km: Math.round(d * 100) / 100,
-    });
+  if (!Number.isFinite(radius) || radius < 0.5 || radius > 30) {
+    throw new Error('반경은 0.5~30km');
   }
-  results.sort(sortCatalogNearby);
-  const total = results.length;
-  const premiumInRadius = results.filter((r) => catalogPremiumActive(r)).length;
+  if (!Number.isFinite(requestedLimit) || requestedLimit < 1) {
+    throw new Error('올바른 표시 건수가 필요합니다');
+  }
+
+  const latDelta = radius / 110.574;
+  const lngDelta = radius / (111.32 * Math.max(0.01, Math.abs(Math.cos(lat * Math.PI / 180))));
+  const args: unknown[] = [
+    lat - latDelta, lat + latDelta, lon - lngDelta, lon + lngDelta, lat, lon, radius,
+  ];
+  const clauses = [
+    "store_listing = 'listed'",
+    'latitude IS NOT NULL',
+    'longitude IS NOT NULL',
+    'latitude BETWEEN $1 AND $2',
+    'longitude BETWEEN $3 AND $4',
+    includeEstimated ? "geocode_status IN ('exact','approx')" : "geocode_status = 'exact'",
+  ];
+  if (q) {
+    args.push('%' + q + '%');
+    const p = '$' + args.length;
+    clauses.push('(name ILIKE ' + p + ' OR address ILIKE ' + p + ' OR district ILIKE ' + p + ' OR trade_category ILIKE ' + p + ')');
+  }
+  if (platform) {
+    args.push(platform);
+    clauses.push('source_platform = $' + args.length);
+  }
+  if (trade) {
+    args.push('%' + trade + '%');
+    clauses.push('trade_category ILIKE $' + args.length);
+  }
+  args.push(limit);
+
+  const distanceSQL = `6371.0088 * 2 * ASIN(LEAST(1, SQRT(
+    POWER(SIN(RADIANS(latitude - $5) / 2), 2) +
+    COS(RADIANS($5)) * COS(RADIANS(latitude)) *
+    POWER(SIN(RADIANS(longitude - $6) / 2), 2)
+  )))`;
+  const sqlText = `
+    WITH candidates AS (
+      SELECT ${LIST_COLS}, (${distanceSQL}) AS unrounded_distance_km
+      FROM public_hospital_stores WHERE ${clauses.join(' AND ')}
+    ),
+    inside_radius AS (
+      SELECT *, ROUND(unrounded_distance_km::numeric, 2)::double precision AS distance_km
+      FROM candidates WHERE unrounded_distance_km <= $7
+    )
+    SELECT *,
+      COUNT(*) OVER ()::int AS total_count,
+      COUNT(*) FILTER (WHERE listing_tier = 'premium' AND marketing_active IS TRUE
+        AND (marketing_expires_at IS NULL OR marketing_expires_at > NOW())) OVER ()::int AS premium_count
+    FROM inside_radius
+    ORDER BY (CASE WHEN listing_tier = 'premium' AND marketing_active IS TRUE
+      AND (marketing_expires_at IS NULL OR marketing_expires_at > NOW()) THEN 1 ELSE 0 END) DESC,
+      COALESCE(priority_boost, 0) DESC, distance_km ASC, id ASC
+    LIMIT $${args.length}
+  `;
+  const rows = await dbQuery<Row & { total_count: number; premium_count: number; distance_km: number }>(sqlText, args);
+  const total = Number(rows[0]?.total_count || 0);
   return {
-    items: results.slice(0, limit).map((r) => presentCatalogStore(r, Number(r.distance_km))),
+    items: rows.map((row) => presentCatalogStore(row, Number(row.distance_km))),
     count: total,
-    premium_in_radius: premiumInRadius,
-    shown: Math.min(limit, total),
-    capped: total > limit,
+    premium_in_radius: Number(rows[0]?.premium_count || 0),
+    shown: rows.length,
+    capped: total > rows.length,
     center: { lat, lng: lon },
-    notice:
-      '메디픽 스마트스토어: 무료=공공 주소록 기본 팝업, 월구독=PRO 정보창·블로그·동영상·목록 우선 노출. 미검증 좌표는 시·도 중심 추정값으로 실제 병원 위치·거리가 아닙니다. 병원별 주소를 다시 확인하세요.',
+    estimated_included: includeEstimated,
+    notice: includeEstimated
+      ? '추정핀은 시·도 중심에 임의 편차를 준 가상 좌표이며 실제 병원 위치·이동거리가 아닙니다.'
+      : '검증된 위치만 표시합니다. 병원명 검색으로 주소록을 찾고 Google 주소 위치 조회로 개별 임시 핀을 확인하세요.',
   };
 }
 
