@@ -75,7 +75,8 @@ export async function publicCatalogSearch(params: URLSearchParams) {
   }
   if (trade) {
     args.push(`%${trade}%`);
-    clauses.push(`trade_category ILIKE $${args.length}`);
+    const p = `${args.length}`;
+    clauses.push(`(trade_category ILIKE ${p} OR name ILIKE ${p} OR summary ILIKE ${p})`);
   }
   args.push(limit, offset);
   const text = `
@@ -138,7 +139,81 @@ export async function publicCatalogNearby(params: URLSearchParams) {
   }
   if (trade) {
     args.push('%' + trade + '%');
-    clauses.push('trade_category ILIKE $' + args.length);
+    const p = '
+  }
+  args.push(limit);
+
+  const distanceSQL = `6371.0088 * 2 * ASIN(LEAST(1, SQRT(
+    POWER(SIN(RADIANS(latitude - $5) / 2), 2) +
+    COS(RADIANS($5)) * COS(RADIANS(latitude)) *
+    POWER(SIN(RADIANS(longitude - $6) / 2), 2)
+  )))`;
+  const sqlText = `
+    WITH candidates AS (
+      SELECT ${LIST_COLS}, (${distanceSQL}) AS unrounded_distance_km
+      FROM public_hospital_stores WHERE ${clauses.join(' AND ')}
+    ),
+    inside_radius AS (
+      SELECT *, ROUND(unrounded_distance_km::numeric, 2)::double precision AS distance_km
+      FROM candidates WHERE unrounded_distance_km <= $7
+    )
+    SELECT *,
+      COUNT(*) OVER ()::int AS total_count,
+      COUNT(*) FILTER (WHERE listing_tier = 'premium' AND marketing_active IS TRUE
+        AND (marketing_expires_at IS NULL OR marketing_expires_at > NOW())) OVER ()::int AS premium_count
+    FROM inside_radius
+    ORDER BY (CASE WHEN listing_tier = 'premium' AND marketing_active IS TRUE
+      AND (marketing_expires_at IS NULL OR marketing_expires_at > NOW()) THEN 1 ELSE 0 END) DESC,
+      COALESCE(priority_boost, 0) DESC, distance_km ASC, id ASC
+    LIMIT $${args.length}
+  `;
+  const rows = await dbQuery<Row & { total_count: number; premium_count: number; distance_km: number }>(sqlText, args);
+  const total = Number(rows[0]?.total_count || 0);
+  return {
+    items: rows.map((row) => presentCatalogStore(row, Number(row.distance_km))),
+    count: total,
+    premium_in_radius: Number(rows[0]?.premium_count || 0),
+    shown: rows.length,
+    capped: total > rows.length,
+    center: { lat, lng: lon },
+    estimated_included: includeEstimated,
+    notice: includeEstimated
+      ? '추정핀은 시·도 중심에 임의 편차를 준 가상 좌표이며 실제 병원 위치·이동거리가 아닙니다.'
+      : '검증된 위치만 표시합니다. 병원명 검색으로 주소록을 찾고 Google 주소 위치 조회로 개별 임시 핀을 확인하세요.',
+  };
+}
+
+export async function publicCatalogStore(id: number) {
+  const sql = db();
+  const rows = await sql<Row>`
+    SELECT * FROM public_hospital_stores WHERE id = ${id} AND store_listing = 'listed' AND name NOT ILIKE '%검색결과%' LIMIT 1
+  `;
+  if (!rows[0]) throw new Error('카탈로그 항목 없음');
+  return presentCatalogStore(rows[0]);
+}
+
+export async function adminSetCatalogMarketing(id: number, body: Row) {
+  const sql = db();
+  const tier = body.listing_tier === 'premium' ? 'premium' : 'free';
+  const active = Boolean(body.marketing_active);
+  await sql`
+    UPDATE public_hospital_stores SET
+      listing_tier = ${tier},
+      marketing_active = ${active},
+      marketing_expires_at = ${body.marketing_expires_at ? String(body.marketing_expires_at) : null},
+      priority_boost = ${Math.min(100, Math.max(0, Number(body.priority_boost || 0)))},
+      hero_image_url = ${String(body.hero_image_url || '').slice(0, 500)},
+      video_url = ${String(body.video_url || '').slice(0, 500)},
+      google_blog_url = ${String(body.google_blog_url || '').slice(0, 500)},
+      naver_blog_url = ${String(body.naver_blog_url || '').slice(0, 500)},
+      trade_category = COALESCE(NULLIF(${String(body.trade_category || '').slice(0, 80)}, ''), trade_category),
+      updated_at = NOW()
+    WHERE id = ${id}
+  `;
+  return publicCatalogStore(id);
+}
+ + args.length;
+    clauses.push('(trade_category ILIKE ' + p + ' OR name ILIKE ' + p + ' OR summary ILIKE ' + p + ')');
   }
   args.push(limit);
 
