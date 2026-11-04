@@ -27,6 +27,9 @@ let activeId = null;
 let liveAddressMarker = null;
 let liveAddressId = null;
 let addressSearchSequence = 0;
+let viewMode = 'catalog';
+let partnerItems = [];
+let searchSequence = 0;
 
 function defaultCenter() {
   const d = config?.default_map_center;
@@ -153,11 +156,9 @@ function openStore(id, pan = true) {
   $$listActive();
   const x = items.find((i) => i.id === id);
   const marker = markerById.get(id);
-  if (!x || !map) return;
-  if (!marker) {
-    showToast('검증된 좌표가 없습니다. Google 주소 위치 조회를 이용하세요.');
-    return;
-  }
+  if (!x) return;
+  showCatalogDetail(x);
+  if (!map || !marker) return;
   if (pan) {
     map.panTo(marker.getPosition());
     map.setZoom(Math.max(map.getZoom(), 14));
@@ -251,16 +252,106 @@ async function locateStoreAddress(id) {
   }
 }
 
+function resetDetail() {
+  const detail = $('#smartDetail');
+  if (!detail) return;
+  detail.hidden = true;
+  detail.replaceChildren();
+}
+
+function showCatalogDetail(item) {
+  const detail = $('#smartDetail');
+  if (!detail || !item || viewMode !== 'catalog') return;
+  detail.hidden = false;
+  const address = String(item.address || '').trim();
+  const mapQuery = encodeURIComponent([item.name, address].filter(Boolean).join(' '));
+  const phone = String(item.phone || '').trim();
+  const hasAddress = Boolean(address && item.district);
+  const pro = Boolean(item.is_premium);
+  const disclosure = item.ui?.disclosure || '등록 주소록: 기관 실재·운영 상태·주소는 방문 전 별도 확인이 필요합니다.';
+  detail.innerHTML =
+    '<div class="mp-smart-detail-top"><span class="mp-smart-detail-kicker">선택한 병원 정보</span>' +
+    '<button type="button" class="mp-smart-detail-close" aria-label="상세정보 닫기">×</button></div>' +
+    '<h3>' + safe(item.name) + '</h3><p class="mp-smart-detail-category">' +
+    safe(item.trade_category || '의료기관') + ' · ' + safe(item.region) + ' ' + safe(item.district) + '</p>' +
+    '<p class="mp-smart-detail-address">' + safe(address || '주소 정보 미등록') + '</p>' +
+    (phone ? '<p>☎ ' + safe(phone) + '</p>' : '') +
+    '<div class="mp-smart-detail-actions">' +
+    (hasAddress ? '<button type="button" class="mp-smart-detail-geocode">◎ Google 주소 위치 조회</button>' : '') +
+    (address ? '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery +
+      '" rel="noopener noreferrer" target="_blank">Google 지도에서 확인 ↗</a>' : '') +
+    '</div>' +
+    (pro ? '<p class="mp-smart-paid">유료 구독 정보창 · 진료 품질 또는 실력 순위가 아닙니다.</p>' : '') +
+    '<p class="mp-smart-detail-note">' + safe(disclosure) + '</p>';
+  detail.querySelector('.mp-smart-detail-close')?.addEventListener('click', resetDetail);
+  detail.querySelector('.mp-smart-detail-geocode')?.addEventListener('click', () => locateStoreAddress(item.id));
+  // Reuse the existing detailed catalog API on explicit user selection.
+  const selectedId = item.id;
+  api('/api/public-catalog/store/' + encodeURIComponent(selectedId)).then((full) => {
+    if (activeId !== selectedId || detail.hidden || viewMode !== 'catalog') return;
+    const ui = full.ui || {};
+    const valid = (url) => /^https:\/\//i.test(String(url || ''));
+    const refs = [
+      ['소개 영상', ui.video_url],
+      ['의료정보 블로그', ui.google_blog_url],
+      ['블로그 콘텐츠', ui.naver_blog_url],
+    ].filter(([,url]) => valid(url));
+    if (!refs.length) return;
+    const group = document.createElement('div');
+    group.className = 'mp-smart-detail-related';
+    for (const [label,url] of refs) {
+      const a = document.createElement('a');
+      a.href = String(url);
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = label + ' ↗';
+      group.appendChild(a);
+    }
+    detail.appendChild(group);
+  }).catch(() => { /* summary card is still useful if detail API is unavailable */ });
+}
+
+function renderPartnerList() {
+  const list = $('#smartList');
+  const meta = $('#smartListMeta');
+  if (!list) return;
+  resetDetail();
+  const title = $('#smartListTitle');
+  if (title) title.textContent = '메디픽 등록·입점 의료기관';
+  if (meta) meta.textContent = partnerItems.length + '건 · 시연 정보 포함';
+  if (!partnerItems.length) {
+    list.innerHTML = '<div class="empty-state">검색 조건과 일치하는 메디픽 등록 병원이 없습니다. 전국 주소록으로 전환해 검색할 수 있습니다.</div>';
+    return;
+  }
+  list.innerHTML = partnerItems.map((p) => {
+    const id = Number(p.id);
+    const isDemo = /^demo-/i.test(String(p.external_key || '')) || /데모|시연/.test(String(p.name || ''));
+    const category = safe(p.category || '의료기관');
+    const label = isDemo ? '시연용 의료기관 · 실제 예약 아님' : '등록 의료기관 · 검증 여부 확인';
+    return '<article class="mp-smart-partner">' +
+      '<span class="mp-smart-partner-label">' + label + '</span>' +
+      '<h3>' + safe(p.name) + '</h3>' +
+      '<p>' + category + ' · ' + safe(p.region || '') + ' ' + safe(p.district || '') + '</p>' +
+      '<p>' + safe(p.description || '병원 상세 페이지에서 정보를 확인할 수 있습니다.') + '</p>' +
+      (Number.isInteger(id) && id > 0
+        ? '<a class="mp-smart-partner-link" href="/hospital?id=' + encodeURIComponent(id) +
+        '">메디픽 병원 상세·예약 요청 ↗</a>' : '') +
+      '</article>';
+  }).join('');
+}
+
 function renderList() {
   const list = $('#smartList');
   const meta = $('#smartListMeta');
   if (!list) return;
+  const title = $('#smartListTitle');
+  if (title) title.textContent = '전국 병원 주소록 · 개별 확인 필요';
   if (!items.length) {
     list.innerHTML = '<div class="empty-state">검증된 주변 병원 좌표가 없습니다. 전국 병원명을 검색한 뒤 개별 병원의 Google 주소 위치 조회로 임시 핀을 확인할 수 있습니다. 추정핀은 별도로 선택한 경우에만 표시됩니다.</div>';
     if (meta) meta.textContent = '검증된 핀 0건';
     return;
   }
-  if (meta) meta.textContent = items.length + '건 목록 · ' + items.filter((item) => item.geocode_status === 'exact').length + '건 검증된 좌표';
+  if (meta) meta.textContent = items.length + '건 지역 주소록 · ' + items.filter((item) => item.geocode_status === 'exact').length + '건 검증된 좌표';
   list.innerHTML = items
     .map(
       (x) => {
