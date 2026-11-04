@@ -506,3 +506,16 @@ body.mp-nav-open {
   color: #617f74;
   line-height: 1.45;
 }
+
+/* MEDIPICK BLUE BRAND V5 — shared navigation reused on all original pages */
+.mp-site-header{border-bottom:1px solid #dbe8fa!important;background:#fff!important;box-shadow:0 6px 24px #1e59b50b!important}
+.mp-site-header .mp-site-header__inner{max-width:1320px}
+.mp-site-header .mp-brand__logo{width:184px!important;max-width:184px!important;height:auto!important;display:block}
+.mp-site-header .mp-nav-link{color:#27497b!important;font-weight:750}
+.mp-site-header .mp-nav-link:hover,.mp-site-header .mp-nav-link.is-active{color:#1769f8!important}
+.mp-site-header .mp-btn-pink,.mp-site-header .mp-drawer-cta{background:#1769f8!important;color:#fff!important}
+.mp-site-header .mp-btn-ghost{border-color:#b9d1f7;color:#245aa9}
+.mp-nav-drawer .mp-drawer-head{color:#174c96}
+.mp-nav-drawer .mp-drawer-link.is-active{color:#155bc8!important;background:#eaf3ff!important}
+@media(max-width:1150px){.mp-site-header .mp-site-nav--desktop{gap:8px!important}.mp-site-header .mp-nav-link{font-size:12px!important}}
+@media(max-width:960px){.mp-site-header .mp-brand__logo{width:166px!important;max-width:166px!important}}
