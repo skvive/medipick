@@ -30,11 +30,6 @@ export async function publicCatalogStats() {
     SELECT count(*)::int AS n FROM public_hospital_stores
     WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%' AND listing_tier = 'premium' AND marketing_active = TRUE
   `;
-  const sources = await sql<{ source_platform: string; n: number }>`
-    SELECT source_platform, count(*)::int AS n FROM public_hospital_stores
-    WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%'
-    GROUP BY source_platform ORDER BY n DESC LIMIT 12
-  `;
   return {
     total: total[0]?.n ?? 0,
     excluded_search_pages: excluded[0]?.n ?? 0,
@@ -43,13 +38,12 @@ export async function publicCatalogStats() {
     estimated_mappable: accuracy[0]?.approximate ?? 0,
     missing_address: accuracy[0]?.missing_address ?? 0,
     premium_listings: premium[0]?.n ?? 0,
-    sources,
     pricing: {
-      free: '공공·플랫폼 주소록 — 텍스트·기본 지도 팝업 무료',
+      free: '메디픽 병원 주소록 — 텍스트·지도 정보 무료',
       premium: '월 구독 — PRO 팝업·블로그·동영상·주변검색 우선 노출',
     },
     notice:
-      '플랫폼·주소록에서 수집한 병원 연락처·주소 카탈로그(공종·진료분야 라벨). 진료·광고 추천이 아니며 운영·위치는 방문 전 확인하세요.',
+      '메디픽에 등록된 병원 주소록 후보입니다. 공식 의료기관 자료와 대조 중이며 실제 운영·주소·위치는 방문 전 확인하세요. 공식 확인처: 공공데이터포털 전국 병의원 현황 또는 HIRA 병원정보서비스.',
   };
 }
 
