@@ -3,26 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#167764">
+<meta name="theme-color" content="#1769f8">
+<meta name="robots" content="noindex,nofollow">
 <meta name="description" content="내 근처 병원찾기, 메디픽. 지역·진료과 검색과 주소 지도 확인.">
 <title>내 근처 병원찾기, 메디픽 | 병원 주소록 지도</title>
 <link rel="icon" href="/assets/favicon.svg">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/assets/style.css">
 <link rel="stylesheet" href="/assets/site-shell.css">
 <link rel="stylesheet" href="/assets/smart-store.css">
+<link rel="stylesheet" href="/assets/pwa/install.css">
 </head>
 <body class="mp-smart-store" data-mp-page="smart-store">
 <div class="demo-ribbon"><strong>주소록 카탈로그</strong> 진료·광고 추천이 아닙니다. 방문 전 주소·전화를 확인하세요. <a href="/">메디픽 홈 ↗</a></div>
-<header class="header"><div class="wrap header-inner"><a class="logo mp-brand-lockup" href="/"><img class="mp-brand-svg" src="/assets/logo-full.svg" alt="MEDIPICK" width="168" height="36"></a><nav class="main-nav"><a class="nav-link" href="/">홈</a><a class="nav-link active" href="/smart-store">스마트스토어</a><a class="nav-link" href="/#home">내 주변</a><a class="nav-link" href="/consult">AI 상담</a></nav><a class="header-admin mp-header-cta" href="/admin">입점 문의</a></div></header>
+<header class="mast"><div class="wrap"><a href="/" aria-label="메디픽 홈"><img src="/assets/logo-full.svg" alt="메디픽 — 내 근처 병원찾기" width="184" height="44"></a><nav aria-label="주요 서비스"><a href="/">홈</a><a href="/smart-store" aria-current="page">병원 지도</a><a href="/consult">AI 상담</a><a href="/doctors">의사 콘텐츠</a><a href="/auth/sign-in">로그인</a></nav></div></header>
 
 <section class="mp-smart-hero"><div class="wrap">
-<div class="eyebrow">MEDIPICK SMART STORE · PUBLIC CATALOG</div>
+<div class="mp-smart-hero-intro"><div class="mp-smart-hero-copy"><div class="eyebrow">MEDIPICK NEARBY CARE · 전국 병원 주소록</div>
 <h1>내 근처 <em>병원찾기, 메디픽</em></h1>
-<p>지역·진료과별 병원 주소록을 검색하고, 지도에서 위치를 확인해 보세요. <strong>병원명 검색</strong>으로 전국 목록을 찾거나 좌표 기준 참고 범위를 살펴보세요. 실제 좌표가 검증된 핀만 기본 표시합니다. 추정핀은 명시적으로 선택한 경우에만 표시할 수 있으며 실제 병원 위치가 아닙니다. <strong>Google 주소 위치 조회</strong>는 사용자가 선택한 1건에 대해서만 시도합니다.</p>
+<p>기존 메디픽의 병원 검색·의료정보 기능과 전국 주소록 지도를 한곳에 모았습니다. 병원명·지역·진료과로 검색하고 주소를 직접 확인하세요. <strong>정확한 좌표로 검증된 핀만 기본 표시</strong>하며, 미검증 좌표는 실제 병원 위치가 아닙니다.</p>
+</div><img class="mp-smart-hero-graphic" src="/assets/photos/medipick-nearby-hero.webp" width="667" height="755" loading="eager" alt="메디픽 병원 위치 검색을 표현한 지도 스마트폰 일러스트 (실제 위치 데이터 아님)"></div>
 <div class="mp-smart-stats" id="smartStats"><span>주소록 정보를 불러오는 중…</span></div>
 <form class="mp-smart-toolbar" id="smartSearchForm">
-<input type="search" name="q" id="smartQ" maxlength="80" placeholder="병원명·동·주소 검색" aria-label="병원 검색">
-<input type="search" id="smartTrade" maxlength="40" placeholder="공종 · 예: 피부과" aria-label="공종 필터">
+<fieldset class="mp-smart-modes" id="smartModes"><legend>병원 정보 보기</legend>
+<label class="is-checked"><input type="radio" name="smartMode" value="catalog" checked> 전국 병원 주소록</label>
+<label><input type="radio" name="smartMode" value="partners"> 입점·시연 병원</label>
+</fieldset>
+<input type="search" name="q" id="smartQ" maxlength="80" placeholder="병원명·주소 검색 (예: 송파구 내과)" aria-label="병원명 또는 주소 검색">
+<input type="search" id="smartTrade" maxlength="40" placeholder="진료과 · 예: 내과" aria-label="진료과 필터">
+<select id="smartRegion" aria-label="검색 지역"><option value="">전국</option><option value="서울" selected>서울</option><option value="경기">경기</option><option value="인천">인천</option><option value="부산">부산</option><option value="대구">대구</option><option value="대전">대전</option><option value="광주">광주</option><option value="울산">울산</option><option value="세종">세종</option><option value="강원">강원</option><option value="충북">충북</option><option value="충남">충남</option><option value="전북">전북</option><option value="전남">전남</option><option value="경북">경북</option><option value="경남">경남</option><option value="제주">제주</option></select>
 
 <select id="smartRadius" aria-label="검색 반경"><option value="1">1km</option><option value="3">3km</option><option value="5">5km</option><option value="10">10km</option><option value="20" selected>20km</option><option value="30">30km</option></select>
 <label class="mp-smart-estimate-control"><input type="checkbox" id="smartEstimated"> 추정핀 보기 <small>(실제 위치 아님)</small></label>
@@ -30,14 +39,16 @@
 <button type="button" class="btn-ghost" id="smartLocate">◎ 현위치</button>
 <button type="button" class="btn-ghost" id="smartDemo">가락시장역 (기본)</button>
 </form>
+<div class="mp-smart-quick" role="group" aria-label="진료과 빠른 검색"><span>진료과 바로가기</span><button type="button" data-smart-category="내과">내과</button><button type="button" data-smart-category="정형외과">정형외과</button><button type="button" data-smart-category="치과">치과</button><button type="button" data-smart-category="피부과">피부과</button><button type="button" data-smart-category="안과">안과</button><button type="button" data-smart-category="소아청소년과">소아청소년과</button><button type="button" data-smart-clear>초기화</button></div>
 </div></section>
+<nav class="mp-smart-service-rail" aria-label="기존 메디픽 서비스"><a href="/"><span aria-hidden="true">⌂</span><b>메디픽 홈</b><small>병원·의료정보 포털</small></a><a href="/?nav=explore"><span aria-hidden="true">⌕</span><b>병원·예약 찾기</b><small>기존 병원 검색</small></a><a href="/consult"><span aria-hidden="true">✚</span><b>AI 건강안내</b><small>의학적 진단 아님</small></a><a href="/doctors"><span aria-hidden="true">▤</span><b>의사 콘텐츠</b><small>블로그·영상 확인</small></a><a href="/my-health"><span aria-hidden="true">♡</span><b>건강노트</b><small>개인 건강기록</small></a><a href="/auth/sign-in"><span aria-hidden="true">♙</span><b>로그인</b><small>메디픽 계정</small></a><a href="/admin"><span aria-hidden="true">✧</span><b>병원 입점</b><small>관리·입점 문의</small></a></nav>
 
 <div class="mp-smart-layout">
 <aside class="mp-smart-list-panel" aria-label="주변 병원 목록">
-<div class="mp-smart-list-head"><b>병원 주소록 · 좌표 참고 목록</b><span id="smartListMeta">위치를 선택하세요</span></div>
-<div class="mp-smart-list" id="smartList"><div class="empty-state">페이지 로드 시 가락시장역 기준으로 표시됩니다. 「현위치」로 변경할 수 있습니다.</div></div>
+<div class="mp-smart-list-head"><b id="smartListTitle">병원 주소록 · 지역 검색</b><span id="smartListMeta">목록을 불러오는 중</span></div>
+<div class="mp-smart-list" id="smartList" aria-live="polite"><div class="empty-state">서울 지역 병원 주소록을 불러오는 중입니다. 검색 지역은 변경할 수 있습니다.</div></div><section class="mp-smart-detail" id="smartDetail" hidden aria-label="선택한 병원 상세정보"></section>
 </aside>
-<div class="mp-smart-map-panel"><div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="병원 지도"><span style="font-size:42px">⌖</span><h3>지도</h3><p>검색 후 마커와 목록이 연동됩니다.</p></div></div>
+<div class="mp-smart-map-panel"><div class="mp-smart-map-status"><span class="mp-smart-map-status-dot"></span> <strong>지도 위치 정확도</strong> · 검증 좌표만 기본 표시 <small>조회된 주소록이 곧 지도 핀을 뜻하지 않습니다.</small></div><div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="병원 지도"><span style="font-size:42px">⌖</span><h3>지도</h3><p>검색 후 마커와 목록이 연동됩니다.</p></div></div>
 </div>
 
 <div class="mp-smart-source-info" aria-label="공식 병원정보 확인처"><strong>공식 병원정보 확인처</strong><a href="https://www.data.go.kr/data/15051059/fileData.do" target="_blank" rel="noopener noreferrer">공공데이터포털 「전국 병의원 현황」</a><a href="https://www.data.go.kr/data/15001698/openapi.do" target="_blank" rel="noopener noreferrer">HIRA 「병원정보서비스」</a><small>현재 메디픽 등록 주소록은 공식 자료와 대조 중입니다. 전체 등록기관의 출처·운영 여부·위치를 인증했다는 의미는 아닙니다.</small></div>
@@ -45,6 +56,7 @@
 
 <div id="toast" class="toast" aria-live="polite"></div>
 <script src="/assets/smart-store.js"></script>
+<script src="/assets/pwa/install.js" defer></script>
 <script src="/assets/site-chrome.js" defer></script>
 </body>
 </html>
