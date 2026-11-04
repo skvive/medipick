@@ -284,3 +284,127 @@
  .mp-smart-store .mp-smart-source-info{margin:12px 12px 5px;padding:12px 14px;gap:6px 10px}
  .mp-smart-store .mp-smart-source-info strong{flex-basis:100%}
 }
+
+/* MEDIPICK Integrated Map Hub · 2026-11-05; restyles existing functional components. */
+.mp-smart-store { color:#15325c; font-family:'Noto Sans KR',Pretendard,'Malgun Gothic',system-ui,sans-serif; }
+.mp-smart-store .mp-smart-hero { padding:22px 0 22px; }
+.mp-smart-store .mp-smart-hero .wrap { max-width:1320px; }
+.mp-smart-hero-intro{display:grid;grid-template-columns:minmax(0,1fr) 198px;gap:20px;align-items:center}
+.mp-smart-hero-copy{min-width:0}
+.mp-smart-hero-graphic{display:block;width:194px;height:160px;object-fit:cover;object-position:50% 52%;border-radius:24px;border:5px solid #fff;box-shadow:0 17px 36px #1a66cf20}
+.mp-smart-store .mp-smart-hero .eyebrow{display:inline-flex;align-items:center;background:#e6f0ff;border:1px solid #cddfff;border-radius:999px;padding:6px 12px;color:#185ab4;font-size:11px;font-weight:850;letter-spacing:.035em}
+.mp-smart-store .mp-smart-hero h1{font-size:clamp(29px,3.9vw,50px);line-height:1.18;margin:12px 0 10px;font-weight:900;letter-spacing:-.055em}
+.mp-smart-store .mp-smart-hero h1 em{color:#1265e8}
+.mp-smart-store .mp-smart-hero p{font-size:13.5px;line-height:1.8;max-width:840px;margin:0}
+.mp-smart-store .mp-smart-stats{gap:7px;margin:12px 0 0}
+.mp-smart-store .mp-smart-stats span{padding:6px 10px;border-radius:10px;font-size:11px}
+.mp-smart-store .mp-smart-toolbar{display:flex;gap:9px;margin-top:17px}
+.mp-smart-modes{display:flex;gap:8px;align-items:center;width:100%;margin:0 0 4px;padding:0;border:0}
+.mp-smart-modes legend{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
+.mp-smart-modes label{display:inline-flex;align-items:center;gap:7px;border:1px solid #d4e1f5;padding:10px 15px;border-radius:12px;background:#fff;color:#34547d;font-size:12px;font-weight:800;cursor:pointer;transition:background .2s,border-color .2s;min-height:44px;user-select:none}
+.mp-smart-modes label.is-checked{background:#175ed9;color:#fff;border-color:#175ed9;box-shadow:0 8px 18px #155cdb22}
+.mp-smart-modes input{accent-color:#0d55ca;width:16px;height:16px}
+.mp-smart-modes .is-checked input{accent-color:#fff}
+.mp-smart-store .mp-smart-toolbar input[type='search'],.mp-smart-store .mp-smart-toolbar select{height:46px;border-radius:12px;border:1px solid #cbdbf2;color:#173f76;min-width:0;padding:10px 13px;box-shadow:0 4px 10px #176ac406}
+.mp-smart-store #smartQ{flex:2 1 260px;max-width:none}
+.mp-smart-store #smartTrade{flex:1 1 135px;max-width:210px}
+.mp-smart-store #smartRegion{flex:0 1 115px;max-width:140px}
+.mp-smart-store #smartRadius{flex:0 1 105px;max-width:120px}
+.mp-smart-store .mp-smart-toolbar .btn-primary,.mp-smart-store .mp-smart-toolbar .btn-ghost{min-height:46px;border-radius:12px;white-space:nowrap;font-size:12px}
+.mp-smart-store .mp-smart-toolbar .btn-primary{background:linear-gradient(120deg,#1465eb,#236cec);box-shadow:0 8px 19px #1b68ea2a}
+.mp-smart-store .mp-smart-toolbar .btn-primary:hover,.mp-smart-store .mp-smart-geocode:hover{filter:brightness(.96)}
+.mp-smart-store .mp-smart-estimate-control{min-height:46px;border-radius:12px}
+.mp-smart-store .mp-smart-estimate-control[hidden]{display:none!important}
+.mp-smart-quick{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:13px}
+.mp-smart-quick>span{font-size:11px;font-weight:800;color:#385b8c;margin-right:7px}
+.mp-smart-quick button{border:1px solid #d8e6f7;background:#fff;color:#345c8b;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:750;cursor:pointer;min-height:33px}
+.mp-smart-quick button.is-active{background:#e0edff;border-color:#4a8af9;color:#1557b9}
+.mp-smart-quick button:hover{border-color:#81b0f7}
+.mp-smart-quick button:focus-visible,.mp-smart-modes input:focus-visible,.mp-smart-partner-link:focus-visible{outline:3px solid #4386f5;outline-offset:2px}
+.mp-smart-service-rail{max-width:1320px;margin:15px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px}
+.mp-smart-service-rail a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 7px;min-width:0;min-height:103px;text-align:center;text-decoration:none;background:#fff;color:#153f81;border:1px solid #dce8fa;border-radius:17px;box-shadow:0 6px 24px #29539b0c;transition:transform .2s,box-shadow .2s,border-color .2s}
+.mp-smart-service-rail a:hover{transform:translateY(-3px);border-color:#aacfff;box-shadow:0 12px 24px #29539b18}
+.mp-smart-service-rail a span{font-size:25px;color:#1678e8;line-height:1.1}
+.mp-smart-service-rail a b{font-size:12px;color:#1c477e}
+.mp-smart-service-rail a small{font-size:10px;color:#7389a6;line-height:1.3}
+.mp-smart-store .mp-smart-layout{max-width:1320px;grid-template-columns:minmax(315px,405px) minmax(0,1fr);gap:16px;padding:16px 20px 33px}
+.mp-smart-store .mp-smart-list-panel{min-height:590px;max-height:min(78vh,830px);border-radius:18px}
+.mp-smart-store .mp-smart-list-head{padding:16px 16px 12px;background:#fff}
+.mp-smart-store .mp-smart-list-head b{color:#183f77;font-size:14px}
+.mp-smart-store .mp-smart-list-head span{font-size:11px;color:#6984a8}
+.mp-smart-store .mp-smart-list{padding:9px;min-height:0}
+.mp-smart-store .mp-smart-item{background:#fbfdff;border:1px solid #edf2fa;border-radius:13px;padding:11px 13px}
+.mp-smart-store .mp-smart-item h3{color:#163a72;font-size:13px;line-height:1.45}
+.mp-smart-store .mp-smart-item p{color:#5c7395;font-size:11px}
+.mp-smart-store .mp-smart-item .dist{color:#3367a6;font-size:11px}
+.mp-smart-store .mp-smart-actions{border-top:1px solid #e5eefc}
+.mp-smart-store .mp-smart-item.active{border-color:#75a5f9;box-shadow:0 5px 16px #175ad91d}
+.mp-smart-store .mp-smart-partner{padding:16px;border:1px solid #e0e9f8;border-radius:14px;background:linear-gradient(140deg,#fff,#f7faff);margin-bottom:9px}
+.mp-smart-store .mp-smart-partner h3{font-size:14px;color:#173c79;margin:8px 0 7px}
+.mp-smart-store .mp-smart-partner p{font-size:11px;color:#5f7596;margin:0 0 7px;line-height:1.7}
+.mp-smart-partner-label{color:#8a5918;background:#fff5e4;border:1px solid #efdab0;padding:5px 9px;border-radius:6px;font-size:10px;font-weight:750}
+.mp-smart-partner-link{display:inline-flex;align-items:center;margin-top:4px;padding:9px 12px;background:#e8f2ff;color:#1661c9;text-decoration:none;border-radius:9px;font-size:11px;font-weight:850;min-height:40px}
+.mp-smart-detail{border-top:1px solid #d9e7fa;background:#f2f7ff;padding:13px 16px 15px;max-height:320px;overflow:auto;flex-shrink:0}
+.mp-smart-detail[hidden]{display:none!important}
+.mp-smart-detail-top{display:flex;align-items:center;justify-content:space-between}
+.mp-smart-detail-kicker{font-size:10px;color:#3568ac;letter-spacing:.055em;font-weight:850}
+.mp-smart-detail-close{border:0;background:transparent;color:#466385;font-size:23px;cursor:pointer;min-width:32px;min-height:32px}
+.mp-smart-detail h3{font-size:16px;color:#153b75;margin:4px 0 8px}
+.mp-smart-detail p{color:#527093;font-size:11px;line-height:1.6;margin:5px 0}
+.mp-smart-detail-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.mp-smart-detail-actions button,.mp-smart-detail-actions a,.mp-smart-detail-related a{display:inline-flex;align-items:center;justify-content:center;background:#1769eb;border:1px solid #1769eb;border-radius:9px;color:#fff;font-size:11px;font-weight:800;padding:10px 12px;min-height:40px;text-decoration:none;cursor:pointer}
+.mp-smart-detail-actions a,.mp-smart-detail-related a{background:#fff;color:#1760c4;border-color:#c6defd}
+.mp-smart-detail-related{display:flex;flex-wrap:wrap;gap:6px}
+.mp-smart-detail-note,.mp-smart-detail .mp-smart-paid{background:#fff;border-left:3px solid #e5ac4a;padding:8px 10px;border-radius:5px}
+.mp-smart-store .mp-smart-map-panel{border-radius:18px;min-height:590px;box-shadow:0 10px 28px #164e9810}
+.mp-smart-map-status{position:absolute;left:14px;top:14px;z-index:2;display:flex;flex-wrap:wrap;gap:5px 6px;align-items:center;max-width:min(380px,calc(100% - 28px));background:#fffffff2;backdrop-filter:blur(12px);box-shadow:0 7px 24px #15427012;border:1px solid #d3e2f8;border-radius:12px;padding:10px 14px;color:#3f5980;font-size:11px;line-height:1.5;pointer-events:none}
+.mp-smart-map-status strong{color:#174e98}
+.mp-smart-map-status small{width:100%;color:#788ca8;font-size:10px}
+.mp-smart-map-status-dot{height:9px;width:9px;display:inline-block;border-radius:50%;background:#1e74ee;box-shadow:0 0 0 4px #1e74ee18}
+.mp-smart-store #smartStoreMap{min-height:590px;height:min(78vh,830px)}
+.mp-smart-store .mp-smart-source-info{max-width:1280px}
+@media(max-width:1080px){
+ .mp-smart-service-rail{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .mp-smart-store .mp-smart-layout{grid-template-columns:minmax(300px,375px) minmax(0,1fr)}
+ .mp-smart-store #smartStoreMap,.mp-smart-store .mp-smart-map-panel{min-height:510px}
+}
+@media(max-width:900px){
+ .mp-smart-store .mp-smart-layout{grid-template-columns:minmax(0,1fr)}
+ .mp-smart-store .mp-smart-list-panel{max-height:none;min-height:320px}
+ .mp-smart-store .mp-smart-list{max-height:460px;min-height:100px}
+ .mp-smart-store .mp-smart-detail{max-height:330px}
+ .mp-smart-store .mp-smart-map-panel{min-height:360px}
+ .mp-smart-store #smartStoreMap{height:390px;min-height:360px}
+}
+@media(max-width:670px){
+ .mp-smart-store .mp-smart-hero{padding:17px 0 20px}
+ .mp-smart-hero-intro{grid-template-columns:minmax(0,1fr) 88px;gap:9px}
+ .mp-smart-hero-graphic{width:88px;height:110px;border-radius:15px;border-width:3px}
+ .mp-smart-store .mp-smart-hero h1{font-size:clamp(27px,7.6vw,37px)}
+ .mp-smart-store .mp-smart-hero p{font-size:12px;line-height:1.7}
+ .mp-smart-store .mp-smart-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .mp-smart-store .mp-smart-modes label{justify-content:center;padding:10px 6px;font-size:11px}
+ .mp-smart-store #smartQ,.mp-smart-store #smartTrade{flex:1 1 100%;max-width:none}
+ .mp-smart-store #smartRegion,.mp-smart-store #smartRadius{flex:1 1 calc(50% - 8px);max-width:none}
+ .mp-smart-store .mp-smart-toolbar .btn-primary{flex:1 1 auto}
+ .mp-smart-service-rail{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:0 12px}
+ .mp-smart-service-rail a{min-height:85px;padding:10px 5px;border-radius:13px}
+ .mp-smart-service-rail a b{font-size:10px}
+ .mp-smart-service-rail a small{font-size:9px}
+ .mp-smart-service-rail a span{font-size:21px}
+ .mp-smart-store .mp-smart-layout{padding:12px 12px 24px}
+ .mp-smart-store .mp-smart-map-status{top:10px;left:10px;padding:7px 10px;font-size:10px}
+ .mp-smart-store .mp-smart-map-status small{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.mp-smart-service-rail a{transition:none!important}}
+
+/* MEDIPICK MAP FOOTER V5 */
+.mp-smart-footer{margin-top:28px;padding:32px 20px 42px;border-top:1px solid #d7e3f5;background:linear-gradient(150deg,#fff,#edf5ff)}
+.mp-smart-footer-inner{max-width:1280px;margin:auto;display:grid;grid-template-columns:195px minmax(200px,1fr) auto;gap:20px;align-items:center}
+.mp-smart-footer-inner>a img{max-width:185px;height:auto}
+.mp-smart-footer-inner>p{color:#627a9e;font-size:12px;line-height:1.75;max-width:520px;margin:0}
+.mp-smart-footer nav{display:flex;flex-wrap:wrap;gap:9px 15px}
+.mp-smart-footer nav a{color:#265a9d;text-decoration:none;font-weight:700;font-size:11px}
+.mp-smart-footer nav a:hover{text-decoration:underline}
+@media(max-width:850px){.mp-smart-footer-inner{grid-template-columns:1fr;gap:12px}.mp-smart-footer{padding:24px 16px 28px}}
+@media(max-width:380px){.mp-smart-store .mp-smart-hero h1{font-size:26px}.mp-smart-hero-intro{grid-template-columns:minmax(0,1fr) 66px}.mp-smart-hero-graphic{width:66px;height:90px}}

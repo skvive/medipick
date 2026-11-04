@@ -17,6 +17,7 @@
 
   var NAV = [
     { key: 'home', href: '/', label: '홈' },
+    { key: 'smart-store', href: '/smart-store', label: '병원 지도' },
     { key: 'explore', href: '/?nav=explore', label: '병원 찾기', homeNav: true },
     { key: 'content', href: '/?nav=content', label: '의사 PICK', homeNav: true },
     { key: 'pharmacy', href: '/?nav=pharmacy', label: '심야약국', homeNav: true },
@@ -65,7 +66,7 @@
       '<header class="mp-site-header" role="banner">' +
       '<div class="mp-site-header__inner">' +
       '<a class="mp-brand" href="/" aria-label="MEDIPICK 홈">' +
-      '<img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="MEDIPICK 메디픽" width="168" height="36" decoding="async">' +
+      '<img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="내 근처 병원찾기, 메디픽" width="184" height="42" decoding="async">' +
       '</a>' +
       '<nav class="mp-site-nav mp-site-nav--desktop" aria-label="주 메뉴">' +
       navHtml(NAV, false) +
@@ -175,7 +176,7 @@
     var lockup = document.querySelector('.brand-lockup');
     if (!lockup) return;
     lockup.innerHTML =
-      '<img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="MEDIPICK" width="168" height="36"> <small>사업자 연동 센터</small>';
+      '<img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="내 근처 병원찾기, 메디픽" width="184" height="42"> <small>사업자 연동 센터</small>';
   }
 
   function upgradeAdvertiserHeader() {
@@ -195,7 +196,7 @@
     h.className = 'mp-site-header';
     h.innerHTML =
       '<div class="mp-site-header__inner">' +
-      '<a class="mp-brand" href="/"><img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="MEDIPICK" width="168" height="36"></a>' +
+      '<a class="mp-brand" href="/"><img class="mp-brand__logo mp-brand__logo--full" src="/assets/logo-full.svg" alt="내 근처 병원찾기, 메디픽" width="184" height="42"></a>' +
       '<div class="mp-site-actions" style="margin-left:auto">' +
       '<a class="mp-btn-ghost" href="/admin">← 관리자</a>' +
       '<button type="button" class="mp-menu-toggle" id="mpMenuToggle" aria-label="메뉴">☰</button></div></div>';
@@ -210,7 +211,30 @@
     ensureDrawer(false);
   }
 
+  function ensurePwaInstall() {
+    // Existing 13 HTML pages reuse one app manifest, one install helper and shared logo.
+    if (!document.querySelector('link[rel="manifest"]')) {
+      var manifest = document.createElement('link');
+      manifest.rel = 'manifest';
+      manifest.href = '/manifest.webmanifest';
+      document.head.appendChild(manifest);
+    }
+    if (!document.querySelector('link[href="/assets/pwa/install.css"]')) {
+      var css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = '/assets/pwa/install.css';
+      document.head.appendChild(css);
+    }
+    if (!document.querySelector('script[src="/assets/pwa/install.js"]')) {
+      var script = document.createElement('script');
+      script.src = '/assets/pwa/install.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    ensurePwaInstall();
     upgradeMast();
     upgradeHomeHeader();
     upgradeIntegrationBrand();

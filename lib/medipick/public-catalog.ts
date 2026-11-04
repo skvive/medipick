@@ -75,7 +75,8 @@ export async function publicCatalogSearch(params: URLSearchParams) {
   }
   if (trade) {
     args.push(`%${trade}%`);
-    clauses.push(`trade_category ILIKE $${args.length}`);
+    const p = `$${args.length}`;
+    clauses.push(`(trade_category ILIKE ${p} OR name ILIKE ${p} OR summary ILIKE ${p})`);
   }
   args.push(limit, offset);
   const text = `
@@ -138,7 +139,8 @@ export async function publicCatalogNearby(params: URLSearchParams) {
   }
   if (trade) {
     args.push('%' + trade + '%');
-    clauses.push('trade_category ILIKE $' + args.length);
+    const p = '$' + args.length;
+    clauses.push('(trade_category ILIKE ' + p + ' OR name ILIKE ' + p + ' OR summary ILIKE ' + p + ')');
   }
   args.push(limit);
 

@@ -1,0 +1,53 @@
+{
+  "id": "/",
+  "name": "메디픽 MEDIPICK | 내 근처 병원찾기",
+  "short_name": "메디픽",
+  "description": "병원명·지역·진료과별 주소록, 메디픽 병원 정보, 건강 안내를 지도와 목록으로 찾아보세요.",
+  "lang": "ko-KR",
+  "start_url": "/smart-store?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#eef6ff",
+  "theme_color": "#1769f8",
+  "orientation": "any",
+  "categories": [
+    "health",
+    "medical",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "내 근처 병원찾기",
+      "short_name": "병원지도",
+      "url": "/smart-store"
+    },
+    {
+      "name": "의료정보 상담",
+      "short_name": "AI 상담",
+      "url": "/consult"
+    },
+    {
+      "name": "의사 콘텐츠",
+      "url": "/doctors"
+    },
+    {
+      "name": "나의 건강노트",
+      "url": "/my-health"
+    }
+  ]
+}
