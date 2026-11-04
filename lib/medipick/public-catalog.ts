@@ -11,28 +11,33 @@ const LIST_COLS = `
 
 export async function publicCatalogStats() {
   const sql = db();
-  const total = await sql<{ n: number }>`SELECT count(*)::int AS n FROM public_hospital_stores WHERE store_listing = 'listed'`;
+  const total = await sql<{ n: number }>`SELECT count(*)::int AS n FROM public_hospital_stores WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%'`;
   const geo = await sql<{ n: number }>`
     SELECT count(*)::int AS n FROM public_hospital_stores
-    WHERE store_listing = 'listed' AND latitude IS NOT NULL AND longitude IS NOT NULL
+    WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%' AND latitude IS NOT NULL AND longitude IS NOT NULL
   `;
   const accuracy = await sql<{ exact: number; approximate: number; missing_address: number }>`
     SELECT count(*) FILTER (WHERE geocode_status = 'exact' AND latitude IS NOT NULL AND longitude IS NOT NULL)::int AS exact,
            count(*) FILTER (WHERE geocode_status = 'approx' AND latitude IS NOT NULL AND longitude IS NOT NULL)::int AS approximate,
            count(*) FILTER (WHERE btrim(address) = '')::int AS missing_address
-    FROM public_hospital_stores WHERE store_listing = 'listed'
+    FROM public_hospital_stores WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%'
+  `;
+  const excluded = await sql<{ n: number }>`
+    SELECT count(*)::int AS n FROM public_hospital_stores
+    WHERE store_listing = 'listed' AND name ILIKE '%검색결과%'
   `;
   const premium = await sql<{ n: number }>`
     SELECT count(*)::int AS n FROM public_hospital_stores
-    WHERE store_listing = 'listed' AND listing_tier = 'premium' AND marketing_active = TRUE
+    WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%' AND listing_tier = 'premium' AND marketing_active = TRUE
   `;
   const sources = await sql<{ source_platform: string; n: number }>`
     SELECT source_platform, count(*)::int AS n FROM public_hospital_stores
-    WHERE store_listing = 'listed'
+    WHERE store_listing = 'listed' AND name NOT ILIKE '%검색결과%'
     GROUP BY source_platform ORDER BY n DESC LIMIT 12
   `;
   return {
     total: total[0]?.n ?? 0,
+    excluded_search_pages: excluded[0]?.n ?? 0,
     mappable: geo[0]?.n ?? 0,
     exact_mappable: accuracy[0]?.exact ?? 0,
     estimated_mappable: accuracy[0]?.approximate ?? 0,
@@ -56,7 +61,7 @@ export async function publicCatalogSearch(params: URLSearchParams) {
   const limit = Math.min(100, Math.max(1, Number(params.get('limit') || 40)));
   const offset = Math.max(0, Number(params.get('offset') || 0));
 
-  const clauses = [`store_listing = 'listed'`];
+  const clauses = [`store_listing = 'listed'`, `name NOT ILIKE '%검색결과%'`];
   const args: unknown[] = [];
   if (q) {
     args.push(`%${q}%`);
@@ -121,6 +126,7 @@ export async function publicCatalogNearby(params: URLSearchParams) {
   ];
   const clauses = [
     "store_listing = 'listed'",
+    "name NOT ILIKE '%검색결과%'",
     'latitude IS NOT NULL',
     'longitude IS NOT NULL',
     'latitude BETWEEN $1 AND $2',
@@ -185,7 +191,7 @@ export async function publicCatalogNearby(params: URLSearchParams) {
 export async function publicCatalogStore(id: number) {
   const sql = db();
   const rows = await sql<Row>`
-    SELECT * FROM public_hospital_stores WHERE id = ${id} AND store_listing = 'listed' LIMIT 1
+    SELECT * FROM public_hospital_stores WHERE id = ${id} AND store_listing = 'listed' AND name NOT ILIKE '%검색결과%' LIMIT 1
   `;
   if (!rows[0]) throw new Error('카탈로그 항목 없음');
   return presentCatalogStore(rows[0]);
