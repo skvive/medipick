@@ -98,9 +98,7 @@ function popupHtml(x) {
   const summary = x.summary
     ? `<p style="margin:8px 0;color:#486b57">${safe(String(x.summary).slice(0, 160))}${String(x.summary).length > 160 ? '…' : ''}</p>`
     : '';
-  const link = x.profile_url
-    ? `<p><a target="_blank" rel="noopener noreferrer" href="${safe(x.profile_url)}">플랫폼 원문 ↗</a></p>`
-    : '';
+  const link = '';
   if (ui.variant === 'premium' || x.is_premium) {
     const img = ui.hero_image
       ? `<img src="${safe(ui.hero_image)}" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px">`
@@ -267,7 +265,7 @@ function renderList() {
     .map(
       (x) => {
         const pro = x.is_premium ? ' mp-smart-item--pro' : '';
-        const badge = x.ui?.badge || x.source_platform;
+        const badge = x.ui?.badge || '병원 정보';
         const distLabel = x.distance_km == null ? '전국 목록 검색 · 거리 미산정' :
           (x.geocode_status === 'exact' ? '직선거리' : '좌표상 추정거리(실거리 아님)') + ' 약 ' + Number(x.distance_km).toFixed(2) + ' km';
         const lookup = x.address && x.district
@@ -361,20 +359,9 @@ async function initStats() {
       `<span>지도 좌표 ${stats.mappable.toLocaleString()}건 (추정 포함)</span>` +
       `<span>정확 위치 검증 ${Number(stats.exact_mappable || 0).toLocaleString()}건</span>` +
       `<span>주소 미등록 ${Number(stats.missing_address || 0).toLocaleString()}건</span>` +
-      (stats.sources || [])
-        .slice(0, 4)
-        .map((s) => `<span>${safe(s.source_platform)} ${s.n.toLocaleString()}</span>`)
-        .join('');
+      '';
   }
-  const sel = $('#smartPlatform');
-  if (sel && stats.sources) {
-    for (const s of stats.sources) {
-      const o = document.createElement('option');
-      o.value = s.source_platform;
-      o.textContent = `${s.source_platform} (${s.n.toLocaleString()})`;
-      sel.appendChild(o);
-    }
-  }
+
 }
 
 function bindUi() {

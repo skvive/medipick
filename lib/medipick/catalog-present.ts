@@ -25,8 +25,6 @@ export function presentCatalogStore(row: Row, distanceKm?: number) {
     address: row.address,
     region: row.region,
     district: row.district,
-    source_platform: row.source_platform,
-    profile_url: row.profile_url,
     summary: row.summary,
     rating: row.rating,
     review_count: row.review_count,
@@ -61,10 +59,10 @@ export function presentCatalogStore(row: Row, distanceKm?: number) {
     ...base,
     ui: {
       variant: 'free' as const,
-      badge: '공공 주소록 · 무료',
+      badge: '메디픽 주소록 · 무료',
       sample_label: '기본 정보 샘플',
       disclosure:
-        '공공·플랫폼에서 수집한 연락처·주소입니다. 광고 없이 무료로 노출됩니다. 마케팅 업그레이드는 월 구독으로 신청할 수 있습니다.',
+        '메디픽에 등록된 병원 주소·연락처는 공식 의료기관 자료와 대조 중입니다. 진료·운영 여부를 확인한 후 방문하세요. 월 구독 정보창은 광고 표시 대상입니다.',
     },
   };
 }

@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff2d6a"/><stop offset="1" stop-color="#ff6b4a"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#g)"/><text x="32" y="42" text-anchor="middle" fill="#fff" font-family="Segoe UI,Arial,sans-serif" font-size="32" font-weight="800">P</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="메디픽">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0fb7f4"/><stop offset=".56" stop-color="#176cf1"/><stop offset="1" stop-color="#5039e5"/></linearGradient></defs>
+<rect width="64" height="64" rx="20" fill="url(#g)"/>
+<path d="M32 14c-11 0-19 8.2-19 18.6C13 46 32 56 32 56s19-10 19-23.4C51 22.2 43 14 32 14Z" fill="none" stroke="#fff" stroke-width="3.3"/>
+<path d="M32 24v17M23.5 32.5h17" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+</svg>

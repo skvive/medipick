@@ -256,3 +256,31 @@
 .mp-smart-estimate-control { display:inline-flex; align-items:center; gap:7px; background:#fff8eb; color:#805315; border:1px solid #dec59c; border-radius:10px; padding:9px 12px; font-size:12px; font-weight:700; cursor:pointer; }
 .mp-smart-estimate-control input { width:16px; height:16px; accent-color:#855923; }
 .mp-smart-estimate-control small { font-weight:500; font-size:10px; }
+
+/* MEDIPICK unified location-first branding · November 2026 */
+.mp-smart-store{background:#f6f9ff}
+.mp-smart-store .mp-smart-hero{background:linear-gradient(135deg,#ffffff 0%,#eef5ff 75%,#e8f1ff 100%);border-bottom:1px solid #dce8fc}
+.mp-smart-store .mp-smart-hero h1{color:#0b2b60;font-size:clamp(26px,3.4vw,43px);letter-spacing:-.052em}
+.mp-smart-store .mp-smart-hero h1 em{color:#1769f8}
+.mp-smart-store .mp-smart-hero p{color:#526c8d;max-width:850px}
+.mp-smart-store .mp-smart-stats span{background:#eaf3ff;color:#1c5bbb;border-color:#cfe0ff}
+.mp-smart-store .mp-smart-toolbar .btn-primary{background:#1769f8;color:#fff}
+.mp-smart-store .mp-smart-toolbar .btn-ghost{border-color:#b8cef2;color:#205fbe}
+.mp-smart-store .mp-smart-toolbar input:focus-visible,.mp-smart-store .mp-smart-toolbar select:focus-visible{outline:3px solid #4c8cff;outline-offset:2px}
+.mp-smart-store .mp-smart-list-panel{border-color:#dde8fa}
+.mp-smart-store .mp-smart-item:hover,.mp-smart-store .mp-smart-item.active{border-color:#81b4ff}
+.mp-smart-store .mp-smart-map-panel{background:#e7f0ff;border-color:#d6e5fb}
+.mp-smart-store .mp-smart-geocode{background:#edf5ff;color:#1c59ba}
+.mp-smart-store .mp-smart-source-info{display:flex;align-items:center;flex-wrap:wrap;gap:10px 17px;max-width:1160px;margin:12px auto 8px;padding:15px 20px;border:1px solid #d4e3fd;border-radius:16px;background:#fff;box-shadow:0 9px 24px #2457a90a;color:#264466;font-size:12px;line-height:1.6}
+.mp-smart-store .mp-smart-source-info strong{font-size:12px;color:#0d3572;margin-right:6px}
+.mp-smart-store .mp-smart-source-info a{color:#1766d5;text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.mp-smart-store .mp-smart-source-info small{display:block;flex-basis:100%;font-size:11px;color:#687f9b}
+@media(max-width:760px){
+ .mp-smart-store .mp-smart-layout{padding:12px 12px 30px}
+ .mp-smart-store .mp-smart-hero .wrap{padding:0 15px}
+ .mp-smart-store .mp-smart-toolbar{gap:8px}
+ .mp-smart-store .mp-smart-toolbar input[type='search']{min-width:0;max-width:none}
+ .mp-smart-store .mp-smart-toolbar .btn-primary{flex:1 1 auto}
+ .mp-smart-store .mp-smart-source-info{margin:12px 12px 5px;padding:12px 14px;gap:6px 10px}
+ .mp-smart-store .mp-smart-source-info strong{flex-basis:100%}
+}
