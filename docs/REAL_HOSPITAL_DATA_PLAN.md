@@ -135,3 +135,39 @@ import 기본은 **시·군·구 중심 + 이름 기반 jitter** — 지도 핀�
 - [ ] prod `public_hospital_stores` count ≈ 35k (`/api/public-catalog/stats`)
 
 관련 정본: `docs/MEDIPICK_SMART_STORE.md`, `data/catalog/README.md`
+
+
+## 2026-11-04 실좌표·지도 핀 검증 현황
+
+### 운영 DB 현장 조회 결과 (Neon medipick-lexid)
+
+| 항목 | 건수 |
+|---|---:|
+| 카탈로그 총계 | 35,458 |
+| 좌표 있는 건 | 29,386 |
+| `geocode_status='approx'` | 29,386 |
+| `geocode_status='exact'` | **0** |
+| 빈 주소 | 5,084 |
+| 똑닥 출처(주소 전체 미등록) | 5,067 |
+
+**중요**: 좌표 29,386건은 `sido_centroid+jitter`이며 실제 건물 좌표가 아니다. 지역 반경 검색 결과 역시 실제 주변 의료기관 목록으로 주장하면 안 된다. 개인정보가 아니라 의료기관의 공개 정보를 다루지만, 플랫폼 소유 데이터 이용범위와 현시점 영업상태는 별도 검수 필요.
+
+### 이번 지도 구현
+
+- `/smart-store`에서 검색어가 있을 때 `/api/public-catalog/search`를 사용해 전국 병원명 검색 지원. 검색어가 없을 때만 좌표 기준 참고 검색 사용
+- 리스트의 **Google 주소 위치 조회 · 임시 핀** 버튼을 사용자가 클릭해야만 Google Maps JavaScript API Geocoder 호출 (대량 자동 호출·서버 저장 없음)
+- 응답이 한국 주소, `ROOFTOP`, 같은 도로명·건물번호·시군구일 때만 Google 주소 검색 임시 핀 생성
+- `ROOFTOP`도 의료기관 실재 및 현재 영업 상태를 입증하지 않음. UI에서 명시하고 기존 DB의 `exact`로 자동 승격하지 않음
+- 서버에 `exact_mappable`, `estimated_mappable`, `missing_address` 집계 노출. 빈 위도/경도 요청 HTTP 400
+- 별도 Google Geocoding API 서비스/과금/키 제한 정책 필요. 브라우저 키만 있다고 실행 가능하다는 뜻이 아님
+
+### 실병원 좌표 DB 갱신 요건
+
+1. **공식 원천 우선**: 건강보험심사평가원 [전국 병의원 및 약국 현황](https://www.data.go.kr/data/15051059/fileData.do) 최신 기준일 자료의 병원명·도로명주소·좌표와 기존 자료 비교. 공식 데이터의 갱신 시점 및 공공누리 출처 표시 확인
+2. **안전 매칭**: 상호(공백·형태 정규화) + 도로명/건물번호 + 시군구 **3요소 모두 일치**하고 후보가 1건인 경우만 위치 검증 대상으로 전환. 지점명 중복, 주소 없는 5,084건, 현 좌표 불일치 및 폐업 의심은 보류
+3. **검증 장부**: 기존 ID·원천 ID·주소·좌표·갱신일·매칭 근거·검수 결과 기록. 기존 추정 좌표 원본은 별도 이력으로 보존
+4. **표시**: 실제 운영기관 여부까지 확인한 레코드만 정확한 병원 핀 표시. 대조만 완료한 주소 검색 위치는 임시 핀으로 구분
+5. **Google Maps 정책**: Google Geocoding/Places 컨텐츠는 허용 범위를 넘어 영구 캐싱하지 않음. Google Place ID는 정책에 따라 장기 보관 가능 (공식 API 이용약관 별도 확인)
+6. **API 키**: 현재 Vercel 프로젝트에는 `GOOGLE_MAPS_BROWSER_KEY`만 있고 별도 `GOOGLE_PLACES_SERVER_KEY`, `GOOGLE_GEOCODING_SERVER_KEY`는 확인되지 않음. 대량 유료 요청은 승인된 키와 쿼터·지출 제한 설정 전 실행 금지
+
+검증 범위: GitHub 소스 정적 검토, JS 문법 체크, Next.js Vercel 미리보기 빌드, 운영 Neon DB 실쿼리, 미리보기 API HTTP. 실제 사용자 브라우저에서의 Google Geocoder 서비스 성공과 지도 타일 렌더는 별도 실기기 확인 필요.
