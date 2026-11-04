@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#167764">
-<meta name="description" content="공공·플랫폼 병원 주소록을 지도와 목록으로 — 메디픽 스마트스토어 카탈로그">
-<title>메디픽 스마트스토어 | 공공병원 지도 카탈로그</title>
+<meta name="description" content="내 근처 병원찾기, 메디픽. 지역·진료과 검색과 주소 지도 확인.">
+<title>내 근처 병원찾기, 메디픽 | 병원 주소록 지도</title>
 <link rel="icon" href="/assets/favicon.svg">
 <link rel="stylesheet" href="/assets/style.css">
 <link rel="stylesheet" href="/assets/site-shell.css">
@@ -17,13 +17,13 @@
 
 <section class="mp-smart-hero"><div class="wrap">
 <div class="eyebrow">MEDIPICK SMART STORE · PUBLIC CATALOG</div>
-<h1>검증 좌표 기반 <em>병원 찾기</em> 지도</h1>
-<p>여신티켓·똑닥·바비톡·강남언니 등 출처의 병원 주소록을 표시합니다. <strong>병원명 검색</strong>으로 전국 목록을 찾거나 좌표 기준 참고 범위를 살펴보세요. 실제 좌표가 검증된 핀만 기본 표시합니다. 추정핀은 명시적으로 선택한 경우에만 표시할 수 있으며 실제 병원 위치가 아닙니다. <strong>Google 주소 위치 조회</strong>는 사용자가 선택한 1건에 대해서만 시도합니다.</p>
-<div class="mp-smart-stats" id="smartStats"><span>불러오는 중…</span></div>
+<h1>내 근처 <em>병원찾기, 메디픽</em></h1>
+<p>지역·진료과별 병원 주소록을 검색하고, 지도에서 위치를 확인해 보세요. <strong>병원명 검색</strong>으로 전국 목록을 찾거나 좌표 기준 참고 범위를 살펴보세요. 실제 좌표가 검증된 핀만 기본 표시합니다. 추정핀은 명시적으로 선택한 경우에만 표시할 수 있으며 실제 병원 위치가 아닙니다. <strong>Google 주소 위치 조회</strong>는 사용자가 선택한 1건에 대해서만 시도합니다.</p>
+<div class="mp-smart-stats" id="smartStats"><span>주소록 정보를 불러오는 중…</span></div>
 <form class="mp-smart-toolbar" id="smartSearchForm">
 <input type="search" name="q" id="smartQ" maxlength="80" placeholder="병원명·동·주소 검색" aria-label="병원 검색">
 <input type="search" id="smartTrade" maxlength="40" placeholder="공종 · 예: 피부과" aria-label="공종 필터">
-<select id="smartPlatform" aria-label="출처 플랫폼"><option value="">전체 출처</option></select>
+
 <select id="smartRadius" aria-label="검색 반경"><option value="1">1km</option><option value="3">3km</option><option value="5">5km</option><option value="10">10km</option><option value="20" selected>20km</option><option value="30">30km</option></select>
 <label class="mp-smart-estimate-control"><input type="checkbox" id="smartEstimated"> 추정핀 보기 <small>(실제 위치 아님)</small></label>
 <button type="submit" class="btn-primary">⌕ 검색</button>
@@ -40,6 +40,7 @@
 <div class="mp-smart-map-panel"><div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="병원 지도"><span style="font-size:42px">⌖</span><h3>지도</h3><p>검색 후 마커와 목록이 연동됩니다.</p></div></div>
 </div>
 
+<div class="mp-smart-source-info" aria-label="공식 병원정보 확인처"><strong>공식 병원정보 확인처</strong><a href="https://www.data.go.kr/data/15051059/fileData.do" target="_blank" rel="noopener noreferrer">공공데이터포털 「전국 병의원 현황」</a><a href="https://www.data.go.kr/data/15001698/openapi.do" target="_blank" rel="noopener noreferrer">HIRA 「병원정보서비스」</a><small>현재 메디픽 등록 주소록은 공식 자료와 대조 중입니다. 전체 등록기관의 출처·운영 여부·위치를 인증했다는 의미는 아닙니다.</small></div>
 <p class="mp-smart-disclaimer" id="smartNotice">※ 병원 목록의 미검증 좌표는 시·도 중심에 편차를 준 임시값으로 실제 병원 위치와 거리가 아닙니다. 기본 설정에서는 추정핀을 숨깁니다. 추정핀 보기를 직접 켜면 회색 가상 좌표가 표시됩니다. 방문 전 실제 주소를 확인하세요. 구독·광고 의료기관은 <a href="/">홈 · 내 주변</a>에서 확인하세요.</p>
 
 <div id="toast" class="toast" aria-live="polite"></div>
