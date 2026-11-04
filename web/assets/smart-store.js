@@ -367,7 +367,12 @@ function renderList() {
     )
     .join('');
   list.querySelectorAll('[data-open-id]').forEach((btn) => {
-    btn.onclick = () => openStore(+btn.dataset.openId, true);
+    btn.onclick = () => {
+      openStore(+btn.dataset.openId, true);
+      if (matchMedia('(max-width:900px)').matches) {
+        $('#smartDetail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    };
   });
   list.querySelectorAll('[data-geocode-id]').forEach((btn) => {
     btn.onclick = () => locateStoreAddress(+btn.dataset.geocodeId);
@@ -379,9 +384,12 @@ function renderMapMarkers() {
   clearMarkers();
   const bounds = new google.maps.LatLngBounds();
   for (const x of items) {
+    // Null/empty coordinates must never become Number(null) = 0 and create bogus pins.
+    if (x.latitude == null || x.longitude == null || x.latitude === '' || x.longitude === '') continue;
     const lat = Number(x.latitude);
     const lng = Number(x.longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) ||
+        lat < 33 || lat > 39.5 || lng < 124 || lng > 132) continue;
     const pos = { lat, lng };
     const precise = x.geocode_status === 'exact';
     if (!precise && !$('#smartEstimated')?.checked) continue;
