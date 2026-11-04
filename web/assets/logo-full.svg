@@ -1,14 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 44" role="img" aria-labelledby="title">
-<title id="title">MEDIPICK T=</title>
-<defs>
-<linearGradient id="mpg" x1="0" y1="0" x2="1" y2="1">
-<stop stop-color="#ff2d6a"/>
-<stop offset="1" stop-color="#ff6b4a"/>
-</linearGradient>
-</defs>
-<rect x="0" y="4" width="36" height="36" rx="11" fill="url(#mpg)"/>
-<text x="18" y="29" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">P</text>
-<text x="46" y="30" fill="#111111" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="800" letter-spacing="-1.2">medi</text>
-<text x="108" y="30" fill="#ff2d6a" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="800" letter-spacing="-1.2">pick</text>
-<text x="46" y="41" fill="#9ca3af" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="1.4">HONEST MEDICAL PICK</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 216 52" role="img" aria-labelledby="title desc">
+<title id="title">메디픽 MEDIPICK</title>
+<desc id="desc">내 근처 병원찾기, 메디픽. 블루·바이올렛 위치 핀 의료 로고</desc>
+<defs><linearGradient id="mark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0fb9f4"/><stop offset=".52" stop-color="#176cf1"/><stop offset="1" stop-color="#5039e5"/></linearGradient></defs>
+<rect x="2" y="3" width="46" height="46" rx="15" fill="url(#mark)"/>
+<path d="M25 12c-7.1 0-12.3 5.3-12.3 12.1C12.7 32.8 25 42 25 42s12.3-9.2 12.3-17.9C37.3 17.3 32.1 12 25 12Z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
+<path d="M25 17.5v13.2M18.4 24.1h13.2" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+<text x="57" y="30" font-family="Pretendard, Noto Sans KR, Segoe UI, Arial, sans-serif" font-size="27" font-weight="850" letter-spacing="-1.25" fill="#0b2b58">medi</text>
+<text x="123" y="30" font-family="Pretendard, Noto Sans KR, Segoe UI, Arial, sans-serif" font-size="27" font-weight="850" letter-spacing="-1.25" fill="#1467ec">pick</text>
+<text x="58" y="45" font-family="Pretendard, Noto Sans KR, Malgun Gothic, sans-serif" font-size="10.2" font-weight="700" fill="#6680a6">내 근처 병원찾기</text>
 </svg>
