@@ -339,7 +339,7 @@ async function searchNearby(lat, lng) {
     : params;
   const res = await api(endpoint + '?' + requestParams.toString());
   items = res.items || [];
-  if (directorySearch && items.length === 100) showToast('전국 병원명 검색의 첫 100건입니다. 검색어를 구체화해 주세요.');
+  if (directorySearch && items.length === 100) showToast('병원 주소록 후보 첫 100건입니다. 검색어를 구체화해 주세요.');
   if (!directorySearch && res.capped) showToast(`좌표상 추정 검색 결과 ${res.count}건 중 ${res.shown || items.length}건만 표시합니다.`);
   renderList();
   loadMaps(() => {
@@ -356,7 +356,8 @@ async function initStats() {
   const el = $('#smartStats');
   if (el) {
     el.innerHTML =
-      `<span>전체 ${stats.total.toLocaleString()}건</span>` +
+      `<span>병원 주소록 후보 ${stats.total.toLocaleString()}건</span>` +
+      `<span>검색결과 페이지 ${Number(stats.excluded_search_pages || 0).toLocaleString()}건 제외</span>` +
       `<span>지도 좌표 ${stats.mappable.toLocaleString()}건 (추정 포함)</span>` +
       `<span>정확 위치 검증 ${Number(stats.exact_mappable || 0).toLocaleString()}건</span>` +
       `<span>주소 미등록 ${Number(stats.missing_address || 0).toLocaleString()}건</span>` +
