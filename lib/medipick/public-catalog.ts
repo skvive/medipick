@@ -30,6 +30,12 @@ export async function publicCatalogStats() {
     SELECT count(*)::int AS n FROM public_hospital_stores
     WHERE store_listing = 'listed' AND latitude IS NOT NULL AND longitude IS NOT NULL
   `;
+  const accuracy = await sql<{ exact: number; approximate: number; missing_address: number }>`
+    SELECT count(*) FILTER (WHERE geocode_status = 'exact' AND latitude IS NOT NULL AND longitude IS NOT NULL)::int AS exact,
+           count(*) FILTER (WHERE geocode_status = 'approx' AND latitude IS NOT NULL AND longitude IS NOT NULL)::int AS approximate,
+           count(*) FILTER (WHERE btrim(address) = '')::int AS missing_address
+    FROM public_hospital_stores WHERE store_listing = 'listed'
+  `;
   const premium = await sql<{ n: number }>`
     SELECT count(*)::int AS n FROM public_hospital_stores
     WHERE store_listing = 'listed' AND listing_tier = 'premium' AND marketing_active = TRUE
@@ -42,6 +48,9 @@ export async function publicCatalogStats() {
   return {
     total: total[0]?.n ?? 0,
     mappable: geo[0]?.n ?? 0,
+    exact_mappable: accuracy[0]?.exact ?? 0,
+    estimated_mappable: accuracy[0]?.approximate ?? 0,
+    missing_address: accuracy[0]?.missing_address ?? 0,
     premium_listings: premium[0]?.n ?? 0,
     sources,
     pricing: {
@@ -97,14 +106,16 @@ export async function publicCatalogSearch(params: URLSearchParams) {
 }
 
 export async function publicCatalogNearby(params: URLSearchParams) {
-  const lat = Number(params.get('lat'));
-  const lon = Number(params.get('lon') ?? params.get('lng'));
+  const rawLat = params.get('lat');
+  const rawLon = params.get('lon') ?? params.get('lng');
+  const lat = rawLat?.trim() ? Number(rawLat) : NaN;
+  const lon = rawLon?.trim() ? Number(rawLon) : NaN;
   const radius = Number(params.get('radius') || 5);
   const limit = Math.min(150, Math.max(1, Number(params.get('limit') || 80)));
   const q = (params.get('q') || '').trim().slice(0, 80);
   const platform = (params.get('platform') || '').trim();
   const trade = (params.get('trade') || '').trim();
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
     throw new Error('위도/경도가 필요합니다');
   }
   if (radius < 0.5 || radius > 30) throw new Error('반경은 0.5~30km');
