@@ -244,3 +244,11 @@
     height: 360px;
   }
 }
+
+/* Separate hospital selection from the explicitly billed geocode request. */
+.mp-smart-item { cursor: default; }
+.mp-smart-item-main { display: block; width: 100%; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; font: inherit; }
+.mp-smart-item-main:focus-visible, .mp-smart-geocode:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.mp-smart-actions { border-top: 1px solid #e7f1eb; margin-top: 8px; padding-top: 8px; }
+.mp-smart-geocode { display: inline-block; padding: 6px 10px; border: 1px solid #a8c6df; border-radius: 8px; background: #f0f6ff; color: #1d4f8f; font-size: 11px; font-weight: 750; cursor: pointer; }
+.mp-smart-no-address { color: #9b6948; font-size: 11px; }
