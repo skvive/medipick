@@ -308,6 +308,11 @@ export async function handleMedipickRequest(
         FROM content x JOIN providers p ON p.id = x.provider_id
         LEFT JOIN doctors d ON x.doctor_id = d.id
         WHERE x.approved = 1 AND p.status = 'active'
+          AND COALESCE(x.author_label, '') NOT ILIKE '%Linkr%'
+          AND (
+            x.title ~* '(병원|약국|건강|의료|진료|검진|약제|복약|처방|의사|의학|질환|치료|내과|외과|치과|안과|소아청소년|정형외과|피부과|산부인과|정신건강|실손|보험)'
+            OR (x.kind = 'guide' AND x.category IN ('내과','정형외과','치과','피부과','안과','산부인과','소아청소년과','정신건강의학과'))
+          )
         ORDER BY x.id DESC LIMIT 200
       `;
       return json({ items });

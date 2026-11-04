@@ -7,6 +7,11 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// MEDIPICK v5 safety gate: this legacy commerce importer is disabled unless explicitly requested.
+if (process.env.ENABLE_LEGACY_LINKR_IMPORT !== '1') {
+  console.log('legacy Linkr commerce content import skipped: medical content portal only');
+  process.exit(0);
+}
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const url = process.env.DATABASE_URL;
 if (!url) {
@@ -38,9 +43,14 @@ if (!prov.rows.length) {
 }
 const defaultProviderId = prov.rows[0].id;
 
-await client.query(`DELETE FROM content WHERE kind IN ('blog', 'shorts', 'video') AND author_label NOT LIKE 'Linkr Discover%'`);
-await client.query(`DELETE FROM content WHERE author_label LIKE 'Linkr Discover%'`);
+// Disabled destructive legacy deletion: preserve existing medical uploads and reviewed content.
+// Existing imported content is preserved. Do not repopulate non-medical items in production.
 
+if (process.env.NODE_ENV === 'production') {
+  console.log('No legacy commerce content may be inserted into the MEDIPICK production catalog.');
+  await client.end();
+  process.exit(0);
+}
 let inserted = 0;
 for (const item of manifest.items || []) {
   const priority =

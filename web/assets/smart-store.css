@@ -321,7 +321,7 @@
 .mp-smart-quick button.is-active{background:#e0edff;border-color:#4a8af9;color:#1557b9}
 .mp-smart-quick button:hover{border-color:#81b0f7}
 .mp-smart-quick button:focus-visible,.mp-smart-modes input:focus-visible,.mp-smart-partner-link:focus-visible{outline:3px solid #4386f5;outline-offset:2px}
-.mp-smart-service-rail{max-width:1320px;margin:15px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px}
+.mp-smart-service-rail{max-width:1320px;margin:15px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:9px}
 .mp-smart-service-rail a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 7px;min-width:0;min-height:103px;text-align:center;text-decoration:none;background:#fff;color:#153f81;border:1px solid #dce8fa;border-radius:17px;box-shadow:0 6px 24px #29539b0c;transition:transform .2s,box-shadow .2s,border-color .2s}
 .mp-smart-service-rail a:hover{transform:translateY(-3px);border-color:#aacfff;box-shadow:0 12px 24px #29539b18}
 .mp-smart-service-rail a span{font-size:25px;color:#1678e8;line-height:1.1}

@@ -48,6 +48,16 @@
     {
       "name": "나의 건강노트",
       "url": "/my-health"
+    },
+    {
+      "name": "건강정보·영상",
+      "short_name": "건강정보",
+      "url": "/health-content"
+    },
+    {
+      "name": "보험·약제비 청구 안내",
+      "short_name": "보험·약제비",
+      "url": "/insurance-claims"
     }
   ]
 }

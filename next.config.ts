@@ -13,6 +13,8 @@ const pages = [
   'clinic-ops',
   'clinic-access',
   'smart-store',
+  'health-content',
+  'insurance-claims',
   'hospital',
 ];
 
