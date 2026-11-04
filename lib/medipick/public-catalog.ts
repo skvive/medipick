@@ -115,6 +115,7 @@ export async function publicCatalogNearby(params: URLSearchParams) {
   const q = (params.get('q') || '').trim().slice(0, 80);
   const platform = (params.get('platform') || '').trim();
   const trade = (params.get('trade') || '').trim();
+  const includeEstimated = params.get('include_estimated') === '1';
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
     throw new Error('위도/경도가 필요합니다');
   }
@@ -129,6 +130,7 @@ export async function publicCatalogNearby(params: URLSearchParams) {
     FROM public_hospital_stores
     WHERE store_listing = 'listed'
       AND latitude IS NOT NULL AND longitude IS NOT NULL
+      AND (${includeEstimated} OR geocode_status = 'exact')
       AND latitude BETWEEN ${lat - 0.35} AND ${lat + 0.35}
       AND longitude BETWEEN ${lon - 0.45} AND ${lon + 0.45}
     LIMIT 800
