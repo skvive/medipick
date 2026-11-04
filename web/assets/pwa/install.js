@@ -5,7 +5,7 @@
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
   });
-  const visiblePaths = ['/', '/smart-store', '/consult', '/hospital', '/doctors', '/my-health'];
+  const visiblePaths = ['/', '/smart-store', '/consult', '/hospital', '/doctors', '/my-health', '/health-content', '/insurance-claims'];
   if (!visiblePaths.includes(location.pathname)) return;
   let pending = null;
   let button = null;
