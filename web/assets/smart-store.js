@@ -24,6 +24,9 @@ const markerById = new Map();
 let items = [];
 let center = null;
 let activeId = null;
+let liveAddressMarker = null;
+let liveAddressId = null;
+let addressSearchSequence = 0;
 
 function defaultCenter() {
   const d = config?.default_map_center;
@@ -68,7 +71,7 @@ function loadMaps(cb) {
   scr.src =
     'https://maps.googleapis.com/maps/api/js?key=' +
     encodeURIComponent(key) +
-    '&loading=async&callback=medipickSmartStoreMapReady';
+    '&language=ko&region=KR&loading=async&callback=medipickSmartStoreMapReady';
   scr.async = true;
   scr.onerror = () => {
     mapsState = 'error';
@@ -141,6 +144,10 @@ function ensureMap() {
 function clearMarkers() {
   for (const m of markerById.values()) m.setMap(null);
   markerById.clear();
+  if (liveAddressMarker) liveAddressMarker.setMap(null);
+  liveAddressMarker = null;
+  liveAddressId = null;
+  addressSearchSequence += 1;
 }
 
 function openStore(id, pan = true) {
@@ -163,6 +170,85 @@ function $$listActive() {
   });
 }
 
+
+/**
+ * User-initiated Google Maps address lookup only (never bulk-geocode on page load).
+ * A Google street address is NOT proof that a hospital currently operates there.
+ * Results remain in browser memory only; Google Maps content is not persisted.
+ */
+function streetKey(value) {
+  const match = String(value || '').match(/([가-힣0-9·-]+(?:대로|로|길))\s*(\d+(?:-\d+)?)/);
+  return match ? match[1] + ' ' + match[2] : '';
+}
+function isPlausibleKoreanAddress(x, r) {
+  if (!r || r.partial_match || r.geometry?.location_type !== 'ROOFTOP') return false;
+  const country = (r.address_components || []).find((part) => part.types?.includes('country'));
+  const originalRoad = streetKey(x.address);
+  return country?.short_name === 'KR' &&
+    Boolean(originalRoad) &&
+    originalRoad === streetKey(r.formatted_address) &&
+    Boolean(x.district) &&
+    String(r.formatted_address).includes(x.district);
+}
+async function locateStoreAddress(id) {
+  const x = items.find((item) => item.id === id);
+  if (!x || !x.address || !x.district) {
+    showToast('주소 정보가 없어 위치를 확인할 수 없습니다.');
+    return;
+  }
+  if (!ensureMap() || typeof google.maps.Geocoder !== 'function') {
+    showToast('Google 주소 조회를 사용할 수 없습니다. 지도 주소 검색 링크를 이용하세요.');
+    return;
+  }
+  if (liveAddressId === id && liveAddressMarker) {
+    map.panTo(liveAddressMarker.getPosition());
+    map.setZoom(16);
+    return;
+  }
+  const requestSequence = ++addressSearchSequence;
+  showToast('Google 지도에서 주소를 확인하고 있습니다. 병원 영업 여부는 별도 확인이 필요합니다.');
+  try {
+    const response = await new google.maps.Geocoder().geocode({ address: x.address, region: 'KR' });
+    if (requestSequence !== addressSearchSequence) return;
+    const found = (response.results || []).find((result) => isPlausibleKoreanAddress(x, result));
+    if (!found) {
+      showToast('정밀 주소 일치 확인 실패. 기존 회색 핀은 추정 위치이며 실제 병원 위치가 아닙니다.');
+      return;
+    }
+    if (liveAddressMarker) liveAddressMarker.setMap(null);
+    liveAddressMarker = new google.maps.Marker({
+      map,
+      position: found.geometry.location,
+      title: x.name + ' · Google 주소 검색 위치(병원 운영 여부 미검증)',
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE, scale: 11,
+        fillColor: '#2563eb', fillOpacity: 0.95,
+        strokeWeight: 2, strokeColor: '#fff',
+      },
+    });
+    liveAddressId = id;
+    const popup = '<div class="mp-store-popup"><strong>' + safe(x.name) + '</strong>' +
+      '<p>Google 주소 검색 결과: 도로명·건물번호 일치</p>' +
+      '<p>' + safe(x.address) + '</p>' +
+      '<p style="color:#a15f15">임시 주소 위치입니다. 병원 실재·현재 운영·상호 동일성은 확인되지 않았습니다.</p>' +
+      '<a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=' +
+      encodeURIComponent(x.name + ' ' + x.address) + '">Google 지도에서 병원 확인 ↗</a></div>';
+    liveAddressMarker.addListener('click', () => {
+      infoWindow.setContent(popup);
+      infoWindow.open({ map, anchor: liveAddressMarker });
+    });
+    map.panTo(found.geometry.location);
+    map.setZoom(16);
+    infoWindow.setContent(popup);
+    infoWindow.open({ map, anchor: liveAddressMarker });
+    showToast('주소 위치 핀을 표시했습니다. 병원 동일성은 추가 검증이 필요합니다.');
+  } catch {
+    if (requestSequence === addressSearchSequence) {
+      showToast('주소 조회 실패: Geocoding API 사용 설정·결제·키 제한을 확인해 주세요.');
+    }
+  }
+}
+
 function renderList() {
   const list = $('#smartList');
   const meta = $('#smartListMeta');
@@ -178,12 +264,20 @@ function renderList() {
       (x) => {
         const pro = x.is_premium ? ' mp-smart-item--pro' : '';
         const badge = x.ui?.badge || x.source_platform;
-        return `<button type="button" class="mp-smart-item${pro}" data-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address)}</p><div class="dist">${x.geocode_status === "exact" ? "직선거리" : "지도상 추정거리"} 약 ${Number(x.distance_km).toFixed(2)} km</div></button>`;
+        const distLabel = x.distance_km == null ? '전국 목록 검색 · 거리 미산정' :
+          (x.geocode_status === 'exact' ? '직선거리' : '좌표상 추정거리(실거리 아님)') + ' 약 ' + Number(x.distance_km).toFixed(2) + ' km';
+        const lookup = x.address && x.district
+          ? `<button type="button" class="mp-smart-geocode" data-geocode-id="${x.id}">◎ Google 주소 위치 조회 · 임시 핀</button>`
+          : '<span class="mp-smart-no-address">주소 미등록 · 위치 조회 불가</span>';
+        return `<article class="mp-smart-item${pro}" data-id="${x.id}"><button type="button" class="mp-smart-item-main" data-open-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address || '주소 정보 없음')}</p><div class="dist">${safe(distLabel)}</div></button><div class="mp-smart-actions">${lookup}</div></article>`;
       },
     )
     .join('');
-  list.querySelectorAll('.mp-smart-item').forEach((btn) => {
-    btn.onclick = () => openStore(+btn.dataset.id, true);
+  list.querySelectorAll('[data-open-id]').forEach((btn) => {
+    btn.onclick = () => openStore(+btn.dataset.openId, true);
+  });
+  list.querySelectorAll('[data-geocode-id]').forEach((btn) => {
+    btn.onclick = () => locateStoreAddress(+btn.dataset.geocodeId);
   });
 }
 
@@ -232,16 +326,23 @@ async function searchNearby(lat, lng) {
   if (q) params.set('q', q);
   if (platform) params.set('platform', platform);
   if (trade) params.set('trade', trade);
-  const res = await api('/api/public-catalog/nearby?' + params.toString());
+  const directorySearch = Boolean(q);
+  const endpoint = directorySearch ? '/api/public-catalog/search' : '/api/public-catalog/nearby';
+  const requestParams = directorySearch
+    ? new URLSearchParams({ q, platform, trade, limit: '100' })
+    : params;
+  const res = await api(endpoint + '?' + requestParams.toString());
   items = res.items || [];
-  if (res.capped) showToast(`반경 내 ${res.count}건 중 ${res.shown || items.length}건만 지도에 표시합니다.`);
+  if (directorySearch && items.length === 100) showToast('전국 병원명 검색의 첫 100건입니다. 검색어를 구체화해 주세요.');
+  if (!directorySearch && res.capped) showToast(`좌표상 추정 검색 결과 ${res.count}건 중 ${res.shown || items.length}건만 표시합니다.`);
   renderList();
   loadMaps(() => {
     renderMapMarkers();
-    if (items[0]) openStore(items[0].id, false);
   });
   const notice = $('#smartNotice');
-  if (notice && res.notice) notice.textContent = '※ ' + res.notice;
+  if (notice) notice.textContent = directorySearch
+    ? '※ 전국 병원명 검색 결과입니다. 추정 좌표는 실제 병원 위치와 다릅니다. 주소 위치 조회는 클릭 시에만 실행되며, 결과는 서버에 저장하지 않습니다.'
+    : '※ ' + (res.notice || '추정 좌표는 실제 병원 위치가 아닙니다.');
 }
 
 async function initStats() {
@@ -250,7 +351,9 @@ async function initStats() {
   if (el) {
     el.innerHTML =
       `<span>전체 ${stats.total.toLocaleString()}건</span>` +
-      `<span>지도 좌표 ${stats.mappable.toLocaleString()}건</span>` +
+      `<span>지도 좌표 ${stats.mappable.toLocaleString()}건 (추정 포함)</span>` +
+      `<span>정확 위치 검증 ${Number(stats.exact_mappable || 0).toLocaleString()}건</span>` +
+      `<span>주소 미등록 ${Number(stats.missing_address || 0).toLocaleString()}건</span>` +
       (stats.sources || [])
         .slice(0, 4)
         .map((s) => `<span>${safe(s.source_platform)} ${s.n.toLocaleString()}</span>`)
