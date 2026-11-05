@@ -1,0 +1,33 @@
+name: HIRA coordinate safety
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/hira_coordinate_safety.py'
+      - 'scripts/import-hira-coordinate-csv.py'
+      - 'tests/test_hira_coordinate_safety.py'
+      - '.github/workflows/hira-coordinate-safety.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-hira-safety-*'
+    paths:
+      - 'scripts/hira_coordinate_safety.py'
+      - 'scripts/import-hira-coordinate-csv.py'
+      - 'tests/test_hira_coordinate_safety.py'
+      - '.github/workflows/hira-coordinate-safety.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile source safely
+        run: python -m py_compile scripts/hira_coordinate_safety.py scripts/import-hira-coordinate-csv.py
+      - name: Offline safety tests
+        run: python -m unittest discover -s tests -p 'test_hira_coordinate_safety.py' -v
