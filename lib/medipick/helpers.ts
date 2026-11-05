@@ -1,7 +1,16 @@
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
+const DEVELOPMENT_SESSION_SECRET = 'dev-only-change-me';
+
 export function medipickSecret(): Buffer {
-  return Buffer.from(process.env.MEDIPICK_SECRET || 'dev-only-change-me', 'utf8');
+  const configured = (process.env.MEDIPICK_SECRET || '').trim();
+  if (configured && configured !== DEVELOPMENT_SESSION_SECRET) {
+    return Buffer.from(configured, 'utf8');
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('MEDIPICK_SECRET must be configured with a unique value in production.');
+  }
+  return Buffer.from(configured || DEVELOPMENT_SESSION_SECRET, 'utf8');
 }
 
 export function field(v: unknown, name: string, maxLen: number, required = false, pattern?: RegExp): string {

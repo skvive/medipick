@@ -1,9 +1,12 @@
-# MEDIPICK v3.1 · Doctor Knowledge Network + Business + AI Medical Information Assistant
+# MEDIPICK · Vercel + Neon
 
-**날짜:** 2026-10-29 | **개발 상태:** 로컬 실행·데모 테스트 완료 / 상용 외부 인증 미완료  
-**중요:** 의료진·병원·지도 좌표는 **가상의 예시 데이터**이며, 12개 진료과 사진은 **AI 생성 연출 이미지**입니다. 실제 병원·의사 및 진료효과를 묘사하지 않습니다.
+**현재 운영 런타임:** Vercel/Next.js + Neon. 배포 UI 원본은 `web/`이며, `scripts/sync-public.mjs`가 빌드 때 `public/`으로 복사합니다. 배포 절차와 운영 기능 범위는 [DEPLOY.md](DEPLOY.md)를 기준으로 확인하세요.
 
-## 1. Windows 원클릭 실행
+**레거시 데모:** 아래 Python `server.py`와 Windows 원클릭 절차는 로컬 시연용입니다. Vercel 운영 서버로 실행하지 마세요. Drive의 MEDIPICK v5 통합 ZIP은 독립 데모/디자인 자산이며, Next.js 운영 앱에 전부 이식된 패키지가 아닙니다.
+
+**데이터·의료 고지:** 실제 병원 운영 상태와 정확 좌표는 검증된 공식 원본이 적용되기 전까지 보증하지 않습니다. UI의 AI 생성 연출 이미지는 실제 의료진·병원 또는 치료효과를 묘사하지 않습니다.
+
+## Legacy Python demo: Windows one-click execution
 
 1. ZIP 압축을 해제합니다. Python **3.10 이상**이 필요합니다.
 2. `run_windows.bat`를 실행합니다. 이미지 검증 라이브러리 Pillow가 없으면 pip로 설치를 시도합니다(인터넷 필요).
