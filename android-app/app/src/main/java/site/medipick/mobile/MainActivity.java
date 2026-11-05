@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     private static final String PREFS="medipick_android";
     private static final int IMAGE_REQUEST=701;
     private static final int GEO_REQUEST=702;
+    private static final String PROD_URL="https://medipick.lexid.site";
     private static final String DEV_URL="http://10.0.2.2:8765"; // Emulator-only in debug builds.
     private WebView web;
     private ProgressBar progress;
@@ -49,7 +50,7 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(Color.rgb(13,59,129));
         getWindow().setNavigationBarColor(Color.rgb(247,250,255));
         setContentView(makeLayout());
-        baseUrl=getPreferences().getString("siteUrl","");
+        baseUrl=getPreferences().getString("siteUrl",PROD_URL);
         if(isAllowedSite(baseUrl)) openSite(); else showSiteSetup();
     }
 
@@ -121,17 +122,19 @@ public class MainActivity extends Activity {
         if(value==null||value.isBlank())return false;
         try {Uri u=Uri.parse(value);String scheme=u.getScheme(),host=u.getHost();
             if(host==null||u.getUserInfo()!=null||u.getFragment()!=null||u.getQuery()!=null)return false;
-            boolean production="https".equalsIgnoreCase(scheme)&&host.contains(".");
+            String path=u.getPath();
+            boolean production="https".equalsIgnoreCase(scheme)&&"medipick.lexid.site".equalsIgnoreCase(host)
+                &&(u.getPort()==-1||u.getPort()==443)&&(path==null||path.isEmpty()||"/".equals(path));
             boolean emulator=BuildConfig.DEBUG&&DEV_URL.equals(value);
             return production||emulator;
         }catch(Exception e){return false;}
     }
     private void openSite(){web.loadUrl(baseUrl);}
     private void showSiteSetup(){
-        EditText input=new EditText(this);input.setSingleLine(true);input.setHint("https://medipick.example.com");input.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        EditText input=new EditText(this);input.setSingleLine(true);input.setHint("https://medipick.lexid.site");input.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_URI);
         if(baseUrl!=null)input.setText(baseUrl);
         LinearLayout wrapper=new LinearLayout(this);wrapper.setOrientation(LinearLayout.VERTICAL);wrapper.setPadding(dp(22),dp(4),dp(22),dp(2));
-        TextView msg=new TextView(this);msg.setText("메디픽의 HTTPS 서버 주소를 입력하세요. 이 앱은 기존 MEDIPICK 웹서버의 검색·예약·의료정보 기능에 연결됩니다. 구글 로그인은 보안상 외부 브라우저에서 수행합니다.");msg.setTextColor(Color.DKGRAY);msg.setPadding(0,0,0,dp(14));wrapper.addView(msg);wrapper.addView(input);
+        TextView msg=new TextView(this);msg.setText("공식 MEDIPICK HTTPS 주소(https://medipick.lexid.site)를 입력하세요. 검색·예약·의료정보는 기존 웹서비스에 연결됩니다. Google 로그인은 외부 브라우저에서 수행합니다.");msg.setTextColor(Color.DKGRAY);msg.setPadding(0,0,0,dp(14));wrapper.addView(msg);wrapper.addView(input);
         new AlertDialog.Builder(this).setTitle("메디픽 서버 연결").setView(wrapper).setCancelable(false)
           .setPositiveButton("연결",(dialog,which)->{
               String v=input.getText().toString().trim().replaceAll("/+$","");
