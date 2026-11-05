@@ -1,0 +1,33 @@
+name: Safe Vercel build gate
+
+on:
+  pull_request:
+    paths:
+      - 'vercel.json'
+      - 'package.json'
+      - 'scripts/check-deploy-build-safety.mjs'
+      - '.github/workflows/medipick-safe-build.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-safe-build-*'
+    paths:
+      - 'vercel.json'
+      - 'package.json'
+      - 'scripts/check-deploy-build-safety.mjs'
+      - '.github/workflows/medipick-safe-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-build-no-db-writes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Enforce DB-write free deployment build
+        run: node scripts/check-deploy-build-safety.mjs
+      - name: Check JSON syntax
+        run: node -e "JSON.parse(require('fs').readFileSync('vercel.json','utf8'))"
