@@ -1,0 +1,25 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'site.medipick.mobile'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'site.medipick.mobile'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '4.3.0'
+    }
+    buildTypes {
+        debug { manifestPlaceholders = [allowCleartextTraffic: 'true'] }
+        release {
+            manifestPlaceholders = [allowCleartextTraffic: 'false']
+            minifyEnabled false
+            // Set a private upload/release keystore in Android Studio. Never ship signing credentials.
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
