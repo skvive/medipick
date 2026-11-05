@@ -18,34 +18,15 @@ from pathlib import Path
 import pandas as pd
 import psycopg2
 
+from hira_coordinate_safety import (attest_official_source, reviewed_plan_equals,
+                                    row_key, sha256_file)
+
 
 def clean(value: object) -> str:
     if pd.isna(value):
         return ""
     return str(value).strip()
 
-
-def norm_name(value: object) -> str:
-    return re.sub(r"\s+", "", clean(value)).lower()
-
-
-def road_key(value: object) -> str:
-    match = re.search(r"([가-힣0-9·-]+(?:대로|로|길))\s*(\d+(?:-\d+)?)", clean(value))
-    return (match.group(1) + match.group(2)).lower() if match else ""
-
-
-def district_key(value: object) -> str:
-    # Only municipal gu/gun; reject district-unknown rows instead of guessing.
-    tokens = clean(value).replace(",", " ").split()[:5]
-    for token in tokens:
-        if token.endswith(("구", "군")) and len(token) >= 2:
-            return token
-    return ""
-
-
-def row_key(name: object, address: object) -> tuple[str, str, str] | None:
-    key = (norm_name(name), road_key(address), district_key(address))
-    return key if all(key) else None
 
 
 def first(row: dict, *aliases: str) -> str:
@@ -87,6 +68,10 @@ def main() -> None:
     parser.add_argument("--report", type=Path, help="Append-safe audit path; must not already exist")
     parser.add_argument("--apply", action="store_true", help="Explicitly write audited, exact matches")
     parser.add_argument("--max-updates", type=int, default=100, help="Hard upper bound for updates")
+    parser.add_argument("--source-sha256", help="Pre-reviewed official source bytes (required for --apply)")
+    parser.add_argument("--official-source-page", help="Official source catalog page (operator attestation)")
+    parser.add_argument("--reviewed-report", type=Path, help="Existing manually reviewed DRY_RUN JSONL")
+    parser.add_argument("--reviewed-report-sha256", help="SHA-256 of the immutable reviewed JSONL")
     args = parser.parse_args()
     if not args.source.is_file():
         parser.error("원본 파일을 확인할 수 없습니다")
@@ -94,6 +79,15 @@ def main() -> None:
         parser.error("--max-updates 범위는 1..5000")
     if not re.fullmatch(r"HIRA-\d{8}", args.source_tag):
         parser.error("--source-tag는 HIRA-YYYYMMDD 형식이어야 합니다")
+    if args.apply:
+        if not all((args.source_sha256, args.official_source_page,
+                    args.reviewed_report, args.reviewed_report_sha256)):
+            parser.error("--apply requires --source-sha256, --official-source-page, "
+                         "--reviewed-report and --reviewed-report-sha256")
+        try:
+            attest_official_source(args.source, args.source_sha256, args.official_source_page)
+        except ValueError as error:
+            parser.error(str(error))
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         parser.error("DATABASE_URL이 설정되지 않았습니다")
@@ -113,6 +107,7 @@ def main() -> None:
                 index.setdefault(key, []).append(hospital)
 
         candidates: dict[int, dict] = {}
+        source_key_counts: dict[tuple[str, str, str], int] = {}
         conflicts: set[int] = set()
         counters = {"source_rows": 0, "no_coordinates": 0, "no_address_key": 0,
                     "no_match": 0, "ambiguous": 0, "exact_already": 0}
@@ -131,6 +126,7 @@ def main() -> None:
             if not key:
                 counters["no_address_key"] += 1
                 continue
+            source_key_counts[key] = source_key_counts.get(key, 0) + 1
             matches = index.get(key, [])
             if not matches:
                 counters["no_match"] += 1
@@ -154,6 +150,12 @@ def main() -> None:
                 conflicts.add(hid)
             else:
                 candidates[hid] = proposed
+        # Even identical duplicate source rows cannot prove a unique hospital match.
+        duplicate_keys = {key for key, n in source_key_counts.items() if n > 1}
+        for key in duplicate_keys:
+            for target in index.get(key, []):
+                conflicts.add(int(target[0]))
+        counters["duplicate_source_keys"] = len(duplicate_keys)
         for hid in conflicts:
             candidates.pop(hid, None)
         proposals = sorted(candidates.values(), key=lambda x: x["id"])
@@ -163,6 +165,11 @@ def main() -> None:
         # Never update if there are more candidates than the explicitly capped batch.
         if args.apply and len(proposals) > args.max_updates:
             raise RuntimeError("검증 대상이 상한을 초과했습니다. 범위를 분할하여 재검수하세요.")
+        if args.apply:
+            if not proposals:
+                raise RuntimeError("검수 승인 가능한 좌표가 0건이므로 DB 반영을 차단합니다.")
+            if not reviewed_plan_equals(args.reviewed_report, args.reviewed_report_sha256, proposals):
+                raise RuntimeError("기존 DRY_RUN 감사 SHA-256 또는 현재 후보가 불일치: DB 반영을 차단합니다.")
         report = args.report or Path("data/catalog") / (
             "hira_coordinate_audit_" + args.source_tag + "_" +
             datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ") + ".jsonl"
@@ -196,6 +203,9 @@ def main() -> None:
             counters["updated"] = 0
         print(json.dumps({"mode": "APPLIED" if args.apply else "DRY_RUN",
                           "source": args.source_tag, "audit": str(report),
+                          "source_sha256": sha256_file(args.source),
+                          "audit_sha256": sha256_file(report),
+                          "independently_verified_official": False,
                           **counters}, ensure_ascii=False))
     except Exception:
         conn.rollback()
