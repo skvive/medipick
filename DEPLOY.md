@@ -12,9 +12,9 @@ Python `server.py`는 로컬 개발·레거시 참고용으로 리포에 유지�
 ## 환경 변수 (Vercel)
 
 - `DATABASE_URL` — Neon pooled connection string
-- `MEDIPICK_ADMIN_PASSWORD` — `/admin` 로그인
-- `MEDIPICK_SECRET` — 세션 HMAC (64+ chars 권장)
-- `MEDIPICK_COOKIE_SECURE=1` — 프로덕션
+- `MEDIPICK_ADMIN_PASSWORD` — `/admin` 로그인. 프로덕션에서는 반드시 고유한 암호를 설정하며 데모 암호는 거부됩니다.
+- `MEDIPICK_SECRET` — 세션 HMAC 키 (64+ chars 권장). 프로덕션에서는 기본 키를 사용하지 않습니다.
+- `MEDIPICK_COOKIE_SECURE=1` — 프로덕션 권장. `NODE_ENV=production`에서는 쿠키에 `Secure` 속성이 강제됩니다.
 - **`NEON_AUTH_BASE_URL`** — Neon Console → Branch → Auth → Project Info (예: `https://ep-….neonauth….neon.tech/neondb/auth`)
 - **`NEON_AUTH_COOKIE_SECRET`** — 32+ bytes (`openssl rand -base64 32`)
 - `GOOGLE_MAPS_BROWSER_KEY` — 선택
