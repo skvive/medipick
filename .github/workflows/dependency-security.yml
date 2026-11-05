@@ -14,44 +14,30 @@ on:
       - 'package-lock.json'
       - '.github/workflows/dependency-security.yml'
 permissions:
-  contents: write
+  contents: read
 jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-      - name: Regenerate lockfile without running package scripts
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Install from committed lockfile without package scripts
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Capture npm audit report
         run: |
           npm audit --json > npm-audit.json || true
-          node -e "const a=require('./npm-audit.json'); console.log(JSON.stringify(a.metadata?.vulnerabilities ?? {}, null, 2))"
-      - name: Install from refreshed lockfile
-        run: npm ci --ignore-scripts --no-audit --no-fund
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const audit = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+          const v = audit.metadata?.vulnerabilities ?? {};
+          console.log(JSON.stringify(v, null, 2));
+          if ((v.moderate || 0) + (v.high || 0) + (v.critical || 0) > 0) process.exit(1);
+          NODE
       - uses: actions/upload-artifact@v4
         with:
           name: medipick-dependency-audit
-          path: |
-            npm-audit.json
-            package-lock.json
+          path: npm-audit.json
           if-no-files-found: error
-      - name: Commit refreshed lockfile to the feature branch
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          if git diff --quiet -- package-lock.json; then
-            echo 'Lockfile already matches package.json.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add package-lock.json
-          git commit -m 'chore(deps): refresh audited lockfile'
-          git push origin "HEAD:${BRANCH_NAME}"
