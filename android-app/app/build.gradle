@@ -3,6 +3,9 @@ plugins { id 'com.android.application' }
 android {
     namespace 'site.medipick.mobile'
     compileSdk 35
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId 'site.medipick.mobile'
         minSdk 26
