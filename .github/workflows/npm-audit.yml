@@ -17,13 +17,12 @@ jobs:
       - name: Collect dependency audit
         run: npm audit --json > npm-audit-report.json || true
       - name: Preview automatic remediation
-        run: npm audit fix --dry-run --json > npm-audit-fix-plan.json || true
+        run: npm audit fix --dry-run > npm-audit-fix-plan.txt 2>&1 || true
       - name: Print audit and fix summary
         run: |
           node <<'NODE'
           const fs = require('fs');
           const audit = JSON.parse(fs.readFileSync('npm-audit-report.json', 'utf8'));
-          const fix = JSON.parse(fs.readFileSync('npm-audit-fix-plan.json', 'utf8'));
           const vulnerabilities = Object.entries(audit.vulnerabilities || {}).map(([name, item]) => ({
             name,
             severity: item.severity,
@@ -31,16 +30,13 @@ jobs:
             range: item.range,
             fixAvailable: item.fixAvailable
           }));
-          console.log(JSON.stringify({
-            current: audit.metadata?.vulnerabilities,
-            automaticPlan: { added: fix.added, removed: fix.removed, changed: fix.changed, audited: fix.audited },
-            findings: vulnerabilities
-          }, null, 2));
+          console.log(JSON.stringify({ current: audit.metadata?.vulnerabilities, findings: vulnerabilities }, null, 2));
           NODE
+          cat npm-audit-fix-plan.txt
       - uses: actions/upload-artifact@v4
         with:
           name: MEDIPICK-npm-audit-report
           path: |
             npm-audit-report.json
-            npm-audit-fix-plan.json
+            npm-audit-fix-plan.txt
           if-no-files-found: error
