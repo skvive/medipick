@@ -1,0 +1,537 @@
+// !$*UTF8*$!
+{
+	archiveVersion = "1";
+	classes = {};
+	objectVersion = "56";
+	objects = {
+		02802DA494DCF2AD49CA90FA = {
+			isa = PBXBuildFile;
+			fileRef = E5F8D7E04A28FF1BD38EC850;
+		};
+		02EB9C34483E8D4FFB6FDF3F = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12922263F33F4DF750D26BCB,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		02EDFFD9F40960A5133F09A2 = {
+			isa = PBXBuildFile;
+			fileRef = 26A5BF4A023BEE8DACEC20F4;
+		};
+		050D17E22C385B084E38D503 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "HospitalRowView.swift";
+			sourceTree = "<group>";
+		};
+		08E8253BD7AAF72721764E6C = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "CatalogAPI.swift";
+			sourceTree = "<group>";
+		};
+		0BC4629F86976E842564662F = {
+			isa = PBXBuildFile;
+			fileRef = E74CDBC5171031AE81DC657C;
+		};
+		0D10563465B3D6415EC9D153 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "CatalogSafetyTests.swift";
+			sourceTree = "<group>";
+		};
+		0D9C5D33DCBBBF3A8FC6F429 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34ED27FE02591B92A69230C5,
+				F98D2B0BBD46A93257E46648,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		107157C27460C7FFE6FC4C31 = {
+			isa = PBXBuildFile;
+			fileRef = FD086AA2C7384A2B43A199CD;
+		};
+		119E12E20F78C16F6C88F122 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "FavoritesStore.swift";
+			sourceTree = "<group>";
+		};
+		12922263F33F4DF750D26BCB = {
+			isa = PBXBuildFile;
+			fileRef = 0D10563465B3D6415EC9D153;
+		};
+		16EA228F98147014AAC32819 = {
+			isa = PBXFileReference;
+			explicitFileType = "wrapper.application";
+			includeInIndex = "0";
+			path = "MEDIPICKiOS.app";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		20618D0C49FA41EF9DD0FBE9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "HospitalDetailView.swift";
+			sourceTree = "<group>";
+		};
+		26A5BF4A023BEE8DACEC20F4 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "CatalogStore.swift";
+			sourceTree = "<group>";
+		};
+		2C2AFE283E3A75C09C17F8B4 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2D3D66C8E9408B0194D951B4 = {
+			isa = PBXBuildFile;
+			fileRef = B8CE9BA29C178B93F671F206;
+		};
+		306FB05F528244EB88F89DDC = {
+			isa = PBXTargetDependency;
+			target = E6B9B9DB788B80C8522CF3E6;
+			targetProxy = 65031073F40AF8A1B1581D4A;
+		};
+		3123708CD03589C036D0823A = {
+			isa = PBXGroup;
+			children = (
+				B8CE9BA29C178B93F671F206,
+				498BC2611169AFA1B55138AD,
+			);
+			path = "App";
+			sourceTree = "<group>";
+		};
+		33CBC4C4B6F72E5AD95461F9 = {
+			isa = PBXFileReference;
+			explicitFileType = "wrapper.cfbundle";
+			includeInIndex = "0";
+			path = "MEDIPICKiOSTests.xctest";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34091A12165080AC423DDF37 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "text.plist.xml";
+			path = "Info.plist";
+			sourceTree = "<group>";
+		};
+		34ED27FE02591B92A69230C5 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon";
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "NO";
+				INFOPLIST_FILE = "MEDIPICKiOS/Info.plist";
+				MARKETING_VERSION = "1.0.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "site.lexid.medipick";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = "5.9";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				SUPPORTS_MACCATALYST = "NO";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG";
+				ENABLE_TESTABILITY = "YES";
+			};
+			name = "Debug";
+		};
+		3BA0AA3BA5D74A87317475D7 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56C941E86ED8CD758AE80C43,
+				41BA6FEF0DC8C2C05A8E1DCE,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		41BA6FEF0DC8C2C05A8E1DCE = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = "NO";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				SDKROOT = "iphoneos";
+				SWIFT_VERSION = "5.9";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CLANG_ENABLE_MODULES = "YES";
+				SWIFT_COMPILATION_MODE = "wholemodule";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+			};
+			name = "Release";
+		};
+		43D203189235A2CE3DD7ABE9 = {
+			isa = PBXGroup;
+			children = (
+				0D10563465B3D6415EC9D153,
+			);
+			path = "MEDIPICKiOSTests";
+			sourceTree = "<group>";
+		};
+		47FA68988F1659CECA8B245C = {
+			isa = PBXBuildFile;
+			fileRef = 050D17E22C385B084E38D503;
+		};
+		498BC2611169AFA1B55138AD = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "MEDIPICKApp.swift";
+			sourceTree = "<group>";
+		};
+		4BEDD2059817C021B660D11E = {
+			isa = PBXGroup;
+			children = (
+				3123708CD03589C036D0823A,
+				AE4DB9B7F5B55430F4AE846B,
+				F8D4060399EF85EFE13BFC1A,
+				82878A88E1AEC44732E18E2F,
+				DEF9E67F994BC2EB79AFEA65,
+				34091A12165080AC423DDF37,
+			);
+			path = "MEDIPICKiOS";
+			sourceTree = "<group>";
+		};
+		4F2F28E82008485090D1D1C9 = {
+			isa = PBXBuildFile;
+			fileRef = 08E8253BD7AAF72721764E6C;
+		};
+		56C941E86ED8CD758AE80C43 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = "NO";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				SDKROOT = "iphoneos";
+				SWIFT_VERSION = "5.9";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CLANG_ENABLE_MODULES = "YES";
+				ONLY_ACTIVE_ARCH = "YES";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				DEBUG_INFORMATION_FORMAT = "dwarf";
+			};
+			name = "Debug";
+		};
+		5FF94D31777FADE84380C087 = {
+			isa = PBXBuildFile;
+			fileRef = C5DA73BF21C7CAB30D922510;
+		};
+		60070D510826C19E96BE996D = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = "YES";
+				LastUpgradeCheck = "1600";
+				TargetAttributes = {
+					E6B9B9DB788B80C8522CF3E6 = {
+						CreatedOnToolsVersion = "16.0";
+					};
+					F5D6255D365BFD82E3CD0D11 = {
+						CreatedOnToolsVersion = "16.0";
+						TestTargetID = E6B9B9DB788B80C8522CF3E6;
+					};
+				};
+			};
+			buildConfigurationList = 3BA0AA3BA5D74A87317475D7;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = "ko";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				"ko",
+				"en",
+				"Base",
+			);
+			mainGroup = EF34A6D789467E822A260AB8;
+			productRefGroup = EAAC9ACE3178B73EA517CF2F;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E6B9B9DB788B80C8522CF3E6,
+				F5D6255D365BFD82E3CD0D11,
+			);
+		};
+		65031073F40AF8A1B1581D4A = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60070D510826C19E96BE996D;
+			proxyType = 1;
+			remoteGlobalIDString = E6B9B9DB788B80C8522CF3E6;
+			remoteInfo = "MEDIPICKiOS";
+		};
+		6BF20F25486606DD38B344B9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "DiscoverView.swift";
+			sourceTree = "<group>";
+		};
+		7A882DD620CE58937F361AAE = {
+			isa = PBXBuildFile;
+			fileRef = F7ED9323BEF13FC7401918B4;
+		};
+		817BFBB2F3ED177E09D567ED = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ();
+			name = "Restore MEDIPICK app icon if missing";
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/sh";
+			shellScript = "set -euo pipefail\nASSET=\"$SRCROOT/MEDIPICKiOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png\"\nif [ ! -s \"$ASSET\" ]; then\n  swift \"$SRCROOT/tools/generate_ios_icon.swift\" \\\n    \"$SRCROOT/../web/assets/pwa/icon-512.png\" \"$ASSET\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		82878A88E1AEC44732E18E2F = {
+			isa = PBXGroup;
+			children = (
+				6BF20F25486606DD38B344B9,
+				FD086AA2C7384A2B43A199CD,
+				20618D0C49FA41EF9DD0FBE9,
+				050D17E22C385B084E38D503,
+				E5F8D7E04A28FF1BD38EC850,
+				E74CDBC5171031AE81DC657C,
+				F7ED9323BEF13FC7401918B4,
+			);
+			path = "Views";
+			sourceTree = "<group>";
+		};
+		A45C9209A2E81964E4C4558B = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D3D66C8E9408B0194D951B4,
+				EE46DDCED42078C31B338B33,
+				5FF94D31777FADE84380C087,
+				4F2F28E82008485090D1D1C9,
+				02EDFFD9F40960A5133F09A2,
+				F189F947B9311294F916C307,
+				D9BEF64D269B89E6B72861E2,
+				EEAA0673A9C0F43C9B3C4080,
+				107157C27460C7FFE6FC4C31,
+				B91BB9DA6603CBE88569CBCE,
+				47FA68988F1659CECA8B245C,
+				02802DA494DCF2AD49CA90FA,
+				0BC4629F86976E842564662F,
+				7A882DD620CE58937F361AAE,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7C8CB6964AB2C32649D1B74 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE4DB9B7F5B55430F4AE846B = {
+			isa = PBXGroup;
+			children = (
+				C5DA73BF21C7CAB30D922510,
+			);
+			path = "Models";
+			sourceTree = "<group>";
+		};
+		AED1F34482DC2D530CC43D21 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DF466294485CE9F48282B5,
+				D25CFDADCCFD1A97E1CEF8BC,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		B8CE9BA29C178B93F671F206 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "AppConfig.swift";
+			sourceTree = "<group>";
+		};
+		B91BB9DA6603CBE88569CBCE = {
+			isa = PBXBuildFile;
+			fileRef = 20618D0C49FA41EF9DD0FBE9;
+		};
+		C0DF466294485CE9F48282B5 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				GENERATE_INFOPLIST_FILE = "YES";
+				PRODUCT_BUNDLE_IDENTIFIER = "site.lexid.medipick.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = "5.9";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MEDIPICKiOS.app/MEDIPICKiOS";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = "Debug";
+		};
+		C5DA73BF21C7CAB30D922510 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "Hospital.swift";
+			sourceTree = "<group>";
+		};
+		CDFC9A95F84907E9A402981A = {
+			isa = PBXBuildFile;
+			fileRef = DEF9E67F994BC2EB79AFEA65;
+		};
+		D25CFDADCCFD1A97E1CEF8BC = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				GENERATE_INFOPLIST_FILE = "YES";
+				PRODUCT_BUNDLE_IDENTIFIER = "site.lexid.medipick.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = "5.9";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MEDIPICKiOS.app/MEDIPICKiOS";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = "Release";
+		};
+		D9BEF64D269B89E6B72861E2 = {
+			isa = PBXBuildFile;
+			fileRef = DA3EFE7B66DA77EB5A645E18;
+		};
+		DA3EFE7B66DA77EB5A645E18 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "LocationService.swift";
+			sourceTree = "<group>";
+		};
+		DEF9E67F994BC2EB79AFEA65 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "folder.assetcatalog";
+			path = "Assets.xcassets";
+			sourceTree = "<group>";
+		};
+		DF73F7B20A61C9E52713BCAA = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDFC9A95F84907E9A402981A,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5F8D7E04A28FF1BD38EC850 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "MoreView.swift";
+			sourceTree = "<group>";
+		};
+		E6B9B9DB788B80C8522CF3E6 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0D9C5D33DCBBBF3A8FC6F429;
+			buildPhases = (
+				817BFBB2F3ED177E09D567ED,
+				A45C9209A2E81964E4C4558B,
+				A7C8CB6964AB2C32649D1B74,
+				DF73F7B20A61C9E52713BCAA,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = "MEDIPICKiOS";
+			productName = "MEDIPICKiOS";
+			productReference = 16EA228F98147014AAC32819;
+			productType = "com.apple.product-type.application";
+		};
+		E74CDBC5171031AE81DC657C = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "RootTabView.swift";
+			sourceTree = "<group>";
+		};
+		EAAC9ACE3178B73EA517CF2F = {
+			isa = PBXGroup;
+			children = (
+				16EA228F98147014AAC32819,
+				33CBC4C4B6F72E5AD95461F9,
+			);
+			name = "Products";
+			sourceTree = "<group>";
+		};
+		EE46DDCED42078C31B338B33 = {
+			isa = PBXBuildFile;
+			fileRef = 498BC2611169AFA1B55138AD;
+		};
+		EEAA0673A9C0F43C9B3C4080 = {
+			isa = PBXBuildFile;
+			fileRef = 6BF20F25486606DD38B344B9;
+		};
+		EF34A6D789467E822A260AB8 = {
+			isa = PBXGroup;
+			children = (
+				4BEDD2059817C021B660D11E,
+				43D203189235A2CE3DD7ABE9,
+				EAAC9ACE3178B73EA517CF2F,
+			);
+			sourceTree = "<group>";
+		};
+		F189F947B9311294F916C307 = {
+			isa = PBXBuildFile;
+			fileRef = 119E12E20F78C16F6C88F122;
+		};
+		F5D6255D365BFD82E3CD0D11 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AED1F34482DC2D530CC43D21;
+			buildPhases = (
+				02EB9C34483E8D4FFB6FDF3F,
+				2C2AFE283E3A75C09C17F8B4,
+			);
+			buildRules = ();
+			dependencies = (
+				306FB05F528244EB88F89DDC,
+			);
+			name = "MEDIPICKiOSTests";
+			productName = "MEDIPICKiOSTests";
+			productReference = 33CBC4C4B6F72E5AD95461F9;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F7ED9323BEF13FC7401918B4 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "VerifiedMapView.swift";
+			sourceTree = "<group>";
+		};
+		F8D4060399EF85EFE13BFC1A = {
+			isa = PBXGroup;
+			children = (
+				08E8253BD7AAF72721764E6C,
+				26A5BF4A023BEE8DACEC20F4,
+				119E12E20F78C16F6C88F122,
+				DA3EFE7B66DA77EB5A645E18,
+			);
+			path = "Services";
+			sourceTree = "<group>";
+		};
+		F98D2B0BBD46A93257E46648 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon";
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "NO";
+				INFOPLIST_FILE = "MEDIPICKiOS/Info.plist";
+				MARKETING_VERSION = "1.0.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "site.lexid.medipick";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = "5.9";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				SUPPORTS_MACCATALYST = "NO";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = "Release";
+		};
+		FD086AA2C7384A2B43A199CD = {
+			isa = PBXFileReference;
+			lastKnownFileType = "sourcecode.swift";
+			path = "FavoritesView.swift";
+			sourceTree = "<group>";
+		};
+	};
+	rootObject = 60070D510826C19E96BE996D;
+}

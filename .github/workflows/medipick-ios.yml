@@ -1,0 +1,73 @@
+name: MEDIPICK iOS build and tests
+
+on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/medipick-ios.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-ios-*'
+    paths:
+      - 'ios/**'
+      - '.github/workflows/medipick-ios.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Environment
+        run: |
+          xcodebuild -version
+          xcrun simctl list devices available
+      - name: Validate project and icon metadata
+        run: |
+          plutil -lint ios/MEDIPICKiOS.xcodeproj/project.pbxproj
+          plutil -lint ios/MEDIPICKiOS/Info.plist
+          python3 -m json.tool ios/MEDIPICKiOS/Assets.xcassets/AppIcon.appiconset/Contents.json > /dev/null
+          sips -g pixelWidth -g pixelHeight ios/MEDIPICKiOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png
+      - name: Compile iOS simulator application
+        run: |
+          xcodebuild -project ios/MEDIPICKiOS.xcodeproj \
+            -scheme MEDIPICKiOS -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Run native safety unit tests
+        run: |
+          set -euo pipefail
+          SIM_ID="$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          runtimes=json.load(sys.stdin)["devices"]
+          sims=[d for ds in runtimes.values() for d in ds if d.get("isAvailable") and "iPhone" in d.get("name","")]
+          print(sims[0]["udid"] if sims else "")
+          ')"
+          if [ -z "$SIM_ID" ]; then
+            echo "No iPhone simulator available on GitHub runner"; exit 1
+          fi
+          xcodebuild -project ios/MEDIPICKiOS.xcodeproj \
+            -scheme MEDIPICKiOS -configuration Debug \
+            -destination "platform=iOS Simulator,id=$SIM_ID" \
+            CODE_SIGNING_ALLOWED=NO test
+
+      - name: Package simulator build
+        if: success()
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Products/Debug-iphonesimulator/MEDIPICKiOS.app' -type d -print -quit)"
+          test -n "$APP_PATH"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$RUNNER_TEMP/MEDIPICKiOS-Simulator.zip"
+          test -s "$RUNNER_TEMP/MEDIPICKiOS-Simulator.zip"
+      - name: Upload unsigned Simulator application
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-Simulator-Debug
+          path: ${{ runner.temp }}/MEDIPICKiOS-Simulator.zip
+          if-no-files-found: error
+          retention-days: 14
