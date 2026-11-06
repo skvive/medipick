@@ -41,7 +41,7 @@ swift ios/tools/generate_ios_icon.swift web/assets/pwa/icon-512.png ios/MEDIPICK
 
 ## 데이터·심사 한계
 
-- 본 프로젝트는 **Xcode 소스/프로젝트 + 정적 검증 완료** 단계이며, Linux 컨테이너에서 iOS SDK를 이용한 실제 Xcode 빌드·앱 서명·IPA/ TestFlight 발행은 할 수 없었다.
+- Linux 컨테이너에서는 iOS SDK를 실행할 수 없지만, **GitHub Actions macos-15 / Xcode 16.4에서 iPhone 시뮬레이터 빌드 및 XCTest 4건 통과를 확인**했다. 결과는 GitHub Actions `MEDIPICK iOS build and tests`에서 검증한다. 이것은 실제 기기 서명·배포 가능한 IPA·TestFlight 등록을 의미하지 않는다.
 - App Store 심사 지침 4.2는 단순 웹뷰 포장을 인정하지 않는다. 본 프로젝트는 자체 검색·지도·즐겨찾기를 구현했지만, **심사 통과를 보장하지 않는다.**
 - 실제 병원 좌표 HIRA 실원본 검증, 인증/예약/결제의 동작 및 OAuth 정책, 앱 개인 정보 처리방침, iOS 개인정보 영양성분표, App Store 로그인/계정 삭제 요구사항은 App Store 제출 전 별도 확인.
 - 현재 서비스가 공개 주소록에 포함하는 개인·의료 민감정보/건강정보의 법적 근거를 App Store 배포 전 검토해야 한다.
