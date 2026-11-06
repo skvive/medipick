@@ -6,7 +6,7 @@ test -d "$APP_PATH"
 SCREEN_DIR="${RUNNER_TEMP:?}/medipick-ios-screenshots"
 mkdir -p "$SCREEN_DIR"
 
-mapfile -t IDS < <(xcrun simctl list devices available -j | python3 -c '
+IDS_OUTPUT="$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
 data=json.load(sys.stdin)["devices"]
 for runtime in sorted(data, reverse=True):
@@ -23,8 +23,10 @@ for runtime in sorted(data, reverse=True):
     print(choose(phones, ["iPhone 17 Pro Max", "iPhone 16 Pro Max"]))
     print(choose(pads, ["iPad Pro 13-inch (M5)", "iPad Pro 13-inch (M4)"]))
     break
-')
-if [[ "${#IDS[@]}" -ne 2 || -z "${IDS[0]}" || -z "${IDS[1]}" ]]; then
+')"
+PHONE_ID="$(printf '%s\n' "$IDS_OUTPUT" | sed -n '1p')"
+PAD_ID="$(printf '%s\n' "$IDS_OUTPUT" | sed -n '2p')"
+if [[ -z "$PHONE_ID" || -z "$PAD_ID" ]]; then
   echo "No iPhone + iPad simulator pair: cannot produce genuine screenshots" >&2
   exit 1
 fi
@@ -47,8 +49,8 @@ capture() {
   fi
   xcrun simctl shutdown "$udid"
 }
-capture "${IDS[0]}" iphone_home
-capture "${IDS[1]}" ipad_home
+capture "$PHONE_ID" iphone_home
+capture "$PAD_ID" ipad_home
 cat > "$SCREEN_DIR/QA_README.txt" <<'EOF'
 Real Simulator captures after launching unsigned MEDIPICKiOS app.
 For QA only, NOT approved App Store marketing screenshots.
