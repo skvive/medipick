@@ -25,20 +25,32 @@ final class LocationService: NSObject, ObservableObject, CLLocationManagerDelega
         }
     }
 
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        status = manager.authorizationStatus
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
-            manager.requestLocation()
+    // CLLocationManagerDelegate requirements are nonisolated under Swift 6.
+    // Cross the actor boundary using only Sendable values; update @Published state on MainActor.
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let authorization = manager.authorizationStatus
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.status = authorization
+            if authorization == .authorizedAlways || authorization == .authorizedWhenInUse {
+                self.manager.requestLocation()
+            }
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last, location.horizontalAccuracy >= 0 else { return }
-        coordinate = location.coordinate
-        message = nil
+        let latitude = location.coordinate.latitude
+        let longitude = location.coordinate.longitude
+        Task { @MainActor [weak self] in
+            self?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            self?.message = nil
+        }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        message = "위치를 확인하지 못했습니다. 지역 검색을 이용해 주세요."
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        Task { @MainActor [weak self] in
+            self?.message = "위치를 확인하지 못했습니다. 지역 검색을 이용해 주세요."
+        }
     }
 }
