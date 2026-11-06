@@ -54,3 +54,20 @@ jobs:
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
             CODE_SIGNING_ALLOWED=NO test
+
+      - name: Package simulator build
+        if: success()
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Products/Debug-iphonesimulator/MEDIPICKiOS.app' -type d -print -quit)"
+          test -n "$APP_PATH"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$RUNNER_TEMP/MEDIPICKiOS-Simulator.zip"
+          test -s "$RUNNER_TEMP/MEDIPICKiOS-Simulator.zip"
+      - name: Upload unsigned Simulator application
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-Simulator-Debug
+          path: ${{ runner.temp }}/MEDIPICKiOS-Simulator.zip
+          if-no-files-found: error
+          retention-days: 14
