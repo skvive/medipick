@@ -9,7 +9,7 @@ mkdir -p "$SCREEN_DIR"
 IDS_OUTPUT="$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
 data=json.load(sys.stdin)["devices"]
-for runtime in sorted(data, reverse=True):
+for runtime in sorted(data):
     if "iOS" not in runtime:
         continue
     phones=[d for d in data[runtime] if d.get("isAvailable") and "iPhone" in d["name"]]
