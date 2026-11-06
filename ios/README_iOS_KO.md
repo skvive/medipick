@@ -13,6 +13,12 @@
 - **안전 문구:** 병원 운영·진료 정확도 미검증, 위치 검증 전 길찾기 미제공, 유료 노출은 광고로 표시.
 - **브랜드:** 기존 v5 PWA 앱 아이콘을 바탕으로 Apple용 1024×1024 **알파 없는** PNG 사용.
 
+## iOS 빌드 검증 레인
+
+- `.github/workflows/medipick-ios.yml`: macOS 15 + Xcode 16.4로 실제 iPhone/iPad Simulator 앱 실행 화면을 캡처하고 XCTest 단위 테스트를 진행한다. 캡처는 QA 증빙이며 App Store 제출용 스크린샷이라고 간주하지 않는다.
+- `.github/workflows/medipick-ios-xcode26.yml`: macOS 26 + Xcode 26.3에서 **실제 iPhoneOS용 unsigned Release 코드 컴파일**을 확인한다. 기기 서명·앱 배포·TestFlight는 포함되지 않는다.
+- Xcode 26의 클라우드 Simulator 테스트 불안정성과 Apple의 배포 도구 버전 요건을 분리해 검증한 것이며, 모든 PR은 두 검증 결과를 확인한 후 병합한다.
+
 ## 맥에서 실행
 
 1. Xcode 16 이상, iOS 17 이상 시뮬레이터가 있는 Mac에서 `ios/MEDIPICKiOS.xcodeproj`를 연다.
