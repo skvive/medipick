@@ -46,6 +46,16 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO build
+      - name: Capture real iPhone and iPad simulator QA screens
+        run: bash ios/tools/capture_screenshots.sh
+      - name: Upload iOS simulator screenshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-QA-Screenshots
+          path: ${{ runner.temp }}/medipick-ios-screenshots/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Run native safety unit tests
         run: |
           set -euo pipefail
@@ -64,20 +74,14 @@ jobs:
           if [ -z "$SIM_ID" ]; then
             echo "No iPhone simulator available on GitHub runner"; exit 1
           fi
+          # Prepare CoreSimulator before XCTest; Xcode 26 CI can hang on cold simulator startup.
+          xcrun simctl boot "$SIM_ID" || true
+          xcrun simctl bootstatus "$SIM_ID" -b
           xcodebuild -project ios/MEDIPICKiOS.xcodeproj \
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
+            -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO test
-
-      - name: Capture real iPhone and iPad simulator QA screens
-        run: bash ios/tools/capture_screenshots.sh
-      - name: Upload iOS simulator screenshot evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: MEDIPICKiOS-QA-Screenshots
-          path: ${{ runner.temp }}/medipick-ios-screenshots/
-          if-no-files-found: error
-          retention-days: 14
 
       - name: Package simulator build
         if: success()
