@@ -3,7 +3,7 @@
 | 분야 | 현재 | 출시 게이트 |
 |---|---|---|
 | iOS 소스 | 완료 | SwiftUI 네이티브 4개 탭 + iPhone/iPad 프로젝트 |
-| iOS SDK 실제 빌드 | 미실행 | Mac Xcode: Simulator Build + Product Test + 실기기 서명 테스트 |
+| iOS SDK 실제 빌드 | GitHub macos-15 Xcode 시뮬레이터 빌드 및 XCTest 4건 통과 (2026-11-06) | 실기기 서명·설치·App Archive 검증 |
 | 서명/계정 | 미설정 | Apple Developer Team, Bundle ID, App Store Connect 앱 레코드 |
 | TestFlight | 미배포 | Archive → Distribute → TestFlight 내부테스트 후 안정화 |
 | 의료기관 위치 | 미검증 | 원본 29,386개 추정핀을 실제 위치로 승격 금지, HIRA 검증 후에만 정확 핀 제공 |
