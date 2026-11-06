@@ -17,18 +17,18 @@ permissions:
 
 jobs:
   ios:
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode 26 (current App Store upload toolchain)
+      - name: Select Xcode 16.4 for stable simulator tests
         run: |
           set -euo pipefail
-          XCODE_DEVELOPER=/Applications/Xcode_26.3.app/Contents/Developer
+          XCODE_DEVELOPER=/Applications/Xcode_16.4.app/Contents/Developer
           test -d "$XCODE_DEVELOPER"
           sudo xcode-select -s "$XCODE_DEVELOPER"
           xcodebuild -version
-          xcodebuild -version | grep -F 'Xcode 26.'
+          xcodebuild -version | grep -F 'Xcode 16.4'
       - name: Environment
         run: |
           xcodebuild -version
@@ -63,7 +63,7 @@ jobs:
           import json,sys
           runtimes=json.load(sys.stdin)["devices"]
           chosen=""
-          for runtime in sorted(runtimes, reverse=True):
+          for runtime in sorted(runtimes):
               if "iOS" not in runtime: continue
               sims=[d for d in runtimes[runtime] if d.get("isAvailable") and "iPhone" in d.get("name","")]
               if sims:
