@@ -17,8 +17,8 @@ permissions:
 
 jobs:
   ios:
-    runs-on: macos-15
-    timeout-minutes: 45
+    runs-on: macos-26
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 26 (current App Store upload toolchain)
@@ -52,8 +52,14 @@ jobs:
           SIM_ID="$(xcrun simctl list devices available -j | python3 -c '
           import json,sys
           runtimes=json.load(sys.stdin)["devices"]
-          sims=[d for ds in runtimes.values() for d in ds if d.get("isAvailable") and "iPhone" in d.get("name","")]
-          print(sims[0]["udid"] if sims else "")
+          chosen=""
+          for runtime in sorted(runtimes, reverse=True):
+              if "iOS" not in runtime: continue
+              sims=[d for d in runtimes[runtime] if d.get("isAvailable") and "iPhone" in d.get("name","")]
+              if sims:
+                  chosen=sims[0]["udid"]
+                  break
+          print(chosen)
           ')"
           if [ -z "$SIM_ID" ]; then
             echo "No iPhone simulator available on GitHub runner"; exit 1
