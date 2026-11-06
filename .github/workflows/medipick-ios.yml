@@ -21,6 +21,14 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 26 (current App Store upload toolchain)
+        run: |
+          set -euo pipefail
+          XCODE_DEVELOPER=/Applications/Xcode_26.3.app/Contents/Developer
+          test -d "$XCODE_DEVELOPER"
+          sudo xcode-select -s "$XCODE_DEVELOPER"
+          xcodebuild -version
+          xcodebuild -version | grep -E '^Xcode 26\\.'
       - name: Environment
         run: |
           xcodebuild -version
@@ -54,6 +62,16 @@ jobs:
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
             CODE_SIGNING_ALLOWED=NO test
+
+      - name: Capture real iPhone and iPad simulator QA screens
+        run: bash ios/tools/capture_screenshots.sh
+      - name: Upload iOS simulator screenshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-QA-Screenshots
+          path: ${{ runner.temp }}/medipick-ios-screenshots/
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Package simulator build
         if: success()
