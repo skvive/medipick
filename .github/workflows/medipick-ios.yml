@@ -28,7 +28,7 @@ jobs:
           test -d "$XCODE_DEVELOPER"
           sudo xcode-select -s "$XCODE_DEVELOPER"
           xcodebuild -version
-          xcodebuild -version | grep -E '^Xcode 26\\.'
+          xcodebuild -version | grep -F 'Xcode 26.'
       - name: Environment
         run: |
           xcodebuild -version
