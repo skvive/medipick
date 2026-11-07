@@ -52,13 +52,18 @@ struct DiscoverView: View {
                         NavigationLink { HospitalDetailView(hospital: h) } label: { HospitalRowView(hospital: h) }
                     }
                     .listStyle(.plain)
-                    .overlay(alignment: .bottom) {
+                    // A sibling footer reserves height instead of obscuring list rows.
+                    HStack(spacing: 6) {
+                        Image(systemName: "info.circle")
                         Text("방문 전 의료기관의 주소·전화·운영 여부를 직접 확인하세요.")
-                            .font(.caption2).foregroundStyle(.secondary)
-                            .padding(8)
-                            .background(.regularMaterial, in: Capsule())
-                            .padding(.bottom, 6)
+                            .multilineTextAlignment(.center)
                     }
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 9)
+                    .background(.regularMaterial)
                 }
             }
             .navigationTitle("병원 찾기")

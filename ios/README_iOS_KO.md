@@ -13,6 +13,14 @@
 - **안전 문구:** 병원 운영·진료 정확도 미검증, 위치 검증 전 길찾기 미제공, 유료 노출은 광고로 표시.
 - **브랜드:** 기존 v5 PWA 앱 아이콘을 바탕으로 Apple용 1024×1024 **알파 없는** PNG 사용.
 
+## 실제 iPhone·iPad 시뮬레이터 QA 2026-11-07
+
+- 기존 PR #13 macOS GitHub Actions에서 캡처된 2장: `iphone_home.png` (1320×2868), `ipad_home.png` (2064×2752). 진짜 시뮬레이터 실행 화면이며 완성 광고용 이미지가 아니다.
+- 병원 주소록 검색과 네비게이션이 렌더링되는 것을 확인했고, 하단 정보 문구가 iPhone 목록을 덮는 문제를 발견해 `DiscoverView`의 overlay를 별도 footer로 수정했다.
+- 병원 데이터의 실재/운영 여부는 이 시뮬레이터 캡처만으로 검증하지 않는다. 추정좌표는 실제 지도핀으로 표시하지 않는다.
+- CI를 분리하여 `.github/workflows/medipick-ios.yml`은 Xcode 16.4 / macOS 15에서 XCTest + 실제 Simulator 캡처를, `.github/workflows/medipick-ios-xcode26.yml`은 Xcode 26.3 / macOS 26에서 서명 없는 iPhoneOS Release 컴파일을 확인한다.
+- 두 CI의 통과는 Apple 개발자 서명, App Store Connect 레코드, TestFlight 업로드, 실제 iPhone 실기기 테스트의 대체가 아니다.
+
 ## 맥에서 실행
 
 1. Xcode 16 이상, iOS 17 이상 시뮬레이터가 있는 Mac에서 `ios/MEDIPICKiOS.xcodeproj`를 연다.

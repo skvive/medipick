@@ -1,0 +1,46 @@
+name: MEDIPICK iOS Xcode 26 device build
+
+on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/medipick-ios-xcode26.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-ios-*'
+    paths:
+      - 'ios/**'
+      - '.github/workflows/medipick-ios-xcode26.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  device:
+    runs-on: macos-26
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 26
+        run: |
+          set -euo pipefail
+          XCODE_DEVELOPER=/Applications/Xcode_26.3.app/Contents/Developer
+          test -d "$XCODE_DEVELOPER"
+          sudo xcode-select -s "$XCODE_DEVELOPER"
+          xcodebuild -version
+          xcodebuild -version | grep -F 'Xcode 26.'
+      - name: Check Xcode project and icon
+        run: |
+          plutil -lint ios/MEDIPICKiOS.xcodeproj/project.pbxproj
+          plutil -lint ios/MEDIPICKiOS/Info.plist
+          python3 -m json.tool ios/MEDIPICKiOS/Assets.xcassets/AppIcon.appiconset/Contents.json >/dev/null
+      - name: Compile unsigned Release iPhoneOS app
+        run: |
+          xcodebuild -project ios/MEDIPICKiOS.xcodeproj \
+            -scheme MEDIPICKiOS -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Report distribution boundary
+        run: |
+          echo 'Xcode 26 iPhoneOS Release compilation succeeded.'
+          echo 'No signing, IPA export, TestFlight upload or App Store submission was performed.'
