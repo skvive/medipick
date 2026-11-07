@@ -21,6 +21,10 @@ jobs:
   responsive:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,16 +33,17 @@ jobs:
       - name: Install existing QA toolchain (Playwright and BeautifulSoup)
         run: |
           python -m pip install --no-cache-dir 'playwright==1.56.0' 'beautifulsoup4==4.14.2'
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps ${{ matrix.browser }}
       - name: Render all MEDIPICK pages across five widths and exercise navigation
         env:
-          MEDIPICK_QA_OUTPUT: ${{ runner.temp }}/medipick-agency-qa
+          MEDIPICK_QA_BROWSER: ${{ matrix.browser }}
+          MEDIPICK_QA_OUTPUT: ${{ runner.temp }}/medipick-agency-qa/${{ matrix.browser }}
         run: python scripts/qa-web-responsive.py
       - name: Upload all-page actual screenshot and layout evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: MEDIPICK-AllPages-Responsive-QA
-          path: ${{ runner.temp }}/medipick-agency-qa
+          name: MEDIPICK-AllPages-${{ matrix.browser }}-Responsive-QA
+          path: ${{ runner.temp }}/medipick-agency-qa/${{ matrix.browser }}
           if-no-files-found: warn
           retention-days: 14

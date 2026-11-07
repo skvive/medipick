@@ -202,7 +202,9 @@
   overflow-x: auto;
   gap: 10px;
   padding: 4px 2px 12px;
-  margin: 0 -2px;
+  margin: 0;
+  box-sizing: border-box;
+  max-width: 100%;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
 }
