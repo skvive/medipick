@@ -45,3 +45,15 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: site.lexid.medipick.tests
+
+  MEDIPICKiOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [MEDIPICKiOSUITests]
+    dependencies:
+      - target: MEDIPICKiOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: site.lexid.medipick.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: MEDIPICKiOS
