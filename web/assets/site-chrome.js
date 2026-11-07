@@ -108,7 +108,7 @@
         }).join('')
       : '';
     return (
-      '<div class="mp-nav-drawer" id="mpNavDrawer" hidden>' +
+      '<div class="mp-nav-drawer" id="mpNavDrawer" role="dialog" aria-label="전체 메뉴" aria-modal="true" hidden>' +
       '<div class="mp-nav-drawer__backdrop" id="mpNavBackdrop" aria-hidden="true"></div>' +
       '<nav class="mp-nav-drawer__panel" aria-label="전체 메뉴">' +
       '<div class="mp-drawer-head"><span>MEDIPICK</span><button type="button" id="mpMenuClose" aria-label="메뉴 닫기">×</button></div>' +
@@ -126,20 +126,33 @@
     wireDrawer();
   }
 
+  var lastDrawerFocus = null;
+
   function setDrawerOpen(open) {
     var drawer = document.getElementById('mpNavDrawer');
     var toggle = document.getElementById('mpMenuToggle') || document.getElementById('menuToggle');
     if (!drawer) return;
+    if (open && !document.body.classList.contains('mp-nav-open')) {
+      lastDrawerFocus = document.activeElement;
+    }
     drawer.hidden = !open;
     drawer.classList.toggle('is-open', open);
     document.body.classList.toggle('mp-nav-open', open);
     if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      var close = document.getElementById('mpMenuClose');
+      if (close) close.focus();
+    } else if (lastDrawerFocus && typeof lastDrawerFocus.focus === 'function') {
+      lastDrawerFocus.focus();
+      lastDrawerFocus = null;
+    }
   }
 
   function wireDrawer() {
     var toggle = document.getElementById('mpMenuToggle') || document.getElementById('menuToggle');
     var closeBtn = document.getElementById('mpMenuClose');
     var backdrop = document.getElementById('mpNavBackdrop');
+    var drawer = document.getElementById('mpNavDrawer');
     if (toggle && !toggle.dataset.mpDrawerBound) {
       toggle.dataset.mpDrawerBound = '1';
       toggle.addEventListener('click', function () {
@@ -152,9 +165,31 @@
     if (backdrop) backdrop.onclick = function () {
       setDrawerOpen(false);
     };
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setDrawerOpen(false);
-    });
+    if (drawer && !drawer.dataset.mpKeyboardBound) {
+      drawer.dataset.mpKeyboardBound = '1';
+      drawer.addEventListener('click', function (event) {
+        if (event.target.closest('a[href]')) setDrawerOpen(false);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (!document.body.classList.contains('mp-nav-open')) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setDrawerOpen(false);
+        } else if (event.key === 'Tab') {
+          var items = Array.from(drawer.querySelectorAll('button:not([disabled]),a[href]'));
+          if (!items.length) return;
+          var first = items[0];
+          var last = items[items.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
+    }
   }
 
   function upgradeHomeHeader() {
