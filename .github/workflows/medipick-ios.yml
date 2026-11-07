@@ -82,7 +82,24 @@ jobs:
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
             -parallel-testing-enabled NO \
+            -resultBundlePath "$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult" \
             CODE_SIGNING_ALLOWED=NO test
+
+      - name: Archive native UI test evidence
+        if: always()
+        run: |
+          RESULT="$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult"
+          if [ -d "$RESULT" ]; then
+            ditto -c -k --sequesterRsrc --keepParent "$RESULT" "$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult.zip"
+          fi
+      - name: Upload simulator interaction screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-InteractiveTests-XCResult
+          path: ${{ runner.temp }}/MEDIPICKiOS-InteractiveTests.xcresult.zip
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Package simulator build
         if: success()
