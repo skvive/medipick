@@ -361,11 +361,22 @@ body {
   flex-shrink: 0;
 }
 
-body.mp-home .header .menu-toggle,
-.mp-site-header .mp-menu-toggle {
+/* All top-level pages stay reachable: desktop shows first five links plus the
+   explicit full-menu control, instead of silently clipping links in a hidden scrollbar. */
+body.mp-home .header .menu-toggle {
   display: none;
   align-items: center;
   justify-content: center;
+}
+
+.mp-site-header .mp-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mp-site-header .mp-site-nav--desktop .mp-nav-link:nth-child(n + 6) {
+  display: none;
 }
 
 .mp-menu-toggle:focus-visible,
@@ -374,6 +385,24 @@ body.mp-home .header .menu-toggle,
 .mp-site-nav .mp-nav-link:focus-visible {
   outline: 3px solid #1769f8;
   outline-offset: 3px;
+}
+
+@media (max-width: 1180px) {
+  body.mp-home .header .main-nav,
+  .mp-site-header .mp-site-nav--desktop {
+    display: none !important;
+  }
+  body.mp-home .header .menu-toggle,
+  .mp-site-header .mp-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-ops { display: none !important; }
+}
+
+@media (max-width: 520px) {
+  .mp-site-actions .mp-btn-pink { display: none !important; }
 }
 
 @media (max-width: 820px) {
