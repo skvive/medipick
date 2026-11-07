@@ -101,7 +101,15 @@ with sync_playwright() as pw:
                         }
                     });
                 }""", DYNAMIC_IMAGES)
-                page.wait_for_timeout(120)
+                # Firefox/WebKit intentionally defer off-screen loading=lazy images.
+                # Request the full image set before counting decode failures, rather
+                # than treating correct lazy loading as a broken asset.
+                page.evaluate("""() => {
+                    document.querySelectorAll('img[loading="lazy"]').forEach(img => img.loading = 'eager');
+                }""")
+                page.wait_for_function("""() =>
+                    [...document.images].filter(x => x.getAttribute('src')?.startsWith('data:')).every(x => x.complete)
+                """, timeout=4000)
                 actual = page.evaluate("""() => {
                     const images = [...document.images];
                     return {
@@ -111,6 +119,18 @@ with sync_playwright() as pw:
                         imagesTotal: images.length,
                         imagesLoaded: images.filter(x => x.complete && x.naturalWidth > 0).length,
                         brokenLocalImages: images.filter(x => x.getAttribute('src')?.startsWith('data:') && (!x.complete || x.naturalWidth === 0)).length,
+                        overflowElements: [...document.querySelectorAll('body *')]
+                            .filter(el => {
+                                const rect = el.getBoundingClientRect();
+                                return rect.width > 0 && rect.right > innerWidth + .5 &&
+                                    getComputedStyle(el).display !== 'none';
+                            })
+                            .slice(0, 8).map(el => ({
+                                tag: el.tagName.toLowerCase(),
+                                id: el.id || '',
+                                class: String(el.className?.baseVal || el.className || '').slice(0,110),
+                                right: Math.round(el.getBoundingClientRect().right * 10) / 10
+                            })),
                         buttons: document.querySelectorAll('button').length,
                         links: document.querySelectorAll('a[href]').length,
                         h1: document.querySelector('h1')?.innerText?.slice(0,90) || ''
