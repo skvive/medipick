@@ -17,21 +17,22 @@ permissions:
 
 jobs:
   ios:
-    runs-on: macos-26
-    timeout-minutes: 45
+    # Stable simulator testing lane; Xcode 26 device Release is checked separately.
+    runs-on: macos-15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-      - name: Environment
+      - name: Select Xcode 16.4 for stable simulator tests
         run: |
           set -euo pipefail
+          XCODE_DEVELOPER=/Applications/Xcode_16.4.app/Contents/Developer
+          test -d "$XCODE_DEVELOPER"
+          sudo xcode-select -s "$XCODE_DEVELOPER"
           xcodebuild -version
-          SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
-          SDK_MAJOR="${SDK_VERSION%%.*}"
-          echo "iOS SDK: $SDK_VERSION"
-          if [ "$SDK_MAJOR" -lt 26 ]; then
-            echo "ERROR: iOS 26 SDK or newer is required for App Store Connect uploads in 2026"
-            exit 1
-          fi
+          xcodebuild -version | grep -F 'Xcode 16.4'
+      - name: Environment
+        run: |
+          xcodebuild -version
           xcrun simctl list devices available
       - name: Validate project and icon metadata
         run: |
@@ -46,21 +47,41 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO build
+      - name: Capture real iPhone and iPad simulator QA screens
+        run: bash ios/tools/capture_screenshots.sh
+      - name: Upload iOS simulator screenshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-QA-Screenshots
+          path: ${{ runner.temp }}/medipick-ios-screenshots/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Run native safety unit tests
         run: |
           set -euo pipefail
           SIM_ID="$(xcrun simctl list devices available -j | python3 -c '
           import json,sys
           runtimes=json.load(sys.stdin)["devices"]
-          sims=[d for ds in runtimes.values() for d in ds if d.get("isAvailable") and "iPhone" in d.get("name","")]
-          print(sims[0]["udid"] if sims else "")
+          chosen=""
+          for runtime in sorted(runtimes):
+              if "iOS" not in runtime: continue
+              sims=[d for d in runtimes[runtime] if d.get("isAvailable") and "iPhone" in d.get("name","")]
+              if sims:
+                  chosen=sims[0]["udid"]
+                  break
+          print(chosen)
           ')"
           if [ -z "$SIM_ID" ]; then
             echo "No iPhone simulator available on GitHub runner"; exit 1
           fi
+          # Prepare CoreSimulator before XCTest; Xcode 26 CI can hang on cold simulator startup.
+          xcrun simctl boot "$SIM_ID" || true
+          xcrun simctl bootstatus "$SIM_ID" -b
           xcodebuild -project ios/MEDIPICKiOS.xcodeproj \
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
+            -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO test
 
       - name: Package simulator build
