@@ -119,9 +119,12 @@ with sync_playwright() as pw:
                 row = {"page": file.stem, "width": width, "height": height, **prelim,
                        **actual, "errors": errors, "menu_check": "not_applicable"}
                 row["overflow_px"] = max(0, actual["scrollWidth"] - width)
-                if width == 390:
+                if width in (320, 390):
                     menu = page.locator("#mpMenuToggle")
                     if menu.count() == 1 and menu.is_visible():
+                        bounds = menu.bounding_box()
+                        row["menu_right_inset_px"] = round(width - bounds["x"] - bounds["width"], 2) if bounds else -1
+                        row["menu_safe_area"] = "passed" if row["menu_right_inset_px"] >= 8 else "failed"
                         menu.click(timeout=3000)
                         opened = page.evaluate("""() => {
                             const m=document.getElementById('mpNavDrawer');
@@ -162,7 +165,7 @@ with sync_playwright() as pw:
 failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) > 6 or
             row.get("duplicate_ids") or row.get("missing_alt") or
             row.get("broken_assets") or row.get("brokenLocalImages", 0) > 0 or
-            row.get("menu_check") == "failed" or row.get("keyboard_focus") == "failed" or row.get("errors")]
+            row.get("menu_check") == "failed" or row.get("menu_safe_area") == "failed" or row.get("keyboard_focus") == "failed" or row.get("errors")]
 report = {
     "mode": "offline actual HTML/CSS across Chromium/Firefox/WebKit, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
     "browser": BROWSER_NAME,
