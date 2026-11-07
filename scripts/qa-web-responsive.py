@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MEDIPICK design QA: real current HTML/CSS in Chromium, without credentials or live APIs.
+"""MEDIPICK design QA: real HTML/CSS across Chromium, Firefox and WebKit, no live APIs.
 Reuses the repository's qa_v32_pages.py set_content() offline rendering pattern.
 Artifacts are evidence, not a production/third-party integration pass.
 """
@@ -14,6 +14,9 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
+BROWSER_NAME = os.environ.get("MEDIPICK_QA_BROWSER", "chromium").lower()
+if BROWSER_NAME not in ("chromium", "firefox", "webkit"):
+    raise SystemExit("MEDIPICK_QA_BROWSER must be chromium, firefox or webkit")
 ROOT = Path(os.environ.get("MEDIPICK_QA_ROOT", Path(__file__).resolve().parents[1]))
 WEB = ROOT / "web"
 OUT = Path(os.environ.get("MEDIPICK_QA_OUTPUT", ROOT / "docs" / "agency_qa"))
@@ -76,7 +79,10 @@ DYNAMIC_IMAGES = {
 DYNAMIC_IMAGES = {url: data for url, data in DYNAMIC_IMAGES.items() if data}
 
 with sync_playwright() as pw:
-    browser = pw.chromium.launch(headless=True, args=["--no-sandbox"])
+    browser_type = getattr(pw, BROWSER_NAME)
+    browser_options = {"headless": True}
+    if BROWSER_NAME == "chromium": browser_options["args"] = ["--no-sandbox"]
+    browser = browser_type.launch(**browser_options)
     for file in PAGES:
         html, prelim = prepare_html(file)
         for width, height in SIZES:
@@ -129,6 +135,20 @@ with sync_playwright() as pw:
                             return !!m && m.hidden && b.getAttribute('aria-expanded') === 'false';
                         }""")
                         row["menu_check"] = "passed" if opened and closed else "failed"
+                        # Opening the dialog moves keyboard focus to its Close control,
+                        # Escape restores it to the original menu trigger.
+                        menu.click(timeout=3000)
+                        focus_open = page.evaluate("document.activeElement?.id === 'mpMenuClose'")
+                        page.keyboard.press("Shift+Tab")
+                        wrapped_to_last = page.evaluate("""() => {
+                            const links=[...document.querySelectorAll('#mpNavDrawer a[href]')];
+                            return links.length > 0 && document.activeElement === links[links.length-1];
+                        }""")
+                        page.keyboard.press("Tab")
+                        wrapped_to_first = page.evaluate("document.activeElement?.id === 'mpMenuClose'")
+                        page.keyboard.press("Escape")
+                        focus_return = page.evaluate("document.activeElement?.id === 'mpMenuToggle'")
+                        row["keyboard_focus"] = "passed" if (focus_open and wrapped_to_last and wrapped_to_first and focus_return) else "failed"
                 rows.append(row)
                 if width in (390, 1440):
                     page.screenshot(path=str(OUT / (file.stem + "-" + str(width) + ".png")), timeout=20000)
@@ -142,9 +162,10 @@ with sync_playwright() as pw:
 failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) > 6 or
             row.get("duplicate_ids") or row.get("missing_alt") or
             row.get("broken_assets") or row.get("brokenLocalImages", 0) > 0 or
-            row.get("menu_check") == "failed" or row.get("errors")]
+            row.get("menu_check") == "failed" or row.get("keyboard_focus") == "failed" or row.get("errors")]
 report = {
-    "mode": "offline actual HTML and CSS, Chromium, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
+    "mode": "offline actual HTML/CSS across Chromium/Firefox/WebKit, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
+    "browser": BROWSER_NAME,
     "pages": len(PAGES), "sizes": [x[0] for x in SIZES],
     "cases": len(rows), "failures": len(failures), "failed_cases": failures, "rows": rows,
 }
