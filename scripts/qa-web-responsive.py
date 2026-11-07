@@ -69,6 +69,12 @@ def prepare_html(file):
     return str(soup), {"duplicate_ids": duplicate_ids, "missing_alt": missing_alt,
                         "broken_assets": sorted(set(broken_assets))}
 
+DYNAMIC_IMAGES = {
+    url: embed_asset(url)
+    for url in ("/assets/logo-full.svg", "/assets/logo-mark.jpg", "/assets/favicon.svg")
+}
+DYNAMIC_IMAGES = {url: data for url, data in DYNAMIC_IMAGES.items() if data}
+
 with sync_playwright() as pw:
     browser = pw.chromium.launch(headless=True, args=["--no-sandbox"])
     for file in PAGES:
@@ -80,6 +86,15 @@ with sync_playwright() as pw:
             page.on("pageerror", lambda exc: errors.append(str(exc)))
             try:
                 page.set_content(html, wait_until="domcontentloaded", timeout=15000)
+                # Resolve dynamically inserted shared navigation logos within the offline DOM.
+                page.evaluate("""assets => {
+                    document.querySelectorAll('img[src]').forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (Object.prototype.hasOwnProperty.call(assets, src)) {
+                            img.setAttribute('src', assets[src]);
+                        }
+                    });
+                }""", DYNAMIC_IMAGES)
                 page.wait_for_timeout(120)
                 actual = page.evaluate("""() => {
                     const images = [...document.images];
@@ -89,6 +104,7 @@ with sync_playwright() as pw:
                         scrollHeight: document.documentElement.scrollHeight,
                         imagesTotal: images.length,
                         imagesLoaded: images.filter(x => x.complete && x.naturalWidth > 0).length,
+                        brokenLocalImages: images.filter(x => x.getAttribute('src')?.startsWith('data:') && (!x.complete || x.naturalWidth === 0)).length,
                         buttons: document.querySelectorAll('button').length,
                         links: document.querySelectorAll('a[href]').length,
                         h1: document.querySelector('h1')?.innerText?.slice(0,90) || ''
@@ -125,7 +141,8 @@ with sync_playwright() as pw:
 
 failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) > 6 or
             row.get("duplicate_ids") or row.get("missing_alt") or
-            row.get("broken_assets") or row.get("menu_check") == "failed" or row.get("errors")]
+            row.get("broken_assets") or row.get("brokenLocalImages", 0) > 0 or
+            row.get("menu_check") == "failed" or row.get("errors")]
 report = {
     "mode": "offline actual HTML and CSS, Chromium, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
     "pages": len(PAGES), "sizes": [x[0] for x in SIZES],
