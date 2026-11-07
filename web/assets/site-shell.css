@@ -422,6 +422,7 @@ body.mp-home .header .menu-toggle {
     min-width: 44px;
     max-width: 44px;
     margin-left: auto;
+    margin-right: 12px !important;
   }
 
   /* Legacy premium-admin header was flush with the viewport edge. */
