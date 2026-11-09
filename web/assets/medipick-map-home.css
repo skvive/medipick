@@ -116,3 +116,23 @@ body.mp-map-home .mp-smart-quick button.is-active{background:#e8f2ff!important;c
  .mp-map-home .mp-home-service-links a>span{width:30px;height:30px;font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){.mp-map-home *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Map is the primary first-view object. Places request lives within the map card. */
+body.mp-map-home .mp-home-main-panel>.mp-google-search-option{width:calc(100% - 18px)!important;max-width:none!important;min-height:54px;margin:8px 9px 0!important;box-shadow:none!important;border-radius:10px!important;padding:7px 10px!important;gap:8px!important;flex-shrink:0}
+body.mp-map-home .mp-home-main-panel>.mp-google-search-option strong{font-size:11px}
+body.mp-map-home .mp-home-main-panel>.mp-google-search-option small{font-size:10px;line-height:1.35}
+body.mp-map-home .mp-home-main-panel>.mp-google-search-option button{font-size:11px;min-height:39px;white-space:nowrap}
+body.mp-map-home .demo-ribbon{padding:4px 12px!important;font-size:10px!important;line-height:1.45!important}
+body.mp-map-home .mp-home-intro{padding-top:11px}
+body.mp-map-home .mp-home-headline{margin-bottom:5px}
+body.mp-map-home .mp-home-location-bar{min-height:24px;padding-bottom:5px}
+@media(max-width:650px){
+ body.mp-map-home .mp-home-headline h1{font-size:24px;line-height:1.23;margin:2px 0 4px}
+ body.mp-map-home .mp-home-intro{padding-top:9px}
+ body.mp-map-home .mp-home-location-bar{margin-top:0;padding-bottom:6px}
+ body.mp-map-home .mp-home-main-panel>.mp-google-search-option{flex-direction:row!important;align-items:center!important;min-height:55px;margin:6px 7px 0!important;width:calc(100% - 14px)!important}
+ body.mp-map-home .mp-home-main-panel>.mp-google-search-option strong{font-size:10px}
+ body.mp-map-home .mp-home-main-panel>.mp-google-search-option small{display:none}
+ body.mp-map-home .mp-home-main-panel>.mp-google-search-option button{width:auto!important;max-width:57%;font-size:10px;padding:7px 9px;min-height:38px;white-space:normal;line-height:1.35}
+ body.mp-map-home .mp-home-main-panel{height:330px;min-height:330px;max-height:330px!important}
+}
