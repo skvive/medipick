@@ -69,3 +69,29 @@ test('local JavaScript syntax parses without adding dependencies',()=>{
     assert.equal(r.status,0,file+'\n'+r.stderr);
   }
 });
+
+test('Google Places (New) search is user-initiated, attributed, and kept separate from internal provider records',()=>{
+  const js=read('web/assets/smart-store.js');
+  const home=read('web/index.html');
+  const directory=read('web/smart-store.html');
+  for(const page of [home,directory]){
+    assert.match(page,/id="smartGooglePlaces"/);
+    assert.match(page,/id="googlePlacesSection"/);
+    assert.match(page,/id="googlePlacesResults"/);
+    assert.match(page,/id="clearGooglePlaces"/);
+  }
+  assert.match(js,/addEventListener\('click', searchGooglePlacesOnDemand\)/);
+  assert.match(js,/Place\.searchNearby\(query\)/);
+  assert.match(js,/google\.maps\.importLibrary\('places'\)/);
+  assert.match(js,/includedTypes:\['hospital','doctor','dentist'\]/);
+  assert.match(js,/Google Places 검색 결과/);
+  assert.match(js,/googleSource\?'#7651dc'/);
+  assert.match(js,/clearGooglePlacesResults\(\);\s*center = \{ lat, lng \};/);
+  assert.doesNotMatch(js,/fetch\(['"]\/api\/admin\/locations['"]/);
+});
+test('clinic storefront has actual no-JS onboarding content instead of a blank page',()=>{
+  const html=read('web/clinic-store.html');
+  assert.match(html,/<section id="clinicStoreLanding" class="mp-store-landing">/);
+  assert.match(html,/id="clinicStoreProfile" class="mp-store-profile" hidden/);
+  assert.match(html,/Blogger/);
+});
