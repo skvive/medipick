@@ -39,7 +39,7 @@ function setLocationStatus(value) { const el = $('#smartLocationStatus'); if (el
 function setPinStatus(value) { const el = $('#smartPinCount'); if (el) el.textContent = value; }
 function removeMapMarker(marker) { if (!marker) return; if (typeof marker.setMap === 'function') marker.setMap(null); else marker.map = null; }
 function markerPosition(marker) { const pos = marker?.position || marker?.getPosition?.(); return pos?.toJSON ? pos.toJSON() : pos; }
-function buildMarker(pos,title,exact,premium=false) { if (google.maps.marker?.AdvancedMarkerElement && google.maps.marker?.PinElement) { const pin = new google.maps.marker.PinElement({background:exact ? (premium ? '#7453ed' : '#1769f8') : '#8391a4', borderColor:'#fff',glyphColor:'#fff',glyph:exact?'✚':'?' ,scale:1.1}); return new google.maps.marker.AdvancedMarkerElement({map,position:pos,title,content:pin.element}); } return new google.maps.Marker({map,position:pos,title,icon:{path:google.maps.SymbolPath.CIRCLE,scale:exact?9:7,fillColor:exact?'#1769f8':'#8391a4',fillOpacity:.92,strokeWeight:2,strokeColor:'#fff'}}); }
+function buildMarker(pos,title,exact,premium=false,googleSource=false) { const color=googleSource?'#7651dc':(exact?(premium?'#7453ed':'#1769f8'):'#8391a4'); if (google.maps.marker?.AdvancedMarkerElement && google.maps.marker?.PinElement) { const pin = new google.maps.marker.PinElement({background:color, borderColor:'#fff',glyphColor:'#fff',glyph:googleSource?'G':(exact?'✚':'?'),scale:1.1}); return new google.maps.marker.AdvancedMarkerElement({map,position:pos,title,content:pin.element}); } return new google.maps.Marker({map,position:pos,title,icon:{path:google.maps.SymbolPath.CIRCLE,scale:exact?9:7,fillColor:color,fillOpacity:.92,strokeWeight:2,strokeColor:'#fff'}}); }
 
 
 function defaultCenter() {
@@ -678,7 +678,7 @@ async function searchGooglePlacesOnDemand(){
     const bounds=new google.maps.LatLngBounds();
     for(const place of places){
       const name=String(place.displayName||'병원 장소');
-      const marker=buildMarker(place.location,'Google Places 장소 · '+name,true,false);
+      const marker=buildMarker(place.location,'Google Places 장소 · '+name,true,false,true);
       googlePlacesMarkers.push(marker);
       marker.addListener?.('click',()=>{
         const card=googlePlaceCard(place,marker);
