@@ -408,3 +408,14 @@
 .mp-smart-footer nav a:hover{text-decoration:underline}
 @media(max-width:850px){.mp-smart-footer-inner{grid-template-columns:1fr;gap:12px}.mp-smart-footer{padding:24px 16px 28px}}
 @media(max-width:380px){.mp-smart-store .mp-smart-hero h1{font-size:26px}.mp-smart-hero-intro{grid-template-columns:minmax(0,1fr) 66px}.mp-smart-hero-graphic{width:66px;height:90px}}
+
+/* Shared directory enhancements: location transparency, real Google pin count, storefront */
+.mp-smart-map-location{display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px;max-width:1280px;margin:10px auto 0;padding:9px 12px;background:#edf5ff;border:1px solid #d3e5ff;border-radius:12px;color:#5878a0;font-size:11px;line-height:1.5}
+.mp-smart-map-location strong{color:#1258b5;font-size:12px}
+#smartPinCount{color:#1769f8;font-weight:850;font-size:11px}
+.mp-smart-storefront-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 11px;margin-top:5px;border:1px solid #c8dbf8;border-radius:9px;background:#edf5ff;color:#1659bb;font-size:12px;font-weight:800;text-decoration:none;min-height:40px}
+.mp-smart-storefront-link:hover{border-color:#8db6ed;background:#e4f1ff}
+.mp-smart-detail-actions a[href^="/clinic-store"]{background:#ecf5ff;color:#1558b3;border-color:#bcd3f9}
+.mp-smart-map-status{flex-wrap:wrap}
+.mp-smart-quick button:focus-visible,.mp-smart-toolbar button:focus-visible{outline:3px solid #1769f8;outline-offset:3px}
+@media(max-width:800px){.mp-smart-map-location{margin:10px 14px 0}.mp-smart-map-status #smartPinCount{width:100%;margin-left:0}}
