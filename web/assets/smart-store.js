@@ -30,6 +30,9 @@ let addressSearchSequence = 0;
 let viewMode = 'catalog';
 let partnerItems = [];
 let searchSequence = 0;
+let googlePlacesMarkers=[];
+let placesSearching=false;
+
 let locationMode = 'default'; // 'default' | 'geo' | 'region' (explicit user action only)
 let userLocationMarker = null;
 function setLocationStatus(value) { const el = $('#smartLocationStatus'); if (el) el.textContent = value; }
@@ -417,6 +420,7 @@ function renderMapMarkers() {
 }
 
 async function searchNearby(lat, lng) {
+  clearGooglePlacesResults();
   center = { lat, lng };
   const requestId = ++searchSequence;
   const q = ($('#smartQ')?.value || '').trim();
@@ -490,6 +494,8 @@ async function initStats() {
 }
 
 function bindUi() {
+  $('#smartGooglePlaces')?.addEventListener('click', searchGooglePlacesOnDemand);
+  $('#clearGooglePlaces')?.addEventListener('click',clearGooglePlacesResults);
   $('#smartSearchForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
     const at = center || defaultCenter();
@@ -586,6 +592,114 @@ async function init() {
     }
   } catch (e) {
     showToast('초기화 실패: ' + e.message);
+  }
+}
+
+/**
+ * Google Places API (New) — explicit on-demand place search. Billing may apply.
+ * Results are separate, non-persistent Google places, NOT verified MediPick hospitals.
+ * Never write Google Place details or temporary positions into the local catalog.
+ */
+function clearGooglePlacesResults(){
+  googlePlacesMarkers.forEach(removeMapMarker);
+  googlePlacesMarkers=[];
+  const panel=$('#googlePlacesSection');
+  if(panel)panel.hidden=true;
+  const list=$('#googlePlacesResults');
+  if(list)list.replaceChildren();
+}
+function googlePlaceLink(p){
+  try{
+    const u=new URL(String(p.googleMapsURI||''));
+    if(u.protocol==='https:' && (u.hostname==='maps.google.com'||u.hostname==='www.google.com'||u.hostname==='google.com')) return u.toString();
+  }catch{}
+  return '';
+}
+function googlePlaceCard(place,marker){
+  const name=String(place.displayName||'의료기관 장소 정보').slice(0,120);
+  const address=String(place.formattedAddress||'주소를 Google 지도에서 확인하세요').slice(0,180);
+  const card=document.createElement('article');
+  card.className='mp-google-place-card';
+  const heading=document.createElement('strong');heading.textContent=name;
+  const where=document.createElement('p');where.textContent=address;
+  const actions=document.createElement('div');actions.className='mp-google-place-actions';
+  const pin=document.createElement('button');pin.type='button';pin.textContent='지도에서 위치 보기';pin.onclick=()=>{
+    if(marker&&map&&place.location){
+      map.panTo(place.location);
+      map.setZoom(Math.max(Number(map.getZoom()||12),15));
+      infoWindow?.setContent('<div class="mp-store-popup"><strong>'+safe(name)+'</strong><p>'+safe(address)+'</p><small>Google Places 검색 결과 · 진료·운영 여부 확인 필요</small></div>');
+      if(infoWindow)infoWindow.open({map,anchor:marker});
+      document.getElementById('smartStoreMap')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  };
+  actions.appendChild(pin);
+  const uri=googlePlaceLink(place);
+  if(uri){const a=document.createElement('a');a.href=uri;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Google 지도 원문 ↗';actions.appendChild(a);}
+  card.append(heading,where,actions);
+  return card;
+}
+async function searchGooglePlacesOnDemand(){
+  const button=$('#smartGooglePlaces'),panel=$('#googlePlacesSection'),holder=$('#googlePlacesResults');
+  if(!button||!panel||!holder||placesSearching)return;
+  clearGooglePlacesResults();
+  panel.hidden=false;
+  holder.textContent='Google Places 지도 검색을 불러오고 있습니다. 사용자 요청에 의한 조회이며 API 사용량에 과금될 수 있습니다.';
+  button.disabled=true;placesSearching=true;
+  try{
+    if(!config?.google_maps_browser_key)throw new Error('Google Maps 브라우저 키가 구성되지 않았습니다.');
+    if(!mapReady()){
+      await new Promise((resolve,reject)=>{
+        loadMaps(resolve);
+        window.setTimeout(()=>mapReady()?resolve():reject(new Error('Google 지도 초기화 실패')),8500);
+      });
+    }
+    if(!ensureMap())throw new Error('Google 지도 화면을 준비할 수 없습니다.');
+    if(!google.maps.importLibrary)throw new Error('현재 Google 지도 SDK가 Places API (New)를 지원하지 않습니다.');
+    const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
+    if(!Place?.searchNearby)throw new Error('Google Places API (New) 이용이 활성화되지 않았습니다.');
+    const point=center||defaultCenter();
+    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
+    const query={
+      fields:['displayName','location','formattedAddress','googleMapsURI'],
+      locationRestriction:{center:{lat:Number(point.lat),lng:Number(point.lng)},radius},
+      includedTypes:['hospital','doctor','dentist'],
+      maxResultCount:15,
+      rankPreference:SearchNearbyRankPreference?.DISTANCE||'DISTANCE'
+    };
+    const result=await Place.searchNearby(query);
+    const places=(Array.isArray(result?.places)?result.places:[]).filter(p=>p?.location&&p?.displayName);
+    holder.replaceChildren();
+    if(!places.length){
+      const empty=document.createElement('p');empty.className='mp-google-places-empty';
+      empty.textContent='선택한 범위에서 Google Places 의료기관 장소 검색 결과가 없습니다. 반경이나 위치를 변경해 다시 검색해 주세요.';
+      holder.appendChild(empty);
+      return;
+    }
+    const bounds=new google.maps.LatLngBounds();
+    for(const place of places){
+      const name=String(place.displayName||'병원 장소');
+      const marker=buildMarker(place.location,'Google Places 장소 · '+name,true,false);
+      googlePlacesMarkers.push(marker);
+      marker.addListener?.('click',()=>{
+        const card=googlePlaceCard(place,marker);
+        const button=card.querySelector('button');
+        button?.click();
+      });
+      bounds.extend(place.location);
+      holder.appendChild(googlePlaceCard(place,marker));
+    }
+    bounds.extend(point);
+    if(map)map.fitBounds(bounds,50);
+    const count=document.createElement('p');count.className='mp-google-places-attribution';
+    count.textContent='Google Maps Platform Places 검색 결과 '+places.length+'곳 · 자체 의료기관 인증이나 영업 여부 확인이 아닙니다. 출처: Google 지도.';
+    holder.prepend(count);
+    panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }catch(error){
+    clearGooglePlacesResults();
+    panel.hidden=false;
+    holder.textContent='Google Places 검색을 표시하지 못했습니다: '+String(error?.message||'API 사용 불가')+' · Google Cloud에서 Places API (New) 활성화 및 브라우저 키 권한을 확인하세요. 기존 병원 주소록과 개별 지도 확인 링크는 계속 이용할 수 있습니다.';
+  }finally{
+    button.disabled=false;placesSearching=false;
   }
 }
 
