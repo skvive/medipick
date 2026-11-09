@@ -1,0 +1,118 @@
+/* MediPick v7 — Map-first home. Separate from the legacy /portal page and shared clinic directory. */
+:root{--mh-blue:#1769f8;--mh-navy:#102e5b;--mh-border:#dbe6f6;--mh-muted:#5e7391}
+body.mp-map-home{background:#f4f8ff!important;color:var(--mh-navy);font-family:'Noto Sans KR',system-ui,sans-serif!important;min-height:100vh}
+body.mp-map-home .mp-site-header{position:sticky;top:0;z-index:95}
+body.mp-map-home .demo-ribbon{font-size:11px;padding:7px 16px;line-height:1.55;background:#fff9ec;color:#68522f;border-bottom:1px solid #f1dfb9}
+body.mp-map-home .mp-smart-toolbar,body.mp-map-home .mp-smart-quick{margin:0!important}
+body.mp-map-home .mp-smart-toolbar{display:grid!important;grid-template-columns:minmax(0,1.6fr) minmax(130px,.84fr) minmax(90px,.54fr) auto auto!important;align-items:center;gap:8px;background:#fff!important;border:1px solid #d4e3f8!important;border-radius:17px!important;padding:12px!important;box-shadow:0 10px 28px rgba(22,76,153,.085)!important}
+body.mp-map-home #smartModes{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:0 0 3px;border:0;margin:0;min-width:0}
+body.mp-map-home #smartModes legend{font-size:11px;font-weight:850;color:#7589a5;float:left;padding:9px 14px 5px 0}
+body.mp-map-home #smartModes label{border-radius:999px;padding:6px 12px;font-weight:750;font-size:12px;min-height:35px;display:inline-flex;align-items:center;gap:6px}
+body.mp-map-home #smartModes .is-checked{color:#135cc9;border:1px solid #b9d5ff;background:#eaf3ff}
+body.mp-map-home .mp-smart-toolbar input[type=search],body.mp-map-home .mp-smart-toolbar select{max-width:100%!important;min-width:0!important;width:100%;border:1px solid #cdddf3;border-radius:12px!important;min-height:47px!important;background:#fff!important;font-size:13px!important;padding:10px 12px!important}
+body.mp-map-home .mp-smart-toolbar input[type=search]::placeholder{color:#8b9db3}
+body.mp-map-home .mp-smart-toolbar button.btn-primary,body.mp-map-home .mp-smart-toolbar button.btn-ghost{min-height:47px!important;white-space:nowrap;font-size:13px;border-radius:12px;padding:9px 18px}
+body.mp-map-home .mp-smart-toolbar button.btn-primary{background:#1769f8!important;color:#fff!important}
+body.mp-map-home .mp-smart-toolbar #smartLocate{color:#125dcb!important;background:#edf5ff!important;border:1px solid #c7dcf9!important}
+body.mp-map-home .mp-smart-advanced{grid-column:1/-1!important;display:block;border-radius:11px!important}
+body.mp-map-home .mp-smart-advanced summary{min-height:36px!important;padding:8px 10px!important;font-size:11px!important}
+body.mp-map-home .mp-smart-advanced .mp-smart-advanced-content{gap:10px}
+body.mp-map-home .mp-smart-advanced select{width:auto!important;min-width:105px!important;max-width:160px!important}
+body.mp-map-home .mp-smart-advanced .mp-smart-estimate-control{white-space:normal}
+body.mp-map-home .mp-smart-quick{display:flex;gap:7px;align-items:center;overflow-x:auto;padding:10px 0 0;white-space:nowrap;scrollbar-width:thin}
+body.mp-map-home .mp-smart-quick>span{font-size:11px;font-weight:800;color:#7085a5}
+body.mp-map-home .mp-smart-quick button{min-height:35px;border:1px solid #cbdff9!important;background:#fff!important;color:#2a5fa8!important;padding:6px 13px!important;border-radius:999px!important;white-space:nowrap;font-size:12px;font-weight:750}
+body.mp-map-home .mp-smart-quick button.is-active{background:#e8f2ff!important;color:#0d57c7!important;border-color:#80affb!important}
+.mp-map-home .mp-home-intro,.mp-map-home .mp-home-workspace,.mp-map-home .mp-home-bottom,.mp-map-home .mp-home-disclaimer,.mp-map-home .mp-home-service-links{width:min(1360px,calc(100% - 40px));margin-left:auto;margin-right:auto}
+.mp-map-home .mp-home-intro{padding:19px 0 0}
+.mp-map-home .mp-home-headline{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:9px}
+.mp-map-home .mp-home-kicker{color:#2f70c2;font-size:10px;font-weight:850;letter-spacing:.11em}
+.mp-map-home .mp-home-headline h1{font-size:clamp(25px,2.9vw,37px);line-height:1.3;letter-spacing:-.06em;margin:3px 0 5px;color:#0d2e5c;font-weight:900}
+.mp-map-home .mp-home-headline h1 em{font-style:normal;color:#1769f8}
+.mp-map-home .mp-home-headline p{font-size:12px;color:#607695;line-height:1.55;margin:0}
+.mp-map-home .mp-home-business-link{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:43px;white-space:nowrap;border-radius:12px;background:#fff;border:1px solid #c9defb;padding:9px 16px;color:#1159b9;font-size:12px;font-weight:800}
+.mp-map-home .mp-home-location-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-height:30px;font-size:11px;color:#607798;padding:2px 1px 9px}
+.mp-map-home .mp-home-location-bar strong{color:#1c578f;font-size:12px}
+.mp-map-home .mp-home-location-indicator{width:9px;height:9px;border-radius:50%;background:#1769f8;box-shadow:0 0 0 4px #dfedff}
+.mp-map-home .mp-home-workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(310px,.75fr)!important;gap:14px;margin-top:13px;align-items:stretch}
+.mp-map-home .mp-home-main-panel,.mp-map-home .mp-smart-list-panel{height:560px;min-height:560px;max-height:560px!important;min-width:0;background:#fff!important;border:1px solid #d7e5f8!important;border-radius:20px!important;box-shadow:0 7px 25px rgba(20,70,140,.075)!important;overflow:hidden}
+.mp-map-home .mp-home-main-panel{display:flex;flex-direction:column}
+.mp-map-home .mp-smart-map-status{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:11px 15px!important;min-height:45px;background:#f5f9ff!important;border-bottom:1px solid #dce8f8!important;font-size:11px;color:#5c7393}
+.mp-map-home .mp-smart-map-status strong{font-size:12px;color:#1a4783}
+.mp-map-home .mp-smart-map-status #smartPinCount{margin-left:auto;color:#195bb9;font-weight:800}
+.mp-map-home .mp-map-legend{font-size:10px;color:#7890aa}
+.mp-map-home #smartStoreMap{width:100%!important;flex:1;height:100%!important;min-height:0!important;background:#ecf4ff}
+.mp-map-home #smartStoreMap.mp-smart-map-empty{display:flex;flex-direction:column;gap:8px;padding:20px;background:radial-gradient(circle at 50% 40%,#dcebff,#f1f7ff)!important}
+.mp-map-home #smartStoreMap.mp-smart-map-empty h2{font-size:18px;color:#1c508e;margin:0}
+.mp-map-home #smartStoreMap.mp-smart-map-empty p{max-width:42ch;font-size:12px;line-height:1.7;color:#5b78a0;margin:0}
+.mp-map-home .mp-map-placeholder-icon{font-size:42px;color:#1769f8}
+.mp-map-home .mp-smart-list-panel{display:flex;flex-direction:column}
+.mp-map-home .mp-smart-list-head{padding:15px 15px 13px!important;align-items:center;gap:8px;border-bottom:1px solid #e6eef9!important}
+.mp-map-home .mp-smart-list-head b{font-size:15px;color:#102f5d}
+.mp-map-home .mp-smart-list-head span{font-size:11px;color:#5077aa;text-align:right}
+.mp-map-home .mp-smart-list{padding:10px;flex:1;min-height:0;overflow:auto}
+.mp-map-home .mp-smart-item{padding:11px 12px;border:1px solid #e0eafa!important;background:#fff!important;border-radius:13px;margin:0 0 8px}
+.mp-map-home .mp-smart-item h3{font-size:14px;color:#183863}
+.mp-map-home .mp-smart-item p{color:#627a99;line-height:1.55}
+.mp-map-home .mp-smart-item.active,.mp-map-home .mp-smart-item:hover{border-color:#7db1fb!important;box-shadow:0 5px 15px #1769f815}
+.mp-map-home .mp-smart-item .dist{color:#185fc6}
+.mp-map-home .mp-smart-detail{padding:10px 13px!important;max-height:270px!important}
+.mp-map-home .mp-home-bottom{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px}
+.mp-map-home .mp-home-bottom .mp-smart-stats{display:flex;gap:6px;flex-wrap:wrap;margin:0!important}
+.mp-map-home .mp-smart-stats span{font-size:11px!important}
+.mp-map-home .mp-home-more-map{display:inline-flex;align-items:center;min-height:38px;white-space:nowrap;padding:7px 13px;border:1px solid #c6dafa;border-radius:11px;background:#fff;color:#195ab3;font-size:12px;font-weight:800}
+.mp-map-home .mp-home-disclaimer{font-size:11px;color:#607895;line-height:1.65;margin-top:8px;margin-bottom:0}
+.mp-map-home .mp-home-service-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px;margin-bottom:20px}
+.mp-map-home .mp-home-service-links a{min-width:0;min-height:72px;display:flex;align-items:center;gap:10px;padding:12px 15px;background:white;border:1px solid #dbe6f7;border-radius:15px;color:#153f78}
+.mp-map-home .mp-home-service-links a>span{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:11px;background:#edf5ff;color:#1769f8;font-size:23px}
+.mp-map-home .mp-home-service-links strong{font-size:13px;line-height:1.45;word-break:keep-all}
+.mp-map-home .mp-home-service-links small{font-size:10px;color:#7186a1;line-height:1.4}
+.mp-map-home .mp-home-service-links a{flex-wrap:wrap}
+.mp-map-home .mp-home-service-links strong,.mp-map-home .mp-home-service-links small{display:block}
+.mp-map-home .mp-home-footer{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px 22px;padding:18px max(20px,calc((100vw - 1360px)/2));border-top:1px solid #e0e9f7;background:#fff;color:#587092;font-size:11px}
+.mp-map-home .mp-home-footer p{margin:0}
+.mp-map-home .mp-home-footer div{display:flex;gap:13px}
+.mp-map-home .mp-home-footer a{color:#1b5db8;font-weight:750}
+.mp-map-home .mp-home-footer>small{font-size:10px;flex-basis:100%;text-align:center}
+.mp-map-home .mp-skip-link{position:absolute;top:-80px;left:14px;z-index:200;background:#1769f8;color:white;padding:10px;border-radius:10px}
+.mp-map-home .mp-skip-link:focus{top:8px}
+@media(max-width:1150px){
+ body.mp-map-home .mp-smart-toolbar{grid-template-columns:minmax(0,1.4fr) minmax(130px,.75fr) minmax(110px,.65fr) auto!important}
+ body.mp-map-home .mp-smart-toolbar #smartLocate{grid-column:4}
+ .mp-map-home .mp-home-workspace{grid-template-columns:minmax(0,1.2fr) minmax(270px,.85fr)!important}
+ .mp-map-home .mp-home-service-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:800px){
+ .mp-map-home .mp-home-intro,.mp-map-home .mp-home-workspace,.mp-map-home .mp-home-bottom,.mp-map-home .mp-home-disclaimer,.mp-map-home .mp-home-service-links{width:calc(100% - 28px)}
+ .mp-map-home .mp-home-intro{padding-top:15px}
+ .mp-map-home .mp-home-headline h1{font-size:27px}
+ .mp-map-home .mp-home-headline p{font-size:11px}
+ .mp-map-home .mp-home-business-link{min-height:37px;font-size:11px}
+ body.mp-map-home .mp-smart-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+ body.mp-map-home .mp-smart-toolbar #smartModes,body.mp-map-home .mp-smart-toolbar #smartQ,body.mp-map-home .mp-smart-toolbar .mp-smart-advanced{grid-column:1/-1!important}
+ body.mp-map-home .mp-smart-toolbar #smartTrade{grid-column:1!important}
+ body.mp-map-home .mp-smart-toolbar #smartRegion{grid-column:2!important}
+ body.mp-map-home .mp-smart-toolbar button.btn-primary{grid-column:1!important;width:100%}
+ body.mp-map-home .mp-smart-toolbar #smartLocate{grid-column:2!important;width:100%}
+ body.mp-map-home #smartModes legend{padding-right:4px}
+ .mp-map-home .mp-home-workspace{display:flex!important;flex-direction:column;gap:12px;margin-top:11px}
+ .mp-map-home .mp-home-main-panel{height:350px;min-height:350px;max-height:350px!important}
+ .mp-map-home .mp-smart-list-panel{height:360px;min-height:360px;max-height:360px!important}
+ .mp-map-home .mp-home-bottom{flex-wrap:wrap}
+ .mp-map-home .mp-smart-map-status{gap:5px}
+}
+@media(max-width:450px){
+ .mp-map-home .mp-home-headline{align-items:flex-start;gap:8px}
+ .mp-map-home .mp-home-headline h1{font-size:25px}
+ .mp-map-home .mp-home-business-link{font-size:10px;padding:7px 10px;max-width:120px;white-space:normal;text-align:center;line-height:1.45}
+ body.mp-map-home .mp-smart-toolbar{padding:9px!important}
+ body.mp-map-home .mp-smart-toolbar input[type=search],body.mp-map-home .mp-smart-toolbar select{font-size:12px!important}
+ .mp-map-home .mp-home-main-panel{height:310px;min-height:310px;max-height:310px!important}
+ .mp-map-home .mp-smart-list-panel{height:330px;min-height:330px;max-height:330px!important}
+ .mp-map-home .mp-home-service-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .mp-map-home .mp-home-service-links a{padding:10px;min-height:88px;gap:5px}
+ .mp-map-home .mp-home-service-links strong{font-size:11px}
+ .mp-map-home .mp-home-service-links small{font-size:9px}
+ .mp-map-home .mp-home-service-links a>span{width:30px;height:30px;font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){.mp-map-home *{scroll-behavior:auto!important;transition:none!important}}
