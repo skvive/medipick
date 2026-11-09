@@ -315,3 +315,15 @@ body.mp-smart-store .mp-smart-map-empty{background:linear-gradient(135deg,rgba(2
  body.mp-smart-store .mp-smart-toolbar #smartRegion{grid-column:2!important}
  body.mp-smart-store .mp-smart-toolbar .mp-smart-advanced{grid-column:1/-1!important}
 }
+
+/* Final screenshot findings: header alignment and unobstructed mobile content. */
+.mp-site-header .mp-site-actions{margin-left:auto!important}
+.mp-site-header .mp-site-header__inner{justify-content:space-between}
+body.v4-index .mp-global-link{position:static!important;display:table!important;width:max-content;max-width:calc(100% - 32px);margin:14px auto 22px!important;padding:10px 16px!important;background:#eef5ff!important;border:1px solid #cddff7!important;color:#1457ba!important;box-shadow:none!important;border-radius:999px}
+body.mp-smart-store .mp-smart-map-panel{position:relative}
+body.mp-smart-store .mp-smart-map-empty{color:#486c9b}
+@media(max-width:800px){
+ .mp-site-header .mp-site-header__inner{gap:8px}
+ .mp-site-header .mp-menu-toggle{margin-left:auto!important}
+ body[data-mp-page=doctor-finance] .portal-hero h1{font-size:26px!important;line-height:1.24!important}
+}
