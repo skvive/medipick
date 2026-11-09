@@ -36,7 +36,7 @@ test('geolocation searches nearby exact locations with explicit consent and no a
   assert.match(src,/precise = x\.geocode_status === 'exact'/);
   assert.match(src,/if \(!precise && !\$\('#smartEstimated'\)\?\.checked\) continue/);
   assert.doesNotMatch(src,/radiusMode = usingEstimates && !q/);
-  assert.match(src,/google\.maps\.marker\.AdvancedMarkerElement/);
+  assert.match(src,/google\.maps\.marker\?\.AdvancedMarkerElement/);
 });
 
 test('unapproved directory records are not treated as clinic storefronts', () => {
