@@ -419,3 +419,29 @@
 .mp-smart-map-status{flex-wrap:wrap}
 .mp-smart-quick button:focus-visible,.mp-smart-toolbar button:focus-visible{outline:3px solid #1769f8;outline-offset:3px}
 @media(max-width:800px){.mp-smart-map-location{margin:10px 14px 0}.mp-smart-map-status #smartPinCount{width:100%;margin-left:0}}
+
+/* Google Places (New), on-demand. Distinct from the validated MediPick catalog. */
+.mp-google-search-option,.mp-google-places-results{box-sizing:border-box;max-width:1280px;width:min(100% - 40px,1280px);margin:12px auto;background:#fff;border:1px solid #d9e7f9;border-radius:15px;box-shadow:0 5px 15px rgba(20,74,142,.04)}
+.mp-google-search-option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px}
+.mp-google-search-option div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mp-google-search-option strong{font-size:13px;font-weight:850;color:#163967}
+.mp-google-search-option small{font-size:11px;line-height:1.5;color:#687e9c}
+.mp-google-search-option button{min-height:44px;flex-shrink:0;padding:9px 14px;border-radius:11px;border:1px solid #1769f8;background:#1769f8;color:#fff;font-size:12px;font-weight:850;cursor:pointer}
+.mp-google-search-option button:disabled{opacity:.65;cursor:wait}
+.mp-google-places-results[hidden]{display:none!important}
+.mp-google-places-results{padding:13px 15px}
+.mp-google-places-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mp-google-places-header strong{color:#1b518e;font-size:13px}
+.mp-google-places-header button{border:1px solid #d5e3f6;background:#f6faff;color:#345f94;border-radius:10px;min-height:38px;font-size:12px;font-weight:750;padding:7px 12px;cursor:pointer}
+#googlePlacesResults{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px 0 0;font-size:12px;color:#47698e}
+.mp-google-places-attribution,.mp-google-places-empty{grid-column:1/-1;color:#5e7798;font-size:11px;line-height:1.6;margin:0;padding:4px 1px}
+.mp-google-place-card{display:flex;flex-direction:column;gap:7px;border:1px solid #dae7fa;border-radius:12px;padding:12px 14px;background:#f8fbff;min-width:0}
+.mp-google-place-card strong{font-size:13px;color:#1c477e;line-height:1.45}
+.mp-google-place-card p{margin:0;color:#5e7390;font-size:11px;line-height:1.55}
+.mp-google-place-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.mp-google-place-actions button,.mp-google-place-actions a{min-height:35px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:750;border:1px solid #bad3f9;background:#eef5ff;color:#1559b5;padding:6px 10px;border-radius:9px;text-decoration:none;cursor:pointer}
+.mp-google-place-actions a{background:#fff}
+.mp-map-home .mp-google-search-option{width:min(1360px,calc(100% - 40px));max-width:1360px}
+.mp-map-home .mp-google-places-results{width:min(1360px,calc(100% - 40px));max-width:1360px}
+@media(max-width:900px){#googlePlacesResults{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.mp-google-search-option{align-items:stretch;flex-direction:column}.mp-google-search-option button{width:100%}#googlePlacesResults{grid-template-columns:minmax(0,1fr)}.mp-google-search-option,.mp-google-places-results,.mp-map-home .mp-google-search-option,.mp-map-home .mp-google-places-results{width:calc(100% - 28px)}}
