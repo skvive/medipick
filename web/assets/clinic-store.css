@@ -1,0 +1,84 @@
+/* MEDIPICK — partner clinic storefront, read-only public profile and Blogger news. */
+body.mp-clinic-store{background:#f5f8fe;color:#102e5c;font-family:'Noto Sans KR',system-ui,sans-serif;min-height:100vh}
+.mp-clinic-store .mp-skip-link{position:absolute;left:10px;top:-80px;z-index:300;background:#1769f8;color:white;padding:10px;border-radius:10px}
+.mp-clinic-store .mp-skip-link:focus{top:6px}
+.mp-clinic-store .mp-store-shell{max-width:1240px;margin:auto;padding:20px 20px 50px;min-height:65vh}
+.mp-clinic-store .mp-store-breadcrumb{display:flex;gap:10px;align-items:center;font-size:12px;color:#7287a6;margin:0 0 17px}
+.mp-clinic-store .mp-store-breadcrumb a{color:#3b69b1;font-weight:750}
+.mp-clinic-store .mp-store-status{font-size:12px;padding:11px 14px;background:#edf5ff;border:1px solid #d7e6fb;border-radius:12px;color:#245ba6;margin:0 0 15px;line-height:1.6}
+.mp-clinic-store .mp-store-status:empty{display:none}
+.mp-clinic-store [hidden]{display:none!important}
+.mp-clinic-store .mp-store-landing{background:#fff;border:1px solid #dbe7f8;border-radius:23px;overflow:hidden;box-shadow:0 16px 44px #133a780c}
+.mp-clinic-store .mp-store-intro{background:radial-gradient(circle at 85% 35%,#c8e3ff,transparent 43%),linear-gradient(110deg,#f8fbff,#eaf4ff);padding:55px 52px 45px}
+.mp-clinic-store .mp-store-eyebrow{font-size:11px;font-weight:850;letter-spacing:.11em;color:#266dce}
+.mp-clinic-store .mp-store-intro h1{font-size:clamp(30px,4.5vw,54px);font-weight:900;line-height:1.25;letter-spacing:-.055em;color:#0d2e5c;margin:13px 0}
+.mp-clinic-store .mp-store-intro h1 em{font-style:normal;color:#1769f8}
+.mp-clinic-store .mp-store-intro p{max-width:70ch;font-size:14px;line-height:1.8;color:#547092;margin:0 0 23px}
+.mp-clinic-store .mp-store-cta{display:flex;gap:10px;flex-wrap:wrap}
+.mp-clinic-store .mp-store-cta a{display:inline-flex;min-height:46px;align-items:center;padding:10px 18px;border-radius:12px;font-weight:800;font-size:13px;border:1px solid #1769f8;background:#1769f8;color:#fff}
+.mp-clinic-store .mp-store-cta a+a{background:white;color:#1769f8;border-color:#b9d2f6}
+.mp-clinic-store .mp-store-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:22px 32px}
+.mp-clinic-store .mp-store-steps div{padding:18px 20px;border:1px solid #e2ebf8;border-radius:14px;display:flex;flex-direction:column;gap:8px}
+.mp-clinic-store .mp-store-steps b{font-size:22px;color:#1769f8}
+.mp-clinic-store .mp-store-steps strong{font-size:17px;color:#113562}
+.mp-clinic-store .mp-store-steps small{font-size:12px;line-height:1.6;color:#6b7f9b}
+.mp-clinic-store .mp-store-fine{font-size:12px;line-height:1.7;color:#697f9d;padding:0 32px 30px;margin:0}
+.mp-clinic-store .mp-store-hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);gap:25px;background:linear-gradient(120deg,#f7fbff,#e7f3ff);border:1px solid #d4e6fa;border-radius:22px;overflow:hidden;padding:32px;align-items:center}
+.mp-clinic-store .mp-store-hero-text h1{font-size:clamp(31px,3.7vw,47px);font-weight:900;line-height:1.28;letter-spacing:-.052em;margin:12px 0;color:#102d59}
+.mp-clinic-store .mp-store-hero-text p{font-size:14px;line-height:1.7;max-width:65ch;color:#577495}
+.mp-clinic-store .mp-store-badges,.mp-clinic-store .mp-store-chip-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.mp-clinic-store .mp-store-badges span,.mp-clinic-store .mp-store-chip-row span{font-size:11px;font-weight:750;line-height:1.4;padding:7px 10px;border-radius:999px;background:white;border:1px solid #cfe0f5;color:#35628f}
+.mp-clinic-store .mp-store-badges .mp-store-sponsored{background:#f3edff;border-color:#d9cbff;color:#6345aa}
+.mp-clinic-store .mp-store-hero-image{height:235px;width:100%;border-radius:18px;background:linear-gradient(130deg,#bfdbff,#e7f4ff);border:5px solid white;display:flex;justify-content:center;align-items:center;box-shadow:0 13px 32px #164b981b;overflow:hidden}
+.mp-clinic-store .mp-store-hero-image img{width:100%;height:100%;object-fit:cover}
+.mp-clinic-store .mp-store-hero-image span{font-size:13px;font-weight:750;color:#5279a9}
+.mp-clinic-store .mp-store-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.65fr);gap:18px;margin-top:18px}
+.mp-clinic-store .mp-store-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.mp-clinic-store .mp-store-sidebar{display:flex;flex-direction:column;gap:15px;min-width:0}
+.mp-clinic-store .mp-store-card{background:#fff;padding:25px;border:1px solid #dce7f8;border-radius:18px;box-shadow:0 8px 23px #0c37760d}
+.mp-clinic-store .mp-store-card h2{font-size:20px;color:#163663;letter-spacing:-.04em;margin:5px 0 12px}
+.mp-clinic-store .mp-store-card p{font-size:13px;line-height:1.75;color:#5c7495}
+.mp-clinic-store .mp-store-section-title>span{font-size:10px;letter-spacing:.1em;font-weight:900;color:#2670d2}
+.mp-clinic-store .mp-store-section-title h2{margin:5px 0}
+.mp-clinic-store .mp-store-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:20px 0}
+.mp-clinic-store .mp-store-facts div{padding:12px 15px;border:1px solid #e2ebf8;border-radius:12px;background:#f8fbff;min-width:0}
+.mp-clinic-store .mp-store-facts dt{font-size:11px;color:#8093ad;margin:0 0 7px}
+.mp-clinic-store .mp-store-facts dd{font-size:13px;color:#204371;font-weight:800;margin:0;line-height:1.65;overflow-wrap:anywhere}
+.mp-clinic-store .mp-store-actions{display:flex;gap:9px;flex-wrap:wrap}
+.mp-clinic-store .mp-store-actions a{min-height:45px;padding:10px 16px;background:#1769f8;color:white;border-radius:11px;font-size:13px;font-weight:800}
+.mp-clinic-store .mp-store-actions a+a{background:#eaf3ff;border:1px solid #c8defc;color:#1760c5}
+.mp-clinic-store .mp-store-source-note{font-size:11px!important;margin:15px 0 0;color:#788da7!important}
+.mp-clinic-store .mp-blog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0}
+.mp-clinic-store .mp-blog-head span{font-size:12px;color:#55759f}
+.mp-clinic-store .mp-blog-head a{font-size:12px;color:#1762cc;font-weight:750;border-bottom:1px solid #b6d4fc}
+.mp-clinic-store .mp-store-post-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.mp-clinic-store .mp-store-post{display:flex;flex-direction:column;gap:8px;padding:17px;border:1px solid #e0eafa;border-radius:13px;min-height:154px;text-decoration:none;background:#fbfdff}
+.mp-clinic-store .mp-store-post:hover{border-color:#90baf4;box-shadow:0 6px 18px #1265d015}
+.mp-clinic-store .mp-store-post time{font-size:11px;color:#7e93ad}
+.mp-clinic-store .mp-store-post strong{font-size:14px;color:#173b6c;line-height:1.5}
+.mp-clinic-store .mp-store-post p{font-size:12px;line-height:1.6;color:#617c9d;margin:0}
+.mp-clinic-store .mp-store-no-posts{border-radius:13px;padding:17px;background:#f3f8ff;color:#5b7393;font-size:12px;line-height:1.8;border:1px solid #dbe8f9;grid-column:1/-1}
+.mp-clinic-store .mp-store-sidebar .mp-store-card a{display:inline-flex;min-height:44px;align-items:center;color:#1764c9;font-size:12px;font-weight:800}
+.mp-clinic-store .mp-store-footer{display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:center;background:#fff;border-top:1px solid #e1eafa;padding:22px;color:#66809e;font-size:12px}
+.mp-clinic-store .mp-store-footer a{color:#1f60b8;font-weight:750}
+@media(max-width:860px){
+ .mp-clinic-store .mp-store-shell{padding:14px 14px 34px}
+ .mp-clinic-store .mp-store-hero{grid-template-columns:minmax(0,1fr);padding:20px}
+ .mp-clinic-store .mp-store-hero-image{height:175px}
+ .mp-clinic-store .mp-store-layout{grid-template-columns:minmax(0,1fr)}
+ .mp-clinic-store .mp-store-intro{padding:33px 25px}
+ .mp-clinic-store .mp-store-steps{grid-template-columns:repeat(3,minmax(0,1fr));padding:15px;gap:8px}
+ .mp-clinic-store .mp-store-steps div{padding:12px;min-height:130px}
+}
+@media(max-width:520px){
+ .mp-clinic-store .mp-store-intro{padding:27px 19px}
+ .mp-clinic-store .mp-store-intro h1{font-size:31px}
+ .mp-clinic-store .mp-store-steps{grid-template-columns:minmax(0,1fr)}
+ .mp-clinic-store .mp-store-steps div{min-height:0}
+ .mp-clinic-store .mp-store-fine{padding:0 18px 22px}
+ .mp-clinic-store .mp-store-card{padding:17px}
+ .mp-clinic-store .mp-store-facts{grid-template-columns:minmax(0,1fr)}
+ .mp-clinic-store .mp-store-post-grid{grid-template-columns:minmax(0,1fr)}
+ .mp-clinic-store .mp-store-hero-image{height:145px}
+ .mp-clinic-store .mp-store-cta a{width:100%;justify-content:center}
+}
