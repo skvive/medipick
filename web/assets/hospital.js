@@ -8,7 +8,7 @@
   const picNum={'피부과':1,'성형외과':2,'정형외과':3,'내과':4,'치과':5,'산부인과':6,'소아청소년과':7,'이비인후과':8,'안과':9,'정신건강의학과':10,'건강검진':11,'약국':12};
   const photo=c=>'/assets/photos/cat'+String(picNum[c]||4).padStart(2,'0')+'.webp';
   const safeUrl=x=>{try{const u=new URL(String(x));return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}};
-  function showError(message){notice.hidden=false;notice.textContent=message;root.textContent='기관 정보를 표시할 수 없습니다. 메인에서 다른 기관을 찾아보세요.'}
+  function showError(message){notice.hidden=false;notice.setAttribute('role','alert');notice.textContent=message;root.innerHTML='<section class="v34-detail-skeleton mp-hospital-empty" aria-labelledby="mpHospitalEmptyTitle"><strong id="mpHospitalEmptyTitle">병원 정보를 표시할 수 없습니다</strong><p>검색한 병원을 확인할 수 없습니다. 다른 병원을 선택하거나 검색 조건을 변경해 주세요. 실제 방문 전 주소·전화·운영 여부를 직접 확인하시기 바랍니다.</p><a class="mp-detail-return" href="/smart-store">병원 지도에서 다시 찾기 ↗</a></section>'}
   const info=(label,value)=>`<div class="v34-fact"><small>${esc(label)}</small><b>${esc(value||'정보 확인 전')}</b></div>`;
   const contentItem=x=>`<div class="v34-entry"><span class="v34-label">${esc(x.kind==='blog'?'BLOG':x.kind==='shorts'?'SHORTS':x.kind==='video'?'VIDEO':'GUIDE')} · ${x.doctor_verification==='verified'?'의료진 자격 확인':'작성자 미검증'}</span><b>${esc(x.title)}</b><p>${esc(x.summary||'원문 내용 확인이 필요합니다.')}</p>${safeUrl(x.url)?`<a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">작성자 원문 보기 ↗</a>`:'<span class="v34-label">데모 원문 링크 없음</span>'}</div>`;
   function render(p){
