@@ -18,6 +18,8 @@
   var NAV = [
     { key: 'home', href: '/', label: '홈' },
     { key: 'smart-store', href: '/smart-store', label: '병원 지도' },
+    { key: 'clinic-store', href: '/clinic-store', label: '병원 스마트스토어' },
+    { key: 'portal', href: '/portal', label: '전체 서비스' },
     { key: 'explore', href: '/?nav=explore', label: '병원 찾기', homeNav: true },
     { key: 'health-content', href: '/health-content', label: '건강정보·영상' },
     { key: 'insurance-claims', href: '/insurance-claims', label: '보험·약제비' },
@@ -32,6 +34,7 @@
     { key: 'clinic-ops', href: '/clinic-ops', label: '예약 운영' },
     { key: 'integrations', href: '/integrations', label: '연동' },
     { key: 'admin', href: '/admin', label: '관리' },
+    { key: 'premium-admin', href: '/premium-admin', label: '입점 운영' },
   ];
 
   var B2B_PAGES = [
