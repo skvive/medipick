@@ -246,3 +246,21 @@ body[data-mp-page=doctor-finance] .columns input{margin:4px 0;min-width:0}
  body[data-mp-page] .opswrap h1{font-size:28px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Task-specific workflow components — progressive enhancements only. */
+.mp-workflow-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.mp-workflow-nav a{display:inline-flex;align-items:center;min-height:44px;padding:9px 15px;background:#fff;border:1px solid #cbdff8;border-radius:11px;color:#1557ba;font-weight:750;font-size:13px;text-decoration:none}
+.mp-workflow-nav a:hover{background:#eaf3ff;border-color:#86b6fb}
+.mp-detail-return{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-top:12px;padding:9px 15px;background:#1769f8;border-radius:12px;color:#fff!important;font-weight:800;font-size:13px}
+.v34-detail-skeleton strong{display:block;color:#153761;font-size:18px;margin-bottom:8px}
+.v34-detail-skeleton p{font-size:13px;line-height:1.75;max-width:70ch;color:#5d7596}
+.mp-ai-input-note{border:1px solid #efdfb6;background:#fff8e8;border-radius:11px;margin:0 0 11px;padding:9px 12px;color:#77552a;font-size:12px;line-height:1.65}
+body.v4-index #editorial-v34{display:none!important}
+body.v4-index:has(#directoryPage:not(.hidden)) #editorial-v34,body.v4-index:has(#contentPage:not(.hidden)) #editorial-v34{display:none!important}
+body.v4-index .search-form .search-button{white-space:nowrap}
+body.v4-index .hero-visual::after{content:'AI 제작 연출 이미지 · 실제 의료기관·의료진과 무관';position:absolute;bottom:8px;right:14px;padding:3px 7px;font-size:10px;color:#4d6584;background:#ffffffd9;border-radius:6px;pointer-events:none}
+body.v4-index .hero-visual{position:relative}
+body.mp-smart-store .mp-smart-estimate-control{font-size:12px;color:#6b4d2c}
+body[data-mp-page=clinic-access] button[id*=revoke],body[data-mp-page=clinic-access] button[id*=Revoke]{background:#fff2ef!important;color:#a33527!important;border:1px solid #f4c7c0!important}
+body[data-mp-page=integrations] input[type=password]{letter-spacing:.14em}
+@media(max-width:800px){.mp-workflow-nav{display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin;padding:4px 0 11px}.mp-workflow-nav a{white-space:nowrap;flex:none}body.v4-index .hero-visual::after{font-size:9px;bottom:4px;right:8px}}
