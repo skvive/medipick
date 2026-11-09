@@ -20,11 +20,11 @@
 </head>
 <body class="mp-smart-store mp-map-home" data-mp-page="home-map">
 <a class="mp-skip-link" href="#mapFinder">검색 및 병원 지도 바로가기</a>
-<div class="demo-ribbon"><strong>병원정보 안내</strong> 검색 결과는 공식 의료기관 자료와 대조 중입니다. 지도 핀은 검증 좌표만 기본 표시하며 예약·진료 가능 여부는 병원에 확인하세요.</div>
+<div class="demo-ribbon"><strong>병원정보 안내</strong> 병원정보 대조 중 · 검증 좌표만 지도 표시 · 방문 전 운영 여부 확인.</div>
 <header class="mast"><div class="wrap"><a href="/" aria-label="메디픽 홈"><img src="/assets/logo-full.svg" width="184" height="42" alt="MEDIPICK 메디픽"></a><nav aria-label="주요 메뉴"><a href="/" aria-current="page">지도 검색</a><a href="/portal">전체 서비스</a><a href="/health-content">건강정보</a><a href="/doctors">의사 블로그</a><a href="/admin">병원 입점</a></nav></div></header>
 <main id="mapFinder">
 <div class="mp-home-intro">
-  <div class="mp-home-headline"><div><span class="mp-home-kicker">MEDIPICK · LOCATION-FIRST CARE</span><h1>내 주변 병원, <em>지도에서 바로 찾기.</em></h1><p>위치와 진료과를 선택하면 검색 결과와 정확 좌표가 확인된 병원 핀을 함께 표시합니다.</p></div><a href="/clinic-store" class="mp-home-business-link">병원 스마트스토어 입점 <span aria-hidden="true">↗</span></a></div>
+  <div class="mp-home-headline"><div><span class="mp-home-kicker">MEDIPICK · LOCATION-FIRST CARE</span><h1>내 주변 병원, <em>지도에서 찾기.</em></h1><p>위치와 진료과를 선택하면 검색 결과와 정확 좌표가 확인된 병원 핀을 함께 표시합니다.</p></div><a href="/clinic-store" class="mp-home-business-link">병원 스마트스토어 입점 <span aria-hidden="true">↗</span></a></div>
   <div class="mp-home-location-bar" role="status"><span class="mp-home-location-indicator" aria-hidden="true"></span><strong id="smartLocationStatus">기본 위치: 가락시장역 주변</strong><span>현위치 버튼을 눌러야 위치 권한을 요청합니다.</span></div>
   <form class="mp-smart-toolbar" id="smartSearchForm" role="search">
     <fieldset class="mp-smart-modes" id="smartModes"><legend>검색 정보</legend><label class="is-checked"><input name="smartMode" value="catalog" type="radio" checked> 전국 병원 주소록</label><label><input name="smartMode" value="partners" type="radio"> 입점 병원</label></fieldset>
@@ -36,14 +36,14 @@
   </form>
   <div class="mp-smart-quick" role="group" aria-label="진료과 빠른 검색"><span>진료과</span><button type="button" data-smart-category="내과">내과</button><button type="button" data-smart-category="정형외과">정형외과</button><button type="button" data-smart-category="소아청소년과">소아청소년과</button><button type="button" data-smart-category="피부과">피부과</button><button type="button" data-smart-category="치과">치과</button><button type="button" data-smart-category="안과">안과</button><button type="button" data-smart-clear>초기화</button></div>
 </div>
-<section class="mp-google-search-option" aria-label="Google Maps 실제 장소 검색">
+
+ 
+ <div class="mp-home-workspace">
+  <div class="mp-home-main-panel mp-smart-map-panel">
+   <section class="mp-google-search-option" aria-label="Google Maps 실제 장소 검색">
  <div><strong>지도에서 주변 병원을 찾을 수 없나요?</strong><small>Google Places 검색 결과는 메디픽의 검증 병원 목록과 별도입니다. 사용자가 요청할 때만 Google Places API를 호출하며 사용량 과금이 발생할 수 있습니다.</small></div>
  <button type="button" id="smartGooglePlaces">Google 지도 병원 핀 검색</button>
  </section>
- <section class="mp-google-places-results" id="googlePlacesSection" hidden aria-label="Google Places 병원 검색 결과">
- <div class="mp-google-places-header"><strong>Google 지도 검색 결과 · 메디픽 자체 인증 아님</strong><button type="button" id="clearGooglePlaces">결과 지우기</button></div><div id="googlePlacesResults" role="status" aria-live="polite"></div></section>
- <div class="mp-home-workspace">
-  <div class="mp-home-main-panel mp-smart-map-panel">
    <div class="mp-smart-map-status"><span class="mp-smart-map-status-dot" aria-hidden="true"></span><strong>Google 지도</strong><span id="smartPinCount">검증된 병원 핀 확인 중</span><span class="mp-map-legend">파랑: 검증 좌표 · 회색: 사용자가 켠 추정 좌표</span></div>
    <div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="병원 위치 Google 지도"><span aria-hidden="true" class="mp-map-placeholder-icon">◎</span><h2>지도 연결을 확인하고 있습니다</h2><p>API 설정 또는 위치 검증이 필요하면 주소록 검색 결과와 Google 지도 바로가기를 이용하세요.</p></div>
   </div>
@@ -53,6 +53,8 @@
    <section class="mp-smart-detail" id="smartDetail" hidden aria-label="선택한 병원 상세정보"></section>
   </aside>
 </div>
+<section class="mp-google-places-results" id="googlePlacesSection" hidden aria-label="Google Places 병원 검색 결과">
+ <div class="mp-google-places-header"><strong>Google 지도 검색 결과 · 메디픽 자체 인증 아님</strong><button type="button" id="clearGooglePlaces">결과 지우기</button></div><div id="googlePlacesResults" role="status" aria-live="polite"></div></section>
 <div class="mp-home-bottom"><div id="smartStats" class="mp-smart-stats" aria-live="polite"></div><a href="/smart-store" class="mp-home-more-map">전국 병원 지도·고급 검색 보기 ↗</a></div>
 <p class="mp-smart-disclaimer mp-home-disclaimer" id="smartNotice">검증 좌표만 기본 표시합니다. 공공 주소록 후보의 실재·현재 진료·영업 여부를 인증하는 서비스가 아니며, 추정핀은 실제 위치가 아닙니다.</p>
 <nav class="mp-home-service-links" aria-label="다른 메디픽 서비스">
