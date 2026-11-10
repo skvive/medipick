@@ -14,7 +14,8 @@ test('all 22 public and detail pages use one canonical shared navigation',()=>{
  const common=read('web/assets/site-chrome.js');
  const expected=['홈','병원찾기','약국찾기','진료과목','AI 건강상담','메디컬센터','입점안내'];
  for(const name of expected)assert.ok(common.includes(name),'missing menu '+name);
- assert.equal((common.match(/\['(?:home|hospitals|pharmacy|specialties|consult|medical|enroll)'/g)||[]).length,7);
+ const navOnly=common.slice(common.indexOf('const NAV=['),common.indexOf('];',common.indexOf('const NAV=['))+2);
+ assert.equal((navOnly.match(/\['(?:home|hospitals|pharmacy|specialties|consult|medical|enroll)'/g)||[]).length,7);
  for(const name of pages){
   const src=read('web/'+name+'.html');
   assert.ok(src.includes('/assets/unified-navigation.css'),'no shared CSS on '+name);
