@@ -78,6 +78,6 @@ test('same-origin Neon Auth proxy rejects non-Google login methods',()=>{
  assert.match(route,/sign-up.{0,3}email/);
  assert.match(route,/sign-in.{0,3}social/);
  assert.match(route,/data\?\.provider !== 'google'/);
- assert.match(route,/return handlers\.POST\(request\)/);
+ assert.match(route,/return handlers\.POST\(request, context\)/);
  assert.match(route,/status: 403/);
 });
