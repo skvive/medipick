@@ -622,6 +622,11 @@ function clearGooglePlacesResults(){
   if(panel)panel.hidden=true;
   const list=$('#googlePlacesResults');
   if(list)list.replaceChildren();
+  const sidebar=$('#smartList');
+  if(sidebar?.dataset.source==='google-places'){
+    sidebar.dataset.source='catalog';
+    if(viewMode==='catalog') renderList();
+  }
 }
 function googlePlaceLink(p){
   try{
@@ -708,7 +713,24 @@ async function searchGooglePlacesOnDemand(){
     const count=document.createElement('p');count.className='mp-google-places-attribution';
     count.textContent='Google Maps Platform Places 검색 결과 '+places.length+'곳 · 자체 의료기관 인증이나 영업 여부 확인이 아닙니다. 출처: Google 지도.';
     holder.prepend(count);
-    panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+    if(document.body.classList.contains('mp-reference-home')){
+      // The reference design's right-side list must follow the same Google markers.
+      const sidebar=$('#smartList'),label=$('#smartListTitle'),meta=$('#smartListMeta');
+      if(sidebar){
+        sidebar.dataset.source='google-places';
+        const back=document.createElement('button');back.type='button';back.className='mp-ref-places-back';
+        back.textContent='← 메디픽 주소록 목록으로 돌아가기';
+        back.addEventListener('click',clearGooglePlacesResults);
+        const attribution=document.createElement('p');attribution.className='mp-google-places-attribution';
+        attribution.textContent='Google 지도 검색 결과 · 의료기관 운영/진료 확인 필요';
+        sidebar.replaceChildren(back,attribution,...places.map((p,i)=>googlePlaceCard(p,googlePlacesMarkers[i])));
+      }
+      if(label)label.textContent='Google 지도 주변 의료기관';
+      if(meta)meta.textContent=places.length+'곳 · 외부 Places 검색';
+      panel.hidden=true; // Prevent a redundant long list below the map.
+    } else {
+      panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
   }catch(error){
     clearGooglePlacesResults();
     panel.hidden=false;
