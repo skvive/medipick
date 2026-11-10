@@ -1,0 +1,35 @@
+name: MEDIPICK HIRA production API live smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/api/hira/**'
+      - 'lib/medipick/hira-client.ts'
+      - '.github/workflows/medipick-hira-live-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Confirm HIRA proxy from live production without exposing private API key
+        shell: bash
+        run: |
+          set -euo pipefail
+          for n in $(seq 1 12); do
+            result="$(curl --silent --show-error --location --max-time 18 https://medipick.lexid.site/api/hira/status || true)"
+            if printf '%s' "$result" | jq -e '.configured==true and .code!=null' >/dev/null 2>&1; then
+              printf '%s' "$result" | jq -c '{ok,configured,code,recordsReturned,total,source}'
+              if printf '%s' "$result" | jq -e '.ok==true' >/dev/null; then
+                echo 'HIRA v2 production authentication and XML response: CONFIRMED'
+                exit 0
+              fi
+              echo 'HIRA is configured, but live API authentication/data returned an error.'
+              exit 1
+            fi
+            echo "Waiting for production route rollout (attempt $n of 12)"
+            sleep 10
+          done
+          echo 'Production /api/hira/status could not be verified after release.'
+          exit 1
