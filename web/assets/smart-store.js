@@ -449,7 +449,7 @@ async function searchNearby(lat, lng) {
   const q = ($('#smartQ')?.value || '').trim();
   const trade = ($('#smartTrade')?.value || '').trim();
   const region = $('#smartRegion')?.value || '';
-  const radius = $('#smartRadius')?.value || '3';
+  const radius = $('#smartRadius')?.value || '2';
   const usingEstimates = Boolean($('#smartEstimated')?.checked);
   const notice = $('#smartNotice');
   if (viewMode === 'partners') {
@@ -480,7 +480,7 @@ async function searchNearby(lat, lng) {
   if (requestId !== searchSequence) return;
   items = Array.isArray(res.items) ? res.items : [];
   // Exact nearby records can be empty; never fill a map with unverified proxy coordinates.
-  if (radiusMode && items.length === 0) {
+  if (radiusMode && items.length === 0 && locationMode !== 'geo') {
     setPinStatus('주변 검증 좌표 0개 · 주소록 목록으로 확인');
     const fall = await api('/api/public-catalog/search?' + new URLSearchParams({ q, region:locationMode==='geo'?'':region, trade, limit:'24' }));
     if (requestId !== searchSequence) return;
@@ -532,7 +532,7 @@ function bindUi() {
     }
     setLocationStatus('현위치 권한을 확인하는 중…');
     navigator.geolocation.getCurrentPosition(
-      (pos) => { locationMode='geo'; if($('#smartRegion')) $('#smartRegion').value=''; setLocationStatus('현위치 검색 · 브라우저 제공 위치 (약 '+Number(pos.coords.accuracy||0).toFixed(0)+'m 정확도)'); searchNearby(pos.coords.latitude,pos.coords.longitude).catch(e=>showToast(e.message)); },
+      (pos) => { locationMode='geo'; if($('#smartRegion')) $('#smartRegion').value=''; setLocationStatus('현위치 검색 · 브라우저 제공 위치 (약 '+Number(pos.coords.accuracy||0).toFixed(0)+'m 정확도)'); searchNearby(pos.coords.latitude,pos.coords.longitude).then(()=>searchHiraOnDemand()).catch(e=>showToast(e.message)); },
       () => searchAtDefault('현위치 권한을 얻지 못해 가락시장역 기준으로 검색합니다.').catch((e) => showToast(e.message)),
       { enableHighAccuracy:true, timeout: 12000, maximumAge: 60000 },
     );
@@ -689,7 +689,7 @@ async function searchGooglePlacesOnDemand(){
     const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
     if(!Place?.searchNearby)throw new Error('Google Places API (New) 이용이 활성화되지 않았습니다.');
     const point=center||defaultCenter();
-    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
+    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||2)*1000));
     const query={
       fields:['displayName','location','formattedAddress','googleMapsURI'],
       locationRestriction:{center:{lat:Number(point.lat),lng:Number(point.lng)},radius},
@@ -780,6 +780,11 @@ async function searchHiraOnDemand(){
     const data=await res.json();
     if(!res.ok||data.ok!==true)throw new Error(String(data.message||data.code||'공식 API 사용 권한을 확인해 주세요'));
     const places=Array.isArray(data.items)?data.items.slice(0,20):[];
+    if(locationMode==='geo' && places.length===0){
+      if(status)status.textContent='HIRA 2km 반경 내 검증 병원 0건 · Google 장소 검색으로 확인';
+      await searchGooglePlacesOnDemand();
+      return;
+    }
     const sidebar=$('#smartList'),label=$('#smartListTitle'),meta=$('#smartListMeta');
     if(!sidebar)throw new Error('병원 결과 영역을 찾지 못했습니다');
     const selected=places.filter(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&p.coordinateSource==='HIRA_API');
@@ -807,6 +812,16 @@ async function searchHiraOnDemand(){
     sidebar.dataset.source='hira';sidebar.replaceChildren(back,source,...cards);
     if(label)label.textContent='HIRA 공식 병원 검색 결과';
     if(meta)meta.textContent=places.length+'건 · 정확좌표 '+selected.length+'건';
+    // The HIRA response may arrive before Google Maps initializes.
+    // Wait briefly for the already-loading SDK, so official pins are not silently skipped.
+    if(!mapReady() && config?.google_maps_browser_key){
+      await new Promise(resolve=>{
+        let attempts=0;
+        const check=setInterval(()=>{
+          if(mapReady() || ++attempts>=40){clearInterval(check);resolve();}
+        },200);
+      });
+    }
     if(mapReady()&&ensureMap()){
       for(const marker of markerById.values())removeMapMarker(marker);
       markerById.clear();
@@ -821,7 +836,12 @@ async function searchHiraOnDemand(){
     if(status)status.textContent='조회 완료 · '+places.length+'건 · 출처 HIRA · 진료 여부 직접 확인';
   }catch(e){
     if(status)status.textContent='HIRA 연동 확인 필요: '+String(e?.message||'API 응답 실패');
-    showToast('HIRA API 응답을 확인할 수 없습니다. 기존 주소록과 Google 장소 검색을 이용해 주세요.');
+    if(locationMode==='geo'){
+      showToast('공식 HIRA 검색을 표시하지 못해 Google 주변 장소를 확인합니다.');
+      await searchGooglePlacesOnDemand();
+    }else{
+      showToast('HIRA API 응답을 확인할 수 없습니다. Google 장소 검색을 선택해 주세요.');
+    }
   }finally{hiraSearching=false;button.disabled=false;}
 }
 init();

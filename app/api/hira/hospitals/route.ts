@@ -11,7 +11,13 @@ export async function GET(request:Request){
  const lat=latRaw!==null?Number(latRaw):undefined,lng=lngRaw!==null?Number(lngRaw):undefined;
  const coord=Number.isFinite(lat)&&Number.isFinite(lng)&&lat!>=32&&lat!<=39&&lng!>=124&&lng!<=132;
  if(!coord&&!q)return Response.json({ok:false,code:'INPUT_REQUIRED',items:[],message:'병원명 또는 한국 내 좌표가 필요합니다.'},{status:400});
- const radius=Math.min(30000,Math.max(500,Number(u.searchParams.get('radius')||3000)||3000));
+ const radius=Math.min(30000,Math.max(500,Number(u.searchParams.get('radius')||2000)||2000));
  const data=await queryHira({q,lat:coord?lat:undefined,lng:coord?lng:undefined,radius,pageNo:1,numOfRows:20});
- return Response.json({ok:data.ok,code:data.code,message:data.message,items:data.items,total:data.total,checkedAt:data.checkedAt,source:'건강보험심사평가원 병원정보서비스',officialSourceUrl:'https://www.data.go.kr/data/15001698/openapi.do',precisionNote:'HIRA가 제공한 좌표만 표시하며 주소록 추정 좌표를 사용하지 않습니다. 방문 전 병원에 확인하세요.'},{status:data.ok?200:502,headers:{'Cache-Control':'public,s-maxage=120,stale-while-revalidate=300'}});
+ // HIRA response coordinate radius must also be verified server-side;
+ // upstream filtering can be incomplete and unverified records must never become map pins.
+ const insideRadius=coord?data.items.filter(item=>
+   item.coordinateSource==='HIRA_API' && item.distanceKm!==null &&
+   Number.isFinite(item.distanceKm) && item.distanceKm<=radius/1000
+ ):data.items;
+ return Response.json({ok:data.ok,code:data.code,message:data.message,items:insideRadius,total:data.total,checkedAt:data.checkedAt,source:'건강보험심사평가원 병원정보서비스',officialSourceUrl:'https://www.data.go.kr/data/15001698/openapi.do',precisionNote:'HIRA가 제공한 좌표만 표시하며 주소록 추정 좌표를 사용하지 않습니다. 방문 전 병원에 확인하세요.'},{status:data.ok?200:502,headers:{'Cache-Control':'public,s-maxage=120,stale-while-revalidate=300'}});
 }
