@@ -70,7 +70,14 @@ export async function queryHira(opts:{q?:string;lat?:number;lng?:number;radius?:
   const parsed=parse(raw,point);
   if(!res.ok&&parsed.ok){parsed.ok=false;parsed.code='HTTP_'+res.status;parsed.message='제공기관 응답 오류';parsed.items=[];}
   return parsed;
- }catch {
-  return {ok:false,code:'HIRA_UNREACHABLE',message:'HIRA 연결 실패·시간 초과. 네트워크 및 서비스 상태 확인 필요',total:0,items:[],checkedAt:new Date().toISOString()};
+ }catch (error:unknown) {
+  // Report a safe failure class only. Never include the fetch URL or raw error/cause,
+  // because they may contain the protected ServiceKey query parameter.
+  const name=error && typeof error==='object' && 'name' in error ? String((error as {name?:unknown}).name||'') : '';
+  const timedOut=name==='TimeoutError'||name==='AbortError';
+  return {ok:false,code:timedOut?'HIRA_TIMEOUT':'HIRA_NETWORK_FAILURE',
+    message:timedOut?'HIRA 응답 시간 초과. 기관 서비스 상태를 확인해 주세요.':
+      'HIRA 서버 연결이 실패했습니다. 정부 API 접근 경로·네트워크 상태를 확인해 주세요.',
+    total:0,items:[],checkedAt:new Date().toISOString()};
  }
 }
