@@ -812,6 +812,16 @@ async function searchHiraOnDemand(){
     sidebar.dataset.source='hira';sidebar.replaceChildren(back,source,...cards);
     if(label)label.textContent='HIRA 공식 병원 검색 결과';
     if(meta)meta.textContent=places.length+'건 · 정확좌표 '+selected.length+'건';
+    // The HIRA response may arrive before Google Maps initializes.
+    // Wait briefly for the already-loading SDK, so official pins are not silently skipped.
+    if(!mapReady() && config?.google_maps_browser_key){
+      await new Promise(resolve=>{
+        let attempts=0;
+        const check=setInterval(()=>{
+          if(mapReady() || ++attempts>=40){clearInterval(check);resolve();}
+        },200);
+      });
+    }
     if(mapReady()&&ensureMap()){
       for(const marker of markerById.values())removeMapMarker(marker);
       markerById.clear();
