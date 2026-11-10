@@ -64,7 +64,7 @@ export async function queryHira(opts:{q?:string;lat?:number;lng?:number;radius?:
  const point=lat!==undefined&&lng!==undefined&&Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=32&&lat<=39&&lng>=124&&lng<=132?{lat,lng}:undefined;
  if(point){u.searchParams.set('xPos',String(point.lng));u.searchParams.set('yPos',String(point.lat));u.searchParams.set('radius',String(Math.min(30000,Math.max(500,opts.radius||3000))));}
  try{
-  const res=await fetch(u.toString(),{headers:{Accept:'application/xml,text/xml;q=0.9,*/*;q=0.8'},signal:AbortSignal.timeout(8500),cache:'no-store',redirect:'error'});
+  const res=await fetch(u.toString(),{headers:{Accept:'application/xml,text/xml;q=0.9,*/*;q=0.8'},signal:AbortSignal.timeout(17500),cache:'no-store',redirect:'error'});
   const raw=await res.text();
   if(raw.length>1_500_000)return {ok:false,code:'RESPONSE_TOO_LARGE',message:'제공기관 응답 크기 제한',total:0,items:[],checkedAt:new Date().toISOString()};
   const parsed=parse(raw,point);
