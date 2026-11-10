@@ -350,38 +350,53 @@ function renderList() {
   const list = $('#smartList');
   const meta = $('#smartListMeta');
   if (!list) return;
+  const compact = document.body.classList.contains('mp-reference-home');
   const title = $('#smartListTitle');
-  if (title) title.textContent = '전국 병원 주소록 · 개별 확인 필요';
+  if (title) title.textContent = compact ? (locationMode === 'geo' ? '현재 위치 주변 병원' : '병원 주소록 검색 결과') : '전국 병원 주소록 · 개별 확인 필요';
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">조건에 맞는 병원 주소록이 없습니다. 지역·진료과 검색 조건을 바꿔 보세요. 실제 지도 핀은 검증된 좌표에만 표시됩니다.</div>';
-    if (meta) meta.textContent = '검증된 핀 0건';
+    list.innerHTML = '<div class="empty-state">조건에 맞는 병원 주소록이 없습니다. 지역·진료과를 변경하거나 Google 지도 장소 검색을 선택해 주세요. 실제 병원 핀은 검증 좌표만 표시됩니다.</div>';
+    if (meta) meta.textContent = '확인된 병원 핀 0건';
     return;
   }
-  if (meta) meta.textContent = items.length + '건 지역 주소록 · ' + items.filter((item) => item.geocode_status === 'exact').length + '건 검증된 좌표';
-  list.innerHTML = items
-    .map(
-      (x) => {
-        const pro = x.is_premium ? ' mp-smart-item--pro' : '';
-        const badge = x.ui?.badge || '병원 정보';
-        const distLabel = x.distance_km == null ? '전국 목록 검색 · 거리 미산정' :
-          (x.geocode_status === 'exact' ? '직선거리' : '좌표상 추정거리(실거리 아님)') + ' 약 ' + Number(x.distance_km).toFixed(2) + ' km';
-        const lookup = x.address && x.district
-          ? `<button type="button" class="mp-smart-geocode" data-geocode-id="${x.id}">◎ Google 주소 위치 조회 · 임시 핀</button>`
-          : '<span class="mp-smart-no-address">주소 미등록 · 위치 조회 불가</span>';
-        return `<article class="mp-smart-item${pro}" data-id="${x.id}"><button type="button" class="mp-smart-item-main" data-open-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address || '주소 정보 없음')}</p><div class="dist">${safe(distLabel)}</div></button><div class="mp-smart-actions">${lookup}${x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':''}</div></article>`;
-      },
-    )
-    .join('');
-  list.querySelectorAll('[data-open-id]').forEach((btn) => {
-    btn.onclick = () => {
-      openStore(+btn.dataset.openId, true);
-      if (matchMedia('(max-width:900px)').matches) {
-        $('#smartDetail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    };
+  if (meta) meta.textContent = items.length + '건 주소록 후보 · 정확좌표 '+items.filter(item=>item.geocode_status === 'exact').length+'건';
+  const safeTel=(value)=>/^\\+?[0-9-]{8,20}$/.test(String(value||'').trim())?String(value).trim().replace(/-/g,''):'';
+  list.innerHTML = items.map(x=>{
+    const pro=x.is_premium?' mp-smart-item--pro':'';
+    const badge=x.ui?.badge||'병원 주소록';
+    const distLabel=x.distance_km==null?'실제 거리 미확인':
+      (x.geocode_status==='exact'?'직선거리 약 ':'추정 좌표 거리 약 ')+Number(x.distance_km).toFixed(2)+' km';
+    const lookup=x.address&&x.district
+      ? '<button type="button" class="mp-smart-geocode" data-geocode-id="'+x.id+'">◎ Google 주소 위치 확인</button>'
+      : '<span class="mp-smart-no-address">주소 확인 필요</span>';
+    if(compact){
+      // Blue outline artwork is deliberately illustrative, not an actual hospital facade.
+      const call=safeTel(x.phone);
+      const contact=call?'<a href="tel:'+safe(call)+'" class="mp-ref-list-cta" aria-label="'+safe(x.name)+' 전화">☎</a>':'';
+      return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
+        '<button class="mp-smart-item-main" type="button" data-open-id="'+x.id+'">'+
+          '<span class="mp-ref-list-icon" aria-hidden="true">✚</span>'+
+          '<span class="mp-ref-list-copy"><span class="mp-ref-list-title">'+safe(x.name)+'</span>'+
+          '<small>'+safe(badge)+' · '+safe(x.trade_category||'의료기관')+'</small>'+
+          '<p>'+safe([x.region,x.district].filter(Boolean).join(' '))+' · '+safe(x.address||'주소 미등록')+'</p>'+
+          '<p>'+safe(distLabel)+'</p></span></button>'+
+          '<div class="mp-smart-actions">'+contact+'<button type="button" class="mp-ref-list-cta" data-open-id="'+x.id+'">상세보기</button>'+lookup+
+            (x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':'')+
+          '</div></article>';
+    }
+    return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
+      '<button type="button" class="mp-smart-item-main" data-open-id="'+x.id+'"><small>'+safe(badge)+'</small>'+
+      '<h3>'+safe(x.name)+'</h3><p>'+safe(x.trade_category||'의료기관')+' · '+safe(x.region)+' '+safe(x.district)+'</p>'+
+      '<p>'+safe(x.address||'주소 정보 없음')+'</p><div class="dist">'+safe(distLabel)+'</div></button>'+
+      '<div class="mp-smart-actions">'+lookup+(x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':'')+'</div></article>';
+  }).join('');
+  list.querySelectorAll('[data-open-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      openStore(+btn.dataset.openId,true);
+      if(matchMedia('(max-width:700px)').matches) $('#smartDetail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
   });
-  list.querySelectorAll('[data-geocode-id]').forEach((btn) => {
-    btn.onclick = () => locateStoreAddress(+btn.dataset.geocodeId);
+  list.querySelectorAll('[data-geocode-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>locateStoreAddress(+btn.dataset.geocodeId));
   });
 }
 
