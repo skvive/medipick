@@ -1,5 +1,6 @@
 import {allowRequest,isHiraConfigured,queryHira} from '@/lib/medipick/hira-client';
 export const runtime='nodejs';
+export const maxDuration=25; // HIRA government API occasionally exceeds the former 8.5-second budget.
 export const preferredRegion='icn1'; // Keep HIRA government API calls in Seoul, not default US iad1.
 export const dynamic='force-dynamic';
 export async function GET(request:Request){
