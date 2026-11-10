@@ -59,7 +59,7 @@ async function search(){
   if(!mapReady)await prepareMaps();
   const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
   if(!Place?.searchNearby)throw Error('Google Places API (New)가 활성화되지 않았습니다');
-  const radius=Math.max(1000,Math.min(20000,Number($('phRadius').value||3)*1000));
+  const radius=Math.max(1000,Math.min(20000,Number($('phRadius').value||2)*1000));
   const {places:returned}=await Place.searchNearby({
    fields:['displayName','formattedAddress','location','googleMapsURI'],
    locationRestriction:{center:point,radius},
@@ -86,8 +86,9 @@ $('phGeo').addEventListener('click',()=>{
  setStatus('현위치 사용 권한을 요청하고 있습니다…');
  navigator.geolocation.getCurrentPosition(({coords})=>{
   point={lat:coords.latitude,lng:coords.longitude};
-  setStatus('내 현위치 검색 · 브라우저 위치 정확도 약 '+Math.round(coords.accuracy||0)+'m');
+  setStatus('내 현위치 중심 '+$('phRadius').value+'km 약국 검색 · 위치 정확도 약 '+Math.round(coords.accuracy||0)+'m');
   if(map)map.panTo(point);
+  search(); // This follows the user's explicit location-search action.
  },()=>setStatus('위치를 사용할 수 없습니다. 서울시청 기본 위치에서 검색할 수 있습니다.'),{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
 });
 })();
