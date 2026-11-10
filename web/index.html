@@ -10,12 +10,12 @@
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/smart-store.css">
 <link rel="stylesheet" href="/assets/medipick-reference-home.css">
 <script>(function(){const q=new URLSearchParams(location.search);if(q.has("nav")||q.has("provider")||/^(explore|pharmacy|content)$/.test(location.hash.slice(1)))location.replace("/portal"+location.search+location.hash)})();</script>
-</head>
+<link rel="stylesheet" href="/assets/unified-navigation.css"></head>
 <body class="mp-smart-store mp-map-home mp-reference-home" data-mp-page="home-map">
 <a class="mp-ref-skip" href="#mpRefFinder">병원 지도 검색 바로가기</a>
 <header class="mp-ref-header">
  <a class="mp-ref-logo" href="/" aria-label="메디픽 홈페이지"><img src="/assets/logo-full.svg" width="188" height="43" alt="MediPick 메디픽"><span>내 근처 병원찾기</span></a>
- <nav class="mp-ref-topnav" aria-label="주 메뉴"><a href="/" class="selected">홈</a><a href="/smart-store">병원찾기</a><a href="/portal?nav=explore">진료과목</a><a href="/health-content">건강정보</a><a href="/consult">AI 건강상담</a><a href="/doctors">의사·병원센터</a><a href="/clinic-store">입점안내</a></nav>
+ <nav class="mp-ref-topnav" aria-label="주 메뉴"><a href="/" class="selected">홈</a><a href="/smart-store">병원찾기</a><a href="/specialties">진료과목</a><a href="/health-content">건강정보</a><a href="/consult">AI 건강상담</a><a href="/doctors">의사·병원센터</a><a href="/clinic-store">입점안내</a></nav>
  <div class="mp-ref-header-actions"><a class="mp-ref-header-login" href="/auth/sign-in">로그인</a><a class="mp-ref-header-signup" href="/auth/sign-up">회원가입</a><details class="mp-ref-mobile-menu"><summary aria-label="전체 메뉴 열기">☰</summary><nav aria-label="모바일 메뉴"><a href="/">홈</a><a href="/smart-store">병원찾기</a><a href="/portal?nav=explore">진료과목</a><a href="/health-content">건강정보</a><a href="/consult">AI 건강상담</a><a href="/doctors">의사·병원센터</a><a href="/clinic-store">입점안내</a><a href="/auth/sign-in">로그인</a></nav></details></div>
 </header>
 <main id="mpRefFinder">
@@ -31,8 +31,8 @@
  <div class="mp-ref-quick">
   <button type="button" id="smartLocate">◎ 내 위치로 검색</button>
   <button type="button" id="smartDemo">⌖ 기본 위치 병원</button>
-  <a href="/portal?nav=pharmacy">◷ 야간진료</a>
-  <a href="/portal?nav=explore">▦ 주말진료</a>
+  <a href="/pharmacy">◷ 야간약국 찾기</a>
+  <a href="/smart-store">▦ 병원 지도</a>
  </div>
  <div class="mp-ref-search-extras">
  <input type="search" id="smartTrade" maxlength="40" placeholder="진료과" aria-label="선택된 진료과목">
@@ -57,7 +57,7 @@
  </header>
  <div class="mp-ref-map-canvas mp-smart-map-panel"><div class="mp-ref-map-label" id="smartLocationStatus">기본 위치: 가락시장역 주변</div>
  <div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="Google 지도에서 병원 검색"><div class="mp-ref-map-wait"><b>지도 연결을 확인하고 있습니다</b><span>실제 병원 위치는 검증된 좌표만 표시합니다.</span></div></div>
- <div class="mp-ref-map-places"><button type="button" id="smartGooglePlaces">◎ Google 주변 병원 핀 검색</button><span id="smartPinCount">검증 좌표 조회 중</span></div>
+ <div class="mp-ref-map-places"><button type="button" id="smartHiraSearch" title="사용자가 실행하면 HIRA 공식 병원 API를 조회합니다">HIRA 공식 병원 핀</button><button type="button" id="smartGooglePlaces">Google 주변 병원 검색</button><span id="hiraStatus" role="status" aria-live="polite"></span><span id="smartPinCount">검증 좌표 조회 중</span></div>
  </div>
  </section>
  <aside class="mp-ref-nearby mp-smart-list-panel" aria-label="현재 위치 주변 병원">
@@ -76,4 +76,4 @@
 <footer class="mp-ref-footer"><a href="/">MediPick 메디픽</a><span>데이터 파트너: 공공데이터포털 · 건강보험심사평가원(HIRA)</span><a href="/portal">전체 서비스</a><a href="/clinic-store">병원 입점·Google Blogger</a><a href="/integrations">연동 상태</a></footer>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script defer src="/assets/smart-store.js"></script><script defer src="/assets/medipick-reference-home.js"></script>
-</body></html>
+<script src="/assets/site-chrome.js" defer></script></body></html>

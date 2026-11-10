@@ -31,6 +31,8 @@ let viewMode = 'catalog';
 let partnerItems = [];
 let searchSequence = 0;
 let googlePlacesMarkers=[];
+let hiraMarkers=[];
+let hiraSearching=false;
 let placesSearching=false;
 
 let locationMode = 'default'; // 'default' | 'geo' | 'region' (explicit user action only)
@@ -39,7 +41,7 @@ function setLocationStatus(value) { const el = $('#smartLocationStatus'); if (el
 function setPinStatus(value) { const el = $('#smartPinCount'); if (el) el.textContent = value; }
 function removeMapMarker(marker) { if (!marker) return; if (typeof marker.setMap === 'function') marker.setMap(null); else marker.map = null; }
 function markerPosition(marker) { const pos = marker?.position || marker?.getPosition?.(); return pos?.toJSON ? pos.toJSON() : pos; }
-function buildMarker(pos,title,exact,premium=false,googleSource=false) { const color=googleSource?'#7651dc':(exact?(premium?'#7453ed':'#1769f8'):'#8391a4'); if (google.maps.marker?.AdvancedMarkerElement && google.maps.marker?.PinElement) { const pin = new google.maps.marker.PinElement({background:color, borderColor:'#fff',glyphColor:'#fff',glyph:googleSource?'G':(exact?'✚':'?'),scale:1.1}); return new google.maps.marker.AdvancedMarkerElement({map,position:pos,title,content:pin.element}); } return new google.maps.Marker({map,position:pos,title,icon:{path:google.maps.SymbolPath.CIRCLE,scale:exact?9:7,fillColor:color,fillOpacity:.92,strokeWeight:2,strokeColor:'#fff'}}); }
+function buildMarker(pos,title,exact,premium=false,googleSource=false,hiraSource=false) { const color=hiraSource?'#159966':(googleSource?'#7651dc':(exact?(premium?'#7453ed':'#1769f8'):'#8391a4')); if (google.maps.marker?.AdvancedMarkerElement && google.maps.marker?.PinElement) { const pin = new google.maps.marker.PinElement({background:color, borderColor:'#fff',glyphColor:'#fff',glyph:hiraSource?'H':(googleSource?'G':(exact?'✚':'?')),scale:1.1}); return new google.maps.marker.AdvancedMarkerElement({map,position:pos,title,content:pin.element}); } return new google.maps.Marker({map,position:pos,title,icon:{path:google.maps.SymbolPath.CIRCLE,scale:exact?9:7,fillColor:color,fillOpacity:.92,strokeWeight:2,strokeColor:'#fff'}}); }
 
 
 function defaultCenter() {
@@ -391,7 +393,12 @@ function renderList() {
   }).join('');
   list.querySelectorAll('[data-open-id]').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      openStore(+btn.dataset.openId,true);
+      const id=Number(btn.dataset.openId);
+      const selected=items.find(p=>Number(p.id)===id);
+      if(selected?.is_premium && Number.isSafeInteger(id) && id>0){
+        location.assign('/clinic-store?id='+encodeURIComponent(id));return;
+      }
+      openStore(id,true);
       if(matchMedia('(max-width:700px)').matches) $('#smartDetail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
     });
   });
@@ -435,6 +442,7 @@ function renderMapMarkers() {
 }
 
 async function searchNearby(lat, lng) {
+  clearHiraResults();
   clearGooglePlacesResults();
   center = { lat, lng };
   const requestId = ++searchSequence;
@@ -509,6 +517,7 @@ async function initStats() {
 }
 
 function bindUi() {
+  $('#smartHiraSearch')?.addEventListener('click',searchHiraOnDemand);
   $('#smartGooglePlaces')?.addEventListener('click', searchGooglePlacesOnDemand);
   $('#clearGooglePlaces')?.addEventListener('click',clearGooglePlacesResults);
   $('#smartSearchForm')?.addEventListener('submit', (event) => {
@@ -586,6 +595,7 @@ async function init() {
     loadMaps();
     const params = new URLSearchParams(location.search);
     if (params.get('q') && $('#smartQ')) $('#smartQ').value = params.get('q').slice(0, 80);
+    if (params.get('trade') && $('#smartTrade')) $('#smartTrade').value = params.get('trade').slice(0,40);
     if (params.has('region') && $('#smartRegion')) $('#smartRegion').value = params.get('region');
     if (params.get('mode') === 'partners') {
       const radio = document.querySelector('input[name="smartMode"][value="partners"]');
@@ -659,6 +669,7 @@ function googlePlaceCard(place,marker){
   return card;
 }
 async function searchGooglePlacesOnDemand(){
+  clearHiraResults();
   const button=$('#smartGooglePlaces'),panel=$('#googlePlacesSection'),holder=$('#googlePlacesResults');
   if(!button||!panel||!holder||placesSearching)return;
   clearGooglePlacesResults();
@@ -740,4 +751,77 @@ async function searchGooglePlacesOnDemand(){
   }
 }
 
+
+/* Official HIRA v2 hospitals (server proxy; caller never sees the API key).
+ * Green H pins are official source coordinates. The database's synthetic/approximate
+ * coordinates are never promoted to verified accuracy. */
+function clearHiraResults(){
+  hiraMarkers.forEach(removeMapMarker);hiraMarkers=[];
+  const sidebar=$('#smartList');
+  if(sidebar?.dataset.source==='hira'){
+    sidebar.dataset.source='catalog';
+    renderList();
+    renderMapMarkers();
+  }
+}
+async function searchHiraOnDemand(){
+  const button=$('#smartHiraSearch'),status=$('#hiraStatus');
+  if(!button||hiraSearching)return;
+  clearGooglePlacesResults();clearHiraResults();
+  hiraSearching=true;button.disabled=true;
+  if(status)status.textContent='HIRA 공식 병원정보 조회 중…';
+  try{
+    const point=center||defaultCenter();
+    const q=($('#smartQ')?.value||'').trim().slice(0,80);
+    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
+    const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius)});
+    if(q)qs.set('q',q);
+    const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store'});
+    const data=await res.json();
+    if(!res.ok||data.ok!==true)throw new Error(String(data.message||data.code||'공식 API 사용 권한을 확인해 주세요'));
+    const places=Array.isArray(data.items)?data.items.slice(0,20):[];
+    const sidebar=$('#smartList'),label=$('#smartListTitle'),meta=$('#smartListMeta');
+    if(!sidebar)throw new Error('병원 결과 영역을 찾지 못했습니다');
+    const selected=places.filter(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&p.coordinateSource==='HIRA_API');
+    const cards=places.map(p=>{
+      const card=document.createElement('article');card.className='mp-google-place-card';
+      const title=document.createElement('strong');title.textContent=p.name||'병원';
+      const address=document.createElement('p');address.textContent=String(p.address||'주소 정보 없음');
+      const type=document.createElement('p');type.textContent=String(p.category||'의료기관')+' · HIRA 공식 공개정보 · 진료/영업상태 별도 확인';
+      const actions=document.createElement('div');actions.className='mp-google-place-actions';
+      if(Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)){
+        const view=document.createElement('button');view.type='button';view.textContent='지도 핀 보기';
+        view.addEventListener('click',()=>{
+          if(map){map.panTo({lat:p.latitude,lng:p.longitude});map.setZoom(15);}
+          $('#smartStoreMap')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+        });actions.appendChild(view);
+      }
+      const link=document.createElement('a');link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((p.name||'병원')+' '+(p.address||''));
+      link.target='_blank';link.rel='noopener noreferrer';link.textContent='Google 지도에서 확인 ↗';
+      actions.appendChild(link);card.append(title,address,type,actions);return card;
+    });
+    const back=document.createElement('button');back.className='mp-ref-places-back';back.type='button';
+    back.textContent='← 기존 주소록 결과로 돌아가기';back.addEventListener('click',clearHiraResults);
+    const source=document.createElement('p');source.className='mp-google-places-attribution';
+    source.textContent='HIRA 병원정보서비스 v2 · 공식 등록 좌표에 한해 녹색 H 핀 · 의료기관 운영 여부 별도 확인';
+    sidebar.dataset.source='hira';sidebar.replaceChildren(back,source,...cards);
+    if(label)label.textContent='HIRA 공식 병원 검색 결과';
+    if(meta)meta.textContent=places.length+'건 · 정확좌표 '+selected.length+'건';
+    if(mapReady()&&ensureMap()){
+      for(const marker of markerById.values())removeMapMarker(marker);
+      markerById.clear();
+      const bounds=new google.maps.LatLngBounds();let n=0;
+      for(const p of selected){
+        const pin=buildMarker({lat:p.latitude,lng:p.longitude},'HIRA 등록 병원 · '+p.name,true,false,false,true);
+        hiraMarkers.push(pin);bounds.extend({lat:p.latitude,lng:p.longitude});n++;
+      }
+      if(n){bounds.extend(point);map.fitBounds(bounds,45);}
+    }
+    setPinStatus('HIRA 공식 좌표 '+selected.length+'개');
+    if(status)status.textContent='조회 완료 · '+places.length+'건 · 출처 HIRA · 진료 여부 직접 확인';
+  }catch(e){
+    if(status)status.textContent='HIRA 연동 확인 필요: '+String(e?.message||'API 응답 실패');
+    showToast('HIRA API 응답을 확인할 수 없습니다. 기존 주소록과 Google 장소 검색을 이용해 주세요.');
+  }finally{hiraSearching=false;button.disabled=false;}
+}
 init();
