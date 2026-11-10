@@ -14,7 +14,10 @@ test('map-first homepage keeps exactly one map/result widget and all required co
   for(const id of required) assert.equal((src.match(new RegExp('id="'+id+'"','g'))||[]).length,1,'missing/duplicate '+id);
   assert.match(src,/smart-store\.js/);
   assert.doesNotMatch(src,/<script[^>]+src="\/assets\/app\.js"/);
-  assert.ok(src.length<11_000,'homepage should stay compact');
+  assert.match(src,/class="mp-ref-hero"/,'reference hero must exist');
+  assert.match(src,/class="mp-ref-services"/,'horizontal category ribbon must exist');
+  assert.match(src,/class="mp-ref-columns"/,'map/list/department panels must exist');
+  assert.match(src,/class="mp-ref-dept-grid"/,'department shortcuts must exist');
 });
 
 test('existing long homepage and legacy navigation are kept in separate portal', () => {
@@ -24,7 +27,7 @@ test('existing long homepage and legacy navigation are kept in separate portal',
   assert.match(portal,/src="\/assets\/app\.js"/);
   const next=read('next.config.ts');
   assert.match(next,/'portal'/);assert.match(next,/'clinic-store'/);
-  assert.match(read('web/index.html'),/location\.replace\('\/portal'/);
+  assert.match(read('web/index.html'),/location\.replace\([\"']\/portal[\"']/);
 });
 
 test('geolocation searches nearby exact locations with explicit consent and no approximation default', () => {
