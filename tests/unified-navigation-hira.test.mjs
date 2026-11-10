@@ -74,3 +74,13 @@ test('HIRA-only functions execute in Korean region and network diagnosis exclude
   assert.match(client,/HIRA_NETWORK_FAILURE/);
   assert.doesNotMatch(client,/String\(error\)/);
 });
+
+test('HIRA live API has sufficient upstream time budget without leaking secrets',()=>{
+ const client=read('lib/medipick/hira-client.ts');
+ assert.match(client,/AbortSignal\.timeout\(17500\)/);
+ for(const file of ['app/api/hira/status/route.ts','app/api/hira/hospitals/route.ts']){
+  const src=read(file);
+  assert.match(src,/maxDuration=25/);
+  assert.match(src,/preferredRegion='icn1'/);
+ }
+});
