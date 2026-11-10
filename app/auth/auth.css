@@ -183,3 +183,84 @@
 .auth-back:hover {
   color: #111;
 }
+
+/* Google-only Neon Auth + responsive member dashboard, aligned with MEDIPICK blue UI. */
+.auth-page{min-height:calc(100vh - var(--mu-header,68px));display:flex;justify-content:center;align-items:center;
+padding:30px 15px 55px;background:radial-gradient(circle at 72% 12%,#d8edff,transparent 42%),#f3f8ff;
+box-sizing:border-box;color:#102f5d}
+.auth-page>div{width:min(470px,100%)}
+.auth-card{width:100%;max-width:470px;border:1px solid #d7e7fa;border-radius:22px;
+background:#fff;box-shadow:0 20px 60px #164d9519;padding:35px 30px;color:#0d2f60}
+.auth-brand{color:#12407b;font-size:24px;margin-bottom:24px}
+.auth-brand-mark{background:linear-gradient(125deg,#25b4ff,#075ce8);border-radius:12px;width:41px;height:41px}
+.auth-brand-sub{font-size:13px;color:#4d729e;font-weight:750;letter-spacing:-.04em}
+.auth-eyebrow{color:#1b74d7;font-size:10px;font-weight:900;letter-spacing:.11em}
+.auth-card h1{font-size:25px;letter-spacing:-.05em;line-height:1.35;margin:10px 0}
+.auth-card>p.sub{font-size:13px;line-height:1.8;margin-bottom:24px;color:#567395}
+.auth-oauth{gap:11px}
+.auth-oauth-btn.google{display:flex;align-items:center;justify-content:center;gap:12px;min-height:56px;width:100%;
+background:#fff;border:2px solid #c5ddfa;border-radius:12px;font-size:15px;color:#1b416e;font-weight:900;box-shadow:0 5px 14px #135dcd0d}
+.auth-oauth-btn.google:hover{border-color:#3285f5;background:#f6faff;color:#1257c3}
+.auth-google-icon{display:grid;place-items:center;background:conic-gradient(from 20deg,#4285f4 0 80deg,#34a853 80deg 165deg,#fbbc05 165deg 225deg,#ea4335 225deg 295deg,#4285f4 295deg);
+background-clip:text;-webkit-background-clip:text;color:transparent;font-size:27px;font-weight:950}
+.auth-oauth-note{font-size:11px;color:#768da9;line-height:1.7;margin:2px 0 0}
+.auth-foot{margin:20px 0 0;color:#67809d;font-size:12px;line-height:1.7}
+.auth-links{text-align:center;margin:18px 0 0;font-size:12px}.auth-links a{color:#095fcb;font-weight:750;text-decoration:none}
+.auth-back{color:#4774a5}
+.auth-submit{background:linear-gradient(125deg,#168afc,#075be1)}
+.auth-error{background:#fff0ef;color:#b12b30}
+.account-page{min-height:calc(100vh - var(--mu-header,68px));background:#f4f8ff;color:#12335e;
+font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;padding:0 18px 55px}
+.account-shell{max-width:1230px;margin:0 auto}
+.account-breadcrumb{display:flex;align-items:center;gap:9px;color:#6885a7;font-size:12px;padding:18px 2px}
+.account-breadcrumb a{color:#2465b7;text-decoration:none;font-weight:800}
+.account-hero{background:radial-gradient(circle at 86% 10%,#b2d7ff,#e6f3ff 40%,#f9fcff 94%);
+border:1px solid #d7e8fc;border-radius:23px;min-height:185px;padding:30px 34px;
+display:flex;justify-content:space-between;align-items:center;gap:20px}
+.account-profile{display:flex;align-items:center;gap:21px;min-width:0}
+.account-avatar{display:grid;place-items:center;flex:0 0 72px;width:72px;height:72px;border-radius:50%;
+background:linear-gradient(145deg,#3bc0ff,#105ddc);color:white;font-size:34px;font-weight:900;
+box-shadow:0 9px 24px #126fd23d}
+.account-overline{font-size:10px;letter-spacing:.12em;color:#2e77cd;font-weight:900}
+.account-identity{min-width:0}
+.account-identity h1{font-size:clamp(23px,2.8vw,33px);line-height:1.3;margin:7px 0;letter-spacing:-.05em;color:#0e3369}
+.account-identity p{font-size:13px;color:#57799f;margin:0 0 10px;overflow-wrap:anywhere}
+.account-verified{display:inline-flex;color:#0c875e;background:#e4f8ee;border:1px solid #a8e0c4;
+border-radius:999px;font-size:11px;font-weight:850;padding:6px 10px}
+.account-signout{background:white;color:#225c9d;font-size:12px;font-weight:850;border:1px solid #c0d7f5;border-radius:11px;
+min-height:43px;padding:9px 18px;cursor:pointer;white-space:nowrap}
+.account-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:17px}
+.account-summary>div{background:#fff;border:1px solid #d9e7fa;border-radius:15px;padding:17px 19px;display:flex;flex-direction:column;gap:8px}
+.account-summary span{color:#7389a6;font-size:11px;font-weight:750}
+.account-summary strong{font-size:18px;color:#143c72;font-weight:900}
+.account-summary small{font-size:11px;color:#6581a2}
+.account-services{margin-top:31px}
+.account-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:16px}
+.account-section-head span{font-size:11px;font-weight:900;letter-spacing:.08em;color:#2b7acb}
+.account-section-head h2{font-size:27px;letter-spacing:-.055em;color:#0c3566;margin:5px 0 0}
+.account-section-head>a{font-size:12px;color:#115fc0;font-weight:850;text-decoration:none}
+.account-service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.account-service-card{background:#fff;position:relative;display:flex;flex-direction:column;gap:9px;padding:19px;
+border:1px solid #dbe7f7;border-radius:16px;text-decoration:none;color:#173d71;min-height:193px;box-shadow:0 5px 20px #1b58a00a}
+.account-service-card:hover{background:#fafdff;border-color:#95bdfa;box-shadow:0 10px 23px #1f6dca15}
+.account-service-symbol{display:grid;place-items:center;width:45px;height:45px;color:#0e72ee;background:#eaf5ff;
+border-radius:13px;font-size:29px;font-weight:850}
+.account-service-card strong{font-size:17px;letter-spacing:-.04em}
+.account-service-card p{font-size:12px;color:#637d9d;line-height:1.6;margin:0;flex:1}
+.account-service-meta{font-size:10px;color:#356dba;font-weight:800}
+.account-service-arrow{position:absolute;right:19px;top:20px;font-size:19px;color:#2b73c5}
+.account-help{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:22px}
+.account-help>div{background:#fff;border:1px solid #deebf9;border-radius:14px;padding:18px}
+.account-help h2{font-size:16px;color:#1b4678;margin:0 0 6px}
+.account-help p{color:#637f9f;font-size:12px;line-height:1.7;margin:0}
+.account-help a{display:inline-flex;margin-top:10px;color:#125cc1;font-size:12px;font-weight:850;text-decoration:none}
+@media(max-width:850px){.account-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){
+ .auth-page{align-items:flex-start;padding:28px 13px 35px}.auth-card{padding:27px 21px}
+ .account-page{padding:0 12px 35px}.account-hero{padding:20px;flex-wrap:wrap}
+ .account-avatar{width:55px;height:55px;flex-basis:55px;font-size:26px}
+ .account-profile{gap:12px}.account-summary{grid-template-columns:1fr;gap:8px}
+ .account-service-grid{grid-template-columns:1fr;gap:10px}
+ .account-service-card{min-height:154px}
+ .account-section-head h2{font-size:23px}.account-help{grid-template-columns:1fr}
+}

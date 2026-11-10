@@ -1,56 +1,21 @@
-'use client';
-
 import Link from 'next/link';
-import { useActionState } from 'react';
 import { OAuthButtons } from '../OAuthButtons';
-import { signUpWithEmail } from './actions';
+import { auth } from '@/lib/auth/server';
+import { redirect } from 'next/navigation';
 
-export default function SignUpPage() {
-  const [state, formAction, pending] = useActionState(signUpWithEmail, null);
-
+export const dynamic = 'force-dynamic';
+export default async function SignUpPage() {
+  const { data: session } = await auth.getSession();
+  if (session?.user) redirect('/account');
   return (
     <div className="auth-card">
-      <div className="auth-brand">
-        <span className="auth-brand-mark">P</span>
-        medipick
-      </div>
-      <h1>회원가입</h1>
-      <p className="sub">후기·예약·건강노트 등 개인 기능을 위해 계정을 만듭니다.</p>
-
-      <OAuthButtons callbackURL="/" errorURL="/auth/sign-in" />
-
-      <div className="auth-divider">또는 이메일</div>
-
-      <form action={formAction}>
-        <div className="auth-field">
-          <label htmlFor="name">이름</label>
-          <input id="name" name="name" type="text" required autoComplete="name" placeholder="홍길동" />
-        </div>
-        <div className="auth-field">
-          <label htmlFor="email">이메일</label>
-          <input id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
-        </div>
-        <div className="auth-field">
-          <label htmlFor="password">비밀번호 (8자 이상)</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            placeholder="••••••••"
-          />
-        </div>
-        {state?.error ? <p className="auth-error">{state.error}</p> : null}
-        <button className="auth-submit" type="submit" disabled={pending}>
-          {pending ? '가입 중…' : '이메일로 가입하기'}
-        </button>
-      </form>
-
-      <p className="auth-foot">
-        이미 계정이 있으신가요? <Link href="/auth/sign-in">로그인</Link>
-      </p>
+      <div className="auth-brand"><span className="auth-brand-mark">✚</span>MediPick <span className="auth-brand-sub">메디픽</span></div>
+      <span className="auth-eyebrow">ONE ACCOUNT · GOOGLE</span>
+      <h1>Google 계정으로 시작하기</h1>
+      <p className="sub">회원가입 양식을 입력할 필요 없이 Google로 계속하기만 선택하세요.</p>
+      <OAuthButtons callbackURL="/account" errorURL="/auth/sign-in" />
+      <p className="auth-foot">이미 가입한 Google 계정이라면 같은 버튼으로 로그인됩니다.</p>
+      <p className="auth-links"><Link href="/">메디픽 홈</Link></p>
     </div>
   );
 }

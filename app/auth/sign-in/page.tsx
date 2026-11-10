@@ -1,51 +1,24 @@
-'use client';
-
 import Link from 'next/link';
-import { useActionState } from 'react';
 import { OAuthButtons } from '../OAuthButtons';
-import { signInWithEmail } from './actions';
+import { auth } from '@/lib/auth/server';
+import { redirect } from 'next/navigation';
 
-export default function SignInPage() {
-  const [state, formAction, pending] = useActionState(signInWithEmail, null);
-
+export const dynamic = 'force-dynamic';
+export default async function SignInPage() {
+  const { data: session } = await auth.getSession();
+  if (session?.user) redirect('/account');
   return (
     <div className="auth-card">
       <div className="auth-brand">
-        <span className="auth-brand-mark">P</span>
-        medipick
+        <span className="auth-brand-mark">✚</span>
+        MediPick <span className="auth-brand-sub">메디픽</span>
       </div>
-      <h1>로그인</h1>
-      <p className="sub">Neon Auth · Google·GitHub·Vercel OAuth 또는 이메일로 로그인합니다.</p>
-
-      <OAuthButtons callbackURL="/" errorURL="/auth/sign-in" />
-
-      <div className="auth-divider">또는 이메일</div>
-
-      <form action={formAction}>
-        <div className="auth-field">
-          <label htmlFor="email">이메일</label>
-          <input id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
-        </div>
-        <div className="auth-field">
-          <label htmlFor="password">비밀번호</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            placeholder="••••••••"
-          />
-        </div>
-        {state?.error ? <p className="auth-error">{state.error}</p> : null}
-        <button className="auth-submit" type="submit" disabled={pending}>
-          {pending ? '로그인 중…' : '이메일로 로그인'}
-        </button>
-      </form>
-
-      <p className="auth-foot">
-        계정이 없으신가요? <Link href="/auth/sign-up">회원가입</Link>
-      </p>
+      <span className="auth-eyebrow">SIMPLE & SECURE SIGN IN</span>
+      <h1>메디픽에 오신 것을 환영합니다.</h1>
+      <p className="sub">Google 계정 하나로 로그인하고 내 건강노트와 병원·약국 검색을 한곳에서 이용하세요.</p>
+      <OAuthButtons callbackURL="/account" errorURL="/auth/sign-in" />
+      <p className="auth-foot">별도 이메일 비밀번호 없이 Google 계정으로 가입과 로그인이 가능합니다.</p>
+      <p className="auth-links"><Link href="/">메디픽 홈으로 돌아가기</Link></p>
     </div>
   );
 }

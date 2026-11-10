@@ -50,11 +50,12 @@ function install(){
  const nav=el('nav','mp-u-nav');nav.setAttribute('aria-label','메디픽 주 메뉴');
  NAV.forEach(([key,path,label])=>nav.appendChild(a(path,label,active,key)));
  const actions=el('div','mp-u-actions');
- const signIn=a('/auth/sign-in','로그인');signIn.className='mp-u-signin';
- const signUp=a('/auth/sign-up','회원가입');signUp.className='mp-u-signup';
+ const signIn=a('/auth/sign-in','Google로 로그인');signIn.className='mp-u-signin mp-u-auth-link';
+ const account=a('/account','마이페이지');account.className='mp-u-account mp-u-auth-link';account.hidden=true;
+ if(location.pathname==='/account'){account.setAttribute('aria-current','page');account.classList.add('is-active');}
  const toggle=el('button','mp-u-toggle','☰');toggle.id='mpUnifiedMenuToggle';toggle.type='button';
  toggle.setAttribute('aria-label','전체 메뉴 열기');toggle.setAttribute('aria-controls','mpUnifiedDrawer');toggle.setAttribute('aria-expanded','false');
- actions.append(signIn,signUp,toggle);
+ actions.append(signIn,account,toggle);
  inner.append(brand,nav,actions);header.appendChild(inner);
  const drawer=el('div','mp-u-drawer');drawer.id='mpUnifiedDrawer';drawer.hidden=true;
  const backdrop=el('button','mp-u-backdrop');backdrop.type='button';backdrop.setAttribute('aria-label','메뉴 닫기');
@@ -66,7 +67,9 @@ function install(){
  NAV.forEach(([key,path,label])=>panel.appendChild(a(path,label,active,key)));
  panel.appendChild(el('div','mp-u-panel-section','부가 서비스'));
  SECONDARY.forEach(([href,label])=>panel.appendChild(a(href,label,active,'secondary')));
- panel.appendChild(a('/auth/sign-in','로그인'));
+ const drawerSignIn=a('/auth/sign-in','Google로 로그인');drawerSignIn.classList.add('mp-u-drawer-login');
+ const drawerAccount=a('/account','마이페이지');drawerAccount.classList.add('mp-u-drawer-account');drawerAccount.hidden=true;
+ panel.append(drawerSignIn,drawerAccount);
  drawer.append(backdrop,panel);
  function setOpen(next,restoreFocus=true){
    drawer.hidden=!next;document.body.classList.toggle('mp-u-menu-open',next);
@@ -92,6 +95,29 @@ function install(){
  if(before)before.before(header);else document.body.prepend(header);
  header.after(drawer);
  document.body.classList.add('mp-has-unified-header');
+ // Verify the real HttpOnly Neon Auth session on the same origin.
+ // Never infer authentication from cookies, localStorage, URL params, or a Google email.
+ (async () => {
+   try {
+     const controller=new AbortController();
+     const timeout=setTimeout(()=>controller.abort(),6000);
+     let response;
+     try {response=await fetch('/api/account/session',{credentials:'same-origin',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});}
+     finally {clearTimeout(timeout);}
+     if(!response.ok)return; // fail closed: keep the anonymous login link
+     const data=await response.json();
+     if(data?.authenticated===true && data.status==='verified_neon_session'){
+       signIn.hidden=true;drawerSignIn.hidden=true;
+       account.hidden=false;drawerAccount.hidden=false;
+       account.title=data.user?.name?String(data.user.name).slice(0,80)+' · 마이페이지':'내 계정';
+       document.body.dataset.mpSession='authenticated';
+     }else{
+       document.body.dataset.mpSession='anonymous';
+     }
+   }catch{
+     document.body.dataset.mpSession='unavailable';
+   }
+ })();
  // Preserve the PWA manifest without altering the existing registration logic.
  if(!document.querySelector('link[rel="manifest"]')){
    const manifest=document.createElement('link');manifest.rel='manifest';manifest.href='/manifest.webmanifest';document.head.appendChild(manifest);

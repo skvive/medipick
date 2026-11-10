@@ -1,0 +1,59 @@
+name: MEDIPICK Google login live production smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/auth/**'
+      - 'app/account/**'
+      - 'app/api/auth/**'
+      - 'app/api/account/**'
+      - 'web/assets/site-chrome.js'
+      - 'web/assets/unified-navigation.css'
+      - '.github/workflows/medipick-google-login-live-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Wait for live session endpoint and assert anonymous access
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://medipick.lexid.site'
+          ready=0
+          for n in $(seq 1 18); do
+            status="$(curl --silent --show-error --max-time 15 --output /tmp/mp-session.json --write-out '%{http_code}' "$BASE/api/account/session" || true)"
+            if [ "$status" = 200 ] && jq -e '.authenticated==false' /tmp/mp-session.json >/dev/null 2>&1; then
+              ready=1; break
+            fi
+            echo "Waiting for Neon session endpoint deployment ($n/18)"
+            sleep 10
+          done
+          if [ "$ready" != 1 ]; then echo "Session endpoint deployment not verified"; exit 1; fi
+          echo 'Anonymous session endpoint: correct'
+          headers="$(curl --silent --show-error --max-time 15 -D - -o /dev/null "$BASE/api/account/session")"
+          echo "$headers" | grep -qi 'cache-control:.*no-store'
+          echo 'Session response: no-store'
+          sign_in="$(curl --silent --show-error --max-time 18 "$BASE/auth/sign-in")"
+          printf '%s' "$sign_in" | grep -q 'Google로 계속하기'
+          if printf '%s' "$sign_in" | grep -Eq 'type="password"|GitHub로 계속하기|Vercel로 계속하기|이메일로 로그인'; then
+            echo 'Unexpected old login option in production'; exit 1
+          fi
+          echo 'Only Google login in SSR sign-in: correct'
+          sign_up="$(curl --silent --show-error --max-time 18 "$BASE/auth/sign-up")"
+          printf '%s' "$sign_up" | grep -q 'Google로 계속하기'
+          if printf '%s' "$sign_up" | grep -Eq 'type="password"|이메일로 가입하기'; then
+            echo 'Unexpected old sign-up form in production'; exit 1
+          fi
+          echo 'Google-only sign-up: correct'
+          account_headers="$(curl --silent --show-error --max-time 15 -D - -o /dev/null "$BASE/account")"
+          printf '%s' "$account_headers" | grep -qi 'location:.*auth/sign-in'
+          echo 'Protected member dashboard redirect: correct'
+          denied="$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' -H 'content-type: application/json' -d '{"email":"example@example.com","password":"not-used"}' "$BASE/api/auth/sign-in/email")"
+          if [ "$denied" != 403 ]; then echo "Email login API was not blocked (HTTP $denied)"; exit 1; fi
+          denied="$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' -H 'content-type: application/json' -d '{"provider":"github"}' "$BASE/api/auth/sign-in/social")"
+          if [ "$denied" != 403 ]; then echo "Non-Google OAuth API was not blocked (HTTP $denied)"; exit 1; fi
+          echo 'Public auth proxy Google-only restrictions: correct'
+          echo 'Actual Google consent/account sign-in must be verified by a real user separately.'
