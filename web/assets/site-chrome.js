@@ -96,6 +96,13 @@ function install(){
  if(!document.querySelector('link[rel="manifest"]')){
    const manifest=document.createElement('link');manifest.rel='manifest';manifest.href='/manifest.webmanifest';document.head.appendChild(manifest);
  }
+ // Maintain legacy PWA install behavior; do not duplicate explicit asset tags.
+ if(!document.querySelector('link[href="/assets/pwa/install.css"]')){
+   const css=document.createElement('link');css.rel='stylesheet';css.href='/assets/pwa/install.css';document.head.appendChild(css);
+ }
+ if(!document.querySelector('script[src="/assets/pwa/install.js"]')){
+   const script=document.createElement('script');script.src='/assets/pwa/install.js';script.defer=true;document.body.appendChild(script);
+ }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
 else install();
