@@ -1,0 +1,32 @@
+name: MEDIPICK unified nav HIRA pharmacy medical QA
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'app/api/hira/**'
+      - 'lib/medipick/hira-client.ts'
+      - 'next.config.ts'
+      - 'tests/unified-navigation-hira.test.mjs'
+      - '.github/workflows/medipick-unified-hira-qa.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-unified-navigation-*'
+    paths:
+      - 'web/**'
+      - 'app/api/hira/**'
+      - 'lib/medipick/hira-client.ts'
+      - 'next.config.ts'
+      - 'tests/unified-navigation-hira.test.mjs'
+      - '.github/workflows/medipick-unified-hira-qa.yml'
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Validate 22 pages, HIRA secret protection, new routes and JS syntax
+        run: node --test tests/unified-navigation-hira.test.mjs tests/map-first-contract.test.mjs
