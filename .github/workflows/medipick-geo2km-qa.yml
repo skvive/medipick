@@ -1,0 +1,25 @@
+name: MEDIPICK 2km HIRA and pharmacy pin QA
+on:
+  pull_request:
+    paths:
+      - 'web/index.html'
+      - 'web/smart-store.html'
+      - 'web/pharmacy.html'
+      - 'web/assets/smart-store.js'
+      - 'web/assets/pharmacy.js'
+      - 'app/api/hira/hospitals/route.ts'
+      - 'tests/geo2km-hira-pharmacy.test.mjs'
+  push:
+    branches: ['chatgpt/geo2km-hira-pharmacy-*']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: 2km geo map, HIRA official only and pharmacy Places logic
+        run: node --test tests/geo2km-hira-pharmacy.test.mjs tests/nav-auth-stability.test.mjs tests/unified-navigation-hira.test.mjs tests/map-first-contract.test.mjs
