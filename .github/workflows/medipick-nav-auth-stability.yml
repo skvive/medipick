@@ -1,0 +1,31 @@
+name: MEDIPICK stable navigation and Google-only Neon Auth
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'app/auth/**'
+      - 'app/account/**'
+      - 'app/api/account/**'
+      - 'tests/nav-auth-stability.test.mjs'
+      - '.github/workflows/medipick-nav-auth-stability.yml'
+  push:
+    branches:
+      - 'chatgpt/stable-navigation-google-neon-*'
+    paths:
+      - 'web/**'
+      - 'app/auth/**'
+      - 'app/account/**'
+      - 'app/api/account/**'
+      - 'tests/nav-auth-stability.test.mjs'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify all pages, OAuth UI, Neon session, dashboard and safe source
+        run: node --test tests/nav-auth-stability.test.mjs tests/unified-navigation-hira.test.mjs tests/map-first-contract.test.mjs
