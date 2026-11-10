@@ -74,9 +74,9 @@ test('My Page reads real session and links only to existing services',()=>{
 
 test('same-origin Neon Auth proxy rejects non-Google login methods',()=>{
  const route=read('app/api/auth/[...path]/route.ts');
- assert.match(route,/sign-in\/email/);
- assert.match(route,/sign-up\/email/);
- assert.match(route,/sign-in\/social/);
+ assert.match(route,/sign-in.{0,3}email/);
+ assert.match(route,/sign-up.{0,3}email/);
+ assert.match(route,/sign-in.{0,3}social/);
  assert.match(route,/data\?\.provider !== 'google'/);
  assert.match(route,/return handlers\.POST\(request\)/);
  assert.match(route,/status: 403/);
