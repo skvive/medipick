@@ -1,72 +1,79 @@
 <!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1769f8">
-<meta name="description" content="지역과 진료과로 병원을 검색하고, 검증된 병원 좌표를 Google 지도에서 확인하는 메디픽">
-<meta name="robots" content="noindex,nofollow">
-<meta property="og:title" content="메디픽 — 지도에서 내 주변 병원 찾기">
-<meta property="og:description" content="현위치와 진료과별로 병원을 검색하고 주소를 확인하세요.">
-<title>메디픽 | 지도에서 내 주변 병원 찾기</title>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0A73FC"><meta name="robots" content="noindex,nofollow">
+<meta name="description" content="내 근처 병원찾기 메디픽 — 진료과목과 현재 위치로 병원 검색 및 Google 지도 위치 확인">
+<meta property="og:type" content="website"><meta property="og:title" content="메디픽 — 내 근처 병원찾기">
+<meta property="og:image" content="https://medipick.lexid.site/assets/photos/medipick-care-team-v6.webp">
+<title>내 근처 병원찾기 | MediPick 메디픽</title>
 <link rel="icon" href="/assets/favicon.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/style.css">
-<link rel="stylesheet" href="/assets/site-shell.css">
-<link rel="stylesheet" href="/assets/smart-store.css">
-<link rel="stylesheet" href="/assets/medipick-delivery-v6.css">
-<link rel="stylesheet" href="/assets/medipick-map-home.css">
-<script>(function(){var p=new URLSearchParams(location.search);if(p.has('nav')||p.has('provider')||/^(explore|pharmacy|content)$/.test(location.hash.slice(1))){location.replace('/portal'+location.search+location.hash);}})();</script>
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/smart-store.css">
+<link rel="stylesheet" href="/assets/medipick-reference-home.css">
+<script>(function(){const q=new URLSearchParams(location.search);if(q.has("nav")||q.has("provider")||/^(explore|pharmacy|content)$/.test(location.hash.slice(1)))location.replace("/portal"+location.search+location.hash)})();</script>
 </head>
-<body class="mp-smart-store mp-map-home" data-mp-page="home-map">
-<a class="mp-skip-link" href="#mapFinder">검색 및 병원 지도 바로가기</a>
-<div class="demo-ribbon"><strong>병원정보 안내</strong> 병원정보 대조 중 · 검증 좌표만 지도 표시 · 방문 전 운영 여부 확인.</div>
-<header class="mast"><div class="wrap"><a href="/" aria-label="메디픽 홈"><img src="/assets/logo-full.svg" width="184" height="42" alt="MEDIPICK 메디픽"></a><nav aria-label="주요 메뉴"><a href="/" aria-current="page">지도 검색</a><a href="/portal">전체 서비스</a><a href="/health-content">건강정보</a><a href="/doctors">의사 블로그</a><a href="/admin">병원 입점</a></nav></div></header>
-<main id="mapFinder">
-<div class="mp-home-intro">
-  <div class="mp-home-headline"><div><span class="mp-home-kicker">MEDIPICK · LOCATION-FIRST CARE</span><h1>내 주변 병원, <em>지도에서 찾기.</em></h1><p>위치와 진료과를 선택하면 검색 결과와 정확 좌표가 확인된 병원 핀을 함께 표시합니다.</p></div><a href="/clinic-store" class="mp-home-business-link">병원 스마트스토어 입점 <span aria-hidden="true">↗</span></a></div>
-  <div class="mp-home-location-bar" role="status"><span class="mp-home-location-indicator" aria-hidden="true"></span><strong id="smartLocationStatus">기본 위치: 가락시장역 주변</strong><span>현위치 버튼을 눌러야 위치 권한을 요청합니다.</span></div>
-  <form class="mp-smart-toolbar" id="smartSearchForm" role="search">
-    <fieldset class="mp-smart-modes" id="smartModes"><legend>검색 정보</legend><label class="is-checked"><input name="smartMode" value="catalog" type="radio" checked> 전국 병원 주소록</label><label><input name="smartMode" value="partners" type="radio"> 입점 병원</label></fieldset>
-    <input type="search" name="q" id="smartQ" maxlength="80" autocomplete="off" placeholder="병원명·지역·주소 검색" aria-label="병원명·지역·주소 검색">
-    <input type="search" id="smartTrade" maxlength="40" placeholder="진료과 (예: 내과)" aria-label="진료과 검색">
-    <select id="smartRegion" aria-label="지역 선택"><option value="">전국</option><option value="서울" selected>서울</option><option value="경기">경기</option><option value="인천">인천</option><option value="부산">부산</option><option value="대구">대구</option><option value="대전">대전</option><option value="광주">광주</option><option value="울산">울산</option><option value="세종">세종</option><option value="강원">강원</option><option value="충북">충북</option><option value="충남">충남</option><option value="전북">전북</option><option value="전남">전남</option><option value="경북">경북</option><option value="경남">경남</option><option value="제주">제주</option></select>
-    <button class="btn-primary" type="submit">병원 검색</button><button class="btn-ghost" id="smartLocate" type="button">◎ 내 현위치</button>
-    <details class="mp-smart-advanced"><summary>반경·핀 옵션</summary><div class="mp-smart-advanced-content"><label for="smartRadius">조회 반경</label><select id="smartRadius" aria-label="주변 병원 검색 반경"><option value="1">1km</option><option value="3" selected>3km</option><option value="5">5km</option><option value="10">10km</option><option value="20">20km</option><option value="30">30km</option></select><label class="mp-smart-estimate-control"><input type="checkbox" id="smartEstimated"> 추정 좌표 보이기 <small>(실제 병원 위치 아님)</small></label><button class="btn-ghost" type="button" id="smartDemo">가락시장역으로 돌아가기</button></div></details>
-  </form>
-  <div class="mp-smart-quick" role="group" aria-label="진료과 빠른 검색"><span>진료과</span><button type="button" data-smart-category="내과">내과</button><button type="button" data-smart-category="정형외과">정형외과</button><button type="button" data-smart-category="소아청소년과">소아청소년과</button><button type="button" data-smart-category="피부과">피부과</button><button type="button" data-smart-category="치과">치과</button><button type="button" data-smart-category="안과">안과</button><button type="button" data-smart-clear>초기화</button></div>
-</div>
-
- 
- <div class="mp-home-workspace">
-  <div class="mp-home-main-panel mp-smart-map-panel">
-   <section class="mp-google-search-option" aria-label="Google Maps 실제 장소 검색">
- <div><strong>지도에서 주변 병원을 찾을 수 없나요?</strong><small>Google Places 검색 결과는 메디픽의 검증 병원 목록과 별도입니다. 사용자가 요청할 때만 Google Places API를 호출하며 사용량 과금이 발생할 수 있습니다.</small></div>
- <button type="button" id="smartGooglePlaces">Google 지도 병원 핀 검색</button>
+<body class="mp-smart-store mp-map-home mp-reference-home" data-mp-page="home-map">
+<a class="mp-ref-skip" href="#mpRefFinder">병원 지도 검색 바로가기</a>
+<header class="mp-ref-header">
+ <a class="mp-ref-logo" href="/" aria-label="메디픽 홈페이지"><img src="/assets/logo-full.svg" width="188" height="43" alt="MediPick 메디픽"><span>내 근처 병원찾기</span></a>
+ <nav class="mp-ref-topnav" aria-label="주 메뉴"><a href="/" class="selected">홈</a><a href="/smart-store">병원찾기</a><a href="/portal?nav=explore">진료과목</a><a href="/health-content">건강정보</a><a href="/consult">AI 건강상담</a><a href="/doctors">의사·병원센터</a><a href="/clinic-store">입점안내</a></nav>
+ <div class="mp-ref-header-actions"><a class="mp-ref-header-login" href="/auth/sign-in">로그인</a><a class="mp-ref-header-signup" href="/auth/sign-up">회원가입</a><details class="mp-ref-mobile-menu"><summary aria-label="전체 메뉴 열기">☰</summary><nav aria-label="모바일 메뉴"><a href="/">홈</a><a href="/smart-store">병원찾기</a><a href="/portal?nav=explore">진료과목</a><a href="/health-content">건강정보</a><a href="/consult">AI 건강상담</a><a href="/doctors">의사·병원센터</a><a href="/clinic-store">입점안내</a><a href="/auth/sign-in">로그인</a></nav></details></div>
+</header>
+<main id="mpRefFinder">
+<section class="mp-ref-hero" aria-labelledby="mpRefHeroTitle">
+ <div class="mp-ref-hero-copy">
+ <span class="mp-ref-hero-kicker"><span aria-hidden="true">◆</span> 내 근처 병원찾기</span>
+ <h1 id="mpRefHeroTitle"><span class="mp-ref-hero-logo">Medi<span>Pick</span></span><small>메디픽</small></h1>
+ <p class="mp-ref-hero-tagline">가장 가까운 병원, 지금 바로 찾으세요!</p>
+ </div>
+ <div class="mp-ref-hero-visual" aria-hidden="true"><img src="/assets/photos/medipick-care-team-v6.webp" width="797" height="327" alt="" loading="eager" decoding="async"><div class="mp-ref-hero-phone"><div class="mp-ref-phone-camera"></div><b>✚ MediPick</b><div class="mp-ref-phone-map"><span class="mp-ref-phone-pin">✚</span></div></div><div class="mp-ref-hero-bubble">지금, 내 주변 병원을<br>지도에서 한눈에!</div></div>
+ <form class="mp-ref-search" id="smartSearchForm" role="search">
+ <div class="mp-ref-search-main"><span class="mp-ref-search-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><input type="search" id="smartQ" name="q" autocomplete="off" maxlength="80" aria-label="지역, 병원명, 진료과 검색" placeholder="지역, 병원명, 진료과를 입력하세요"><button type="submit">⌕ 병원 검색</button></div>
+ <div class="mp-ref-quick">
+  <button type="button" id="smartLocate">◎ 내 위치로 검색</button>
+  <button type="button" id="smartDemo">⌖ 기본 위치 병원</button>
+  <a href="/portal?nav=pharmacy">◷ 야간진료</a>
+  <a href="/portal?nav=explore">▦ 주말진료</a>
+ </div>
+ <div class="mp-ref-search-extras">
+ <input type="search" id="smartTrade" maxlength="40" placeholder="진료과" aria-label="선택된 진료과목">
+ <select id="smartRegion" aria-label="검색 지역"><option value="">전국</option><option value="서울" selected>서울</option><option value="경기">경기</option><option value="인천">인천</option><option value="부산">부산</option><option value="대구">대구</option><option value="대전">대전</option><option value="광주">광주</option><option value="울산">울산</option><option value="세종">세종</option><option value="강원">강원</option><option value="충북">충북</option><option value="충남">충남</option><option value="전북">전북</option><option value="전남">전남</option><option value="경북">경북</option><option value="경남">경남</option><option value="제주">제주</option></select>
+ <select id="smartRadius" aria-label="주변 검색 반경"><option value="1">1km</option><option value="3" selected>3km</option><option value="5">5km</option><option value="10">10km</option><option value="20">20km</option><option value="30">30km</option></select>
+ <label class="mp-ref-estimate"><input type="checkbox" id="smartEstimated"> 추정좌표 표시(실제 위치 아님)</label>
+ <fieldset class="mp-smart-modes" id="smartModes"><legend>검색 데이터</legend><label class="is-checked"><input name="smartMode" type="radio" value="catalog" checked> 공공 주소록</label><label><input name="smartMode" type="radio" value="partners"> 입점 병원</label></fieldset>
+ </div>
+ </form>
+</section>
+<nav class="mp-ref-services" aria-label="빠른 진료과·병원 서비스"><button class="mp-ref-service active" type="button" id="refNearbyShortcut"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>내 주변 병원</span></button><a class="mp-ref-service" href="/portal?nav=explore"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v5a6 6 0 0 0 12 0V3"/><path d="M4 3h4M16 3h4"/><circle cx="20" cy="16" r="2"/><path d="M12 14v3a4 4 0 0 0 8 0"/></svg><span>진료과목 찾기</span></a><button class="mp-ref-service" type="button" data-smart-category="치과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5c-2 3 0 8 1.5 12.5 1 3 3.5 4 4 0l1.5-5 1.5 5c.5 4 3 3 4 0C19 13 21 8 19 5c-2-3-5-2-7-1-2-1-5-2-7 1Z"/></svg><span>치과</span></button><button class="mp-ref-service" type="button" data-smart-category="안과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg><span>안과</span></button><button class="mp-ref-service" type="button" data-smart-category="피부과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Zm6 0 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z"/></svg><span>피부과</span></button><button class="mp-ref-service" type="button" data-smart-category="성형외과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 9.1c0 4.1-8.8 10-8.8 10S3.2 13.2 3.2 9.1a4.8 4.8 0 0 1 8.8-2.6 4.8 4.8 0 0 1 8.8 2.6Z"/><path d="M7 11h3l2-3 2 6 1-3h2"/></svg><span>성형·시술</span></button><button class="mp-ref-service" type="button" data-smart-category="산부인과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 9.1c0 4.1-8.8 10-8.8 10S3.2 13.2 3.2 9.1a4.8 4.8 0 0 1 8.8-2.6 4.8 4.8 0 0 1 8.8 2.6Z"/><path d="M7 11h3l2-3 2 6 1-3h2"/></svg><span>산부인과</span></button><button class="mp-ref-service" type="button" data-smart-category="소아청소년과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3c2-3 5 0 2 3m-6 6h.1m8 0h.1M9 16c2 2 4 2 6 0"/><circle cx="9" cy="12" r="0.7"/><circle cx="15" cy="12" r="0.7"/></svg><span>소아청소년과</span></button><button class="mp-ref-service" type="button" data-smart-category="정형외과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8c-4-4-6 2-3 4l2 1 6-6-1-2c-2-3-8-1-4 3Zm12 8c4 4 6-2 3-4l-2-1-6 6 1 2c2 3 8 1 4-3Z"/><path d="m9 8 7 7"/></svg><span>정형외과</span></button><button class="mp-ref-service" type="button" data-smart-category="신경과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-1-4-7-3-7 2-4 1-4 6 0 8-1 4 4 7 7 3 3 4 8 1 7-3 4-2 4-7 0-8 0-5-6-6-7-2Z"/><path d="M12 5v14M8 9c2 0 3 1 4 3m4-3c-2 0-3 1-4 3M8 15l4-1m4 1-4-1"/></svg><span>신경과</span></button><button class="mp-ref-service" type="button" data-smart-category="이비인후과"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9c0-8-13-8-13 0 0 3 2 4 4 6 1 1 1 4 4 4 2 0 3-2 3-4"/><path d="M9 10c-1-4 6-5 6 0 0 3-3 3-3 5"/></svg><span>이비인후과</span></button><a class="mp-ref-service" href="/smart-store"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>전체보기</span></a></nav>
+<div class="mp-ref-columns">
+ <aside class="mp-ref-categories" aria-label="진료과목 병원 찾기">
+ <header><h2>진료과목 병원 찾기</h2><a href="/portal?nav=explore" aria-label="모든 진료과목 보기">›</a></header>
+ <div class="mp-ref-dept-grid"><button class="mp-ref-dept" type="button" data-smart-category="내과" aria-label="내과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v5a6 6 0 0 0 12 0V3"/><path d="M4 3h4M16 3h4"/><circle cx="20" cy="16" r="2"/><path d="M12 14v3a4 4 0 0 0 8 0"/></svg><span>내과</span></button><button class="mp-ref-dept" type="button" data-smart-category="외과" aria-label="외과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="3"/><path d="M12 7v10M7 12h10"/></svg><span>외과</span></button><button class="mp-ref-dept" type="button" data-smart-category="정형외과" aria-label="정형외과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8c-4-4-6 2-3 4l2 1 6-6-1-2c-2-3-8-1-4 3Zm12 8c4 4 6-2 3-4l-2-1-6 6 1 2c2 3 8 1 4-3Z"/><path d="m9 8 7 7"/></svg><span>정형외과</span></button><button class="mp-ref-dept" type="button" data-smart-category="신경과" aria-label="신경과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-1-4-7-3-7 2-4 1-4 6 0 8-1 4 4 7 7 3 3 4 8 1 7-3 4-2 4-7 0-8 0-5-6-6-7-2Z"/><path d="M12 5v14M8 9c2 0 3 1 4 3m4-3c-2 0-3 1-4 3M8 15l4-1m4 1-4-1"/></svg><span>신경과</span></button><button class="mp-ref-dept" type="button" data-smart-category="소아청소년과" aria-label="소아청소년과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3c2-3 5 0 2 3m-6 6h.1m8 0h.1M9 16c2 2 4 2 6 0"/><circle cx="9" cy="12" r="0.7"/><circle cx="15" cy="12" r="0.7"/></svg><span>소아청소년과</span></button><button class="mp-ref-dept" type="button" data-smart-category="산부인과" aria-label="산부인과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 9.1c0 4.1-8.8 10-8.8 10S3.2 13.2 3.2 9.1a4.8 4.8 0 0 1 8.8-2.6 4.8 4.8 0 0 1 8.8 2.6Z"/><path d="M7 11h3l2-3 2 6 1-3h2"/></svg><span>산부인과</span></button><button class="mp-ref-dept" type="button" data-smart-category="이비인후과" aria-label="이비인후과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9c0-8-13-8-13 0 0 3 2 4 4 6 1 1 1 4 4 4 2 0 3-2 3-4"/><path d="M9 10c-1-4 6-5 6 0 0 3-3 3-3 5"/></svg><span>이비인후과</span></button><button class="mp-ref-dept" type="button" data-smart-category="비뇨의학과" aria-label="비뇨의학과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-2.3 4-7 8-7 12a7 7 0 0 0 14 0c0-4-4.7-8-7-12Z"/><path d="M8 16c0 2 2 3 4 3"/></svg><span>비뇨의학과</span></button><button class="mp-ref-dept" type="button" data-smart-category="피부과" aria-label="피부과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Zm6 0 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z"/></svg><span>피부과</span></button><button class="mp-ref-dept" type="button" data-smart-category="안과" aria-label="안과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg><span>안과</span></button><button class="mp-ref-dept" type="button" data-smart-category="치과" aria-label="치과 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5c-2 3 0 8 1.5 12.5 1 3 3.5 4 4 0l1.5-5 1.5 5c.5 4 3 3 4 0C19 13 21 8 19 5c-2-3-5-2-7-1-2-1-5-2-7 1Z"/></svg><span>치과</span></button><button class="mp-ref-dept" type="button" data-smart-category="한의원" aria-label="한의원 병원 검색"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 8 4 15c0 4 4 6 7 4 6-3 9-10 9-15Z"/><path d="M4 20c4-5 8-8 13-11"/></svg><span>한의원</span></button></div>
+ <a class="mp-ref-health-card" href="/health-content"><div><strong>건강정보 <span>헬스가이드</span></strong><small>질병·예방·검진·건강정보까지<br>메디픽에서 확인하세요.</small></div><span>›</span></a>
+ </aside>
+ <section class="mp-ref-map" aria-label="병원 Google 지도">
+ <header class="mp-ref-map-header">
+  <div class="mp-ref-map-tabs" role="group" aria-label="지도 형식"><button type="button" id="refMapRoad" class="selected">지도</button><button type="button" id="refMapSatellite">위성</button></div>
+  <div class="mp-ref-map-filters" role="group" aria-label="지도 검색"><button type="button" id="refMapAll" class="selected">전체</button><button type="button" data-smart-category="내과">내과</button><button type="button" data-smart-category="치과">치과</button><button type="button" data-smart-category="피부과">피부과</button></div>
+ </header>
+ <div class="mp-ref-map-canvas mp-smart-map-panel"><div class="mp-ref-map-label" id="smartLocationStatus">기본 위치: 가락시장역 주변</div>
+ <div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="Google 지도에서 병원 검색"><div class="mp-ref-map-wait"><b>지도 연결을 확인하고 있습니다</b><span>실제 병원 위치는 검증된 좌표만 표시합니다.</span></div></div>
+ <div class="mp-ref-map-places"><button type="button" id="smartGooglePlaces">◎ Google 주변 병원 핀 검색</button><span id="smartPinCount">검증 좌표 조회 중</span></div>
+ </div>
  </section>
-   <div class="mp-smart-map-status"><span class="mp-smart-map-status-dot" aria-hidden="true"></span><strong>Google 지도</strong><span id="smartPinCount">검증된 병원 핀 확인 중</span><span class="mp-map-legend">파랑: 검증 좌표 · 회색: 사용자가 켠 추정 좌표</span></div>
-   <div id="smartStoreMap" class="mp-smart-map-empty" role="region" aria-label="병원 위치 Google 지도"><span aria-hidden="true" class="mp-map-placeholder-icon">◎</span><h2>지도 연결을 확인하고 있습니다</h2><p>API 설정 또는 위치 검증이 필요하면 주소록 검색 결과와 Google 지도 바로가기를 이용하세요.</p></div>
-  </div>
-  <aside class="mp-smart-list-panel" aria-label="주변 병원 검색결과">
-   <div class="mp-smart-list-head"><b id="smartListTitle">내 주변 병원</b><span id="smartListMeta">검색 결과 확인 중</span></div>
-   <div class="mp-smart-list" id="smartList" aria-live="polite"><div class="empty-state">주변의 검증된 병원 좌표를 검색하고 있습니다. 결과가 없으면 병원명 검색 또는 반경을 넓혀 주세요.</div></div>
-   <section class="mp-smart-detail" id="smartDetail" hidden aria-label="선택한 병원 상세정보"></section>
-  </aside>
+ <aside class="mp-ref-nearby mp-smart-list-panel" aria-label="현재 위치 주변 병원">
+ <header class="mp-ref-nearby-header"><div><h2 id="smartListTitle">현재 위치 주변 병원</h2><small id="smartListMeta">주소록 검색 중</small></div><select id="refSort" aria-label="병원 목록 정렬"><option value="source">기본순</option><option value="name">병원명순</option><option value="distance">거리순(검증 시)</option></select></header>
+ <div id="smartList" class="mp-smart-list" aria-live="polite"><div class="empty-state">병원 목록을 불러오는 중입니다. 위치를 허용하거나 진료과목을 선택하세요.</div></div>
+ <section id="smartDetail" class="mp-smart-detail" hidden aria-label="선택한 병원 상세정보"></section>
+ </aside>
 </div>
-<section class="mp-google-places-results" id="googlePlacesSection" hidden aria-label="Google Places 병원 검색 결과">
- <div class="mp-google-places-header"><strong>Google 지도 검색 결과 · 메디픽 자체 인증 아님</strong><button type="button" id="clearGooglePlaces">결과 지우기</button></div><div id="googlePlacesResults" role="status" aria-live="polite"></div></section>
-<div class="mp-home-bottom"><div id="smartStats" class="mp-smart-stats" aria-live="polite"></div><a href="/smart-store" class="mp-home-more-map">전국 병원 지도·고급 검색 보기 ↗</a></div>
-<p class="mp-smart-disclaimer mp-home-disclaimer" id="smartNotice">검증 좌표만 기본 표시합니다. 공공 주소록 후보의 실재·현재 진료·영업 여부를 인증하는 서비스가 아니며, 추정핀은 실제 위치가 아닙니다.</p>
-<nav class="mp-home-service-links" aria-label="다른 메디픽 서비스">
-<a href="/portal?nav=explore"><span>⌕</span><strong>상세 병원 검색</strong><small>병원·약국·야간 진료</small></a>
-<a href="/health-content"><span>▤</span><strong>건강정보</strong><small>의료정보·블로그·영상</small></a>
-<a href="/consult"><span>✚</span><strong>AI 건강안내</strong><small>진단이 아닌 참고 정보</small></a>
-<a href="/clinic-store"><span>▣</span><strong>병원 스마트스토어</strong><small>입점·Blogger 연동 안내</small></a>
-</nav>
+<div class="mp-ref-results"><div class="mp-google-search-option" aria-label="Google Places 실제 병원 위치 검색"><div><strong>Google 지도 장소 검색</strong><small>메디픽 검증 병원 핀과 별도 · 클릭하면 Google Places API 조회 (과금 가능)</small></div><a href="/smart-store">전체 지도·상세 검색 ↗</a></div>
+<section id="googlePlacesSection" class="mp-google-places-results" hidden aria-label="Google 지도 병원 검색 결과"><div class="mp-google-places-header"><strong>Google 지도 검색 결과 · 메디픽 인증 아님</strong><button type="button" id="clearGooglePlaces">결과 지우기</button></div><div id="googlePlacesResults" role="status" aria-live="polite"></div></section>
+</div>
+<section class="mp-ref-source" aria-label="데이터 출처 및 서비스 안내"><div><b>▣ 검색 데이터 출처</b><small>공공데이터포털·HIRA와 대조 중인 주소록입니다.</small></div><div><b>◎ Google 지도 연동</b><small>실제 좌표가 확인된 핀과 검색 결과를 구분합니다.</small></div><div><b>♡ 신뢰할 수 있는 병원정보</b><small>진료 가능 여부·주소·전화는 방문 전 확인하세요.</small></div><div><b>▣ 모바일에서도 간편하게</b><small>위치 기반 병원 검색 및 건강정보 확인</small></div></section>
+<p class="mp-ref-disclaimer" id="smartNotice">주소록 후보는 의료기관 실재·진료시간·의료 수준을 보증하지 않습니다. 추정 좌표는 기본 숨김이며 Google Places 장소 결과는 별도 출처로 표시됩니다.</p>
+<div id="smartStats" class="mp-ref-hidden-stats" aria-live="polite"></div>
 </main>
-<footer class="mp-home-footer"><img src="/assets/logo-full.svg" alt="메디픽" width="142" height="32"><p>병원 정보는 방문 전 의료기관에 직접 확인하세요. 응급상황은 119.</p><div><a href="/portal">전체 서비스</a><a href="/admin">병원 입점</a><a href="/integrations">서비스 연동</a></div><small>공공데이터포털·HIRA 자료와 교차 확인 중 · 광고는 의료 서비스 품질 순위가 아닙니다.</small></footer>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script defer src="/assets/smart-store.js"></script>
-<script defer src="/assets/site-chrome.js"></script>
-<script defer src="/assets/pwa/install.js"></script>
+<footer class="mp-ref-footer"><a href="/">MediPick 메디픽</a><span>데이터 파트너: 공공데이터포털 · 건강보험심사평가원(HIRA)</span><a href="/portal">전체 서비스</a><a href="/clinic-store">병원 입점·Google Blogger</a><a href="/integrations">연동 상태</a></footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script defer src="/assets/smart-store.js"></script><script defer src="/assets/medipick-reference-home.js"></script>
 </body></html>
