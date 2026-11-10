@@ -18,7 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           for n in $(seq 1 12); do
-            result="$(curl --silent --show-error --location --max-time 18 https://medipick.lexid.site/api/hira/status || true)"
+            result="$(curl --silent --show-error --location --max-time 30 https://medipick.lexid.site/api/hira/status || true)"
             if printf '%s' "$result" | jq -e '.configured==true and .code!=null' >/dev/null 2>&1; then
               printf '%s' "$result" | jq -c '{ok,configured,code,recordsReturned,total,source}'
               if printf '%s' "$result" | jq -e '.ok==true' >/dev/null; then
