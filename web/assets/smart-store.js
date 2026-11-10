@@ -393,7 +393,12 @@ function renderList() {
   }).join('');
   list.querySelectorAll('[data-open-id]').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      openStore(+btn.dataset.openId,true);
+      const id=Number(btn.dataset.openId);
+      const selected=items.find(p=>Number(p.id)===id);
+      if(selected?.is_premium && Number.isSafeInteger(id) && id>0){
+        location.assign('/clinic-store?id='+encodeURIComponent(id));return;
+      }
+      openStore(id,true);
       if(matchMedia('(max-width:700px)').matches) $('#smartDetail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
     });
   });
