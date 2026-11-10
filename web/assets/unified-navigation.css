@@ -35,3 +35,75 @@ body.mp-has-unified-header:not(.mp-reference-home) .demo-ribbon{position:relativ
 @media(max-width:1050px){.mp-u-nav{display:none!important}.mp-u-toggle{display:grid;place-items:center}.mp-u-inner{width:calc(100% - 28px)}.mp-u-signup{display:none!important}}
 @media(max-width:520px){:root{--mu-header:61px}.mp-u-brand{flex-basis:150px}.mp-u-signin{font-size:11px!important;padding:0 5px}.mp-u-actions{gap:5px}}
 @media(prefers-reduced-motion:reduce){.mp-u-nav .mp-u-link{transition:none}}
+
+/* MEDIPICK v10 — fixed geometry before first paint, independent of route content.
+   The previous delayed DOM insertion and varying top ribbons made every click jump. */
+:root{--mu-header:68px}
+html{scrollbar-gutter:stable;scroll-padding-top:calc(var(--mu-header) + 14px)}
+body{padding-top:var(--mu-header)!important}
+body > header:not(#mpUnifiedHeader),
+body > .demo-ribbon,
+body > .notice-bar,
+body > .mp-info-ribbon,
+body > .top-notice,
+body > .announcement-bar,
+body > .mp-announcement,
+body > .mp-site-header,
+body > .mp-nav-drawer,
+.demo-ribbon,
+.mp-old-header{display:none!important}
+/* Top explanatory banners were retired; disclosures remain inside the content and footer. */
+.mp-unified-header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:180!important;
+height:var(--mu-header)!important;min-height:var(--mu-header)!important;max-height:var(--mu-header)!important;
+margin:0!important;padding:0!important;width:100%!important;border-radius:0!important;transform:none!important}
+.mp-u-inner{height:100%!important;width:min(1380px,calc(100% - 40px))!important;max-width:1380px!important;
+margin:0 auto!important;padding:0!important;display:grid!important;
+grid-template-columns:175px minmax(0,1fr) 178px!important;gap:12px!important;align-items:center!important}
+.mp-u-brand{flex:none!important;width:175px!important;min-width:0!important;height:50px;display:flex!important;align-items:center!important}
+.mp-u-brand img{height:38px!important;width:165px!important;max-width:165px!important;object-fit:contain!important}
+.mp-u-nav{height:100%!important;min-width:0;display:flex!important;align-items:center!important;
+justify-content:center!important;flex-wrap:nowrap!important;gap:3px!important;margin:0!important}
+.mp-u-nav .mp-u-link{height:42px!important;min-height:42px!important;max-height:42px!important;
+border:1px solid transparent!important;outline-offset:2px!important;box-shadow:none!important;
+padding:9px 11px!important;line-height:22px!important;letter-spacing:-.025em!important;
+transform:none!important;text-decoration:none!important}
+.mp-u-nav .mp-u-link.is-active,.mp-u-nav .mp-u-link[aria-current=page]{border-color:#c2dcff!important}
+.mp-u-nav .mp-u-link:active{transform:none!important}
+.mp-u-actions{height:100%!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;
+gap:8px!important;min-width:0!important;width:178px!important;white-space:nowrap}
+.mp-u-actions .mp-u-auth-link{width:130px!important;min-width:130px!important;height:42px!important;min-height:42px!important;
+padding:8px 12px!important;border-radius:12px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+color:#0b56b1!important;font-weight:850!important;font-size:12px!important;background:#edf5ff!important;border:1px solid #c6defd!important;box-shadow:none!important}
+.mp-u-actions .mp-u-auth-link[hidden],.mp-u-panel .mp-u-link[hidden]{display:none!important}
+.mp-u-actions .mp-u-account[aria-current=page]{background:#dfeeff!important;color:#0956b9!important}
+.mp-u-drawer[hidden]{display:none!important}
+.mp-u-panel{box-sizing:border-box}
+@media(max-width:1350px){
+ .mp-u-inner{grid-template-columns:150px minmax(0,1fr) 150px!important;gap:7px!important}
+ .mp-u-brand{width:150px!important}.mp-u-brand img{width:148px!important}
+ .mp-u-actions{width:150px!important}
+ .mp-u-actions .mp-u-auth-link{min-width:123px!important;width:123px!important}
+ .mp-u-nav .mp-u-link{padding:9px 8px!important;font-size:12px!important}
+}
+@media(max-width:1050px){
+ .mp-u-nav{display:none!important}
+ .mp-u-inner{grid-template-columns:155px minmax(0,1fr) 178px!important;width:calc(100% - 28px)!important}
+ .mp-u-brand{width:155px!important}
+ .mp-u-actions{width:178px!important}
+ .mp-u-toggle{display:grid!important;place-items:center!important;flex:0 0 44px}
+}
+@media(max-width:520px){
+ :root{--mu-header:61px}
+ .mp-u-inner{grid-template-columns:140px minmax(0,1fr) 150px!important;gap:4px!important}
+ .mp-u-brand{width:140px!important}.mp-u-brand img{width:135px!important}
+ .mp-u-actions{width:150px!important;gap:5px!important}
+ .mp-u-actions .mp-u-auth-link{width:97px!important;min-width:97px!important;font-size:10px!important;
+ height:39px!important;min-height:39px!important;padding:8px 5px!important}
+ .mp-u-toggle{width:43px!important;min-width:43px!important}
+}
+@media(max-width:365px){
+ .mp-u-inner{grid-template-columns:127px minmax(0,1fr) 132px!important;width:calc(100% - 18px)!important}
+ .mp-u-brand{width:127px!important}.mp-u-brand img{width:122px!important}
+ .mp-u-actions{width:132px!important}.mp-u-actions .mp-u-auth-link{min-width:81px!important;width:81px!important;font-size:9px!important}
+ .mp-u-toggle{min-width:41px!important;width:41px!important}
+}
