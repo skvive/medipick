@@ -62,3 +62,15 @@ test('new static routes are registered and JS parses',()=>{
   assert.equal(result.status,0,name+': '+result.stderr);
  }
 });
+
+test('HIRA-only functions execute in Korean region and network diagnosis excludes secret URL',()=>{
+  for(const route of ['app/api/hira/status/route.ts','app/api/hira/hospitals/route.ts']){
+    const src=read(route);
+    assert.match(src,/preferredRegion='icn1'/);
+    assert.match(src,/queryHira/);
+  }
+  const client=read('lib/medipick/hira-client.ts');
+  assert.match(client,/HIRA_TIMEOUT/);
+  assert.match(client,/HIRA_NETWORK_FAILURE/);
+  assert.doesNotMatch(client,/String\(error\)/);
+});
