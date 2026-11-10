@@ -82,3 +82,17 @@ body.mp-clinic-store{background:#f5f8fe;color:#102e5c;font-family:'Noto Sans KR'
  .mp-clinic-store .mp-store-hero-image{height:145px}
  .mp-clinic-store .mp-store-cta a{width:100%;justify-content:center}
 }
+
+/* Onboarding offers — no invented monthly pricing or auto activation. */
+.mp-clinic-store .mp-store-offers{padding:22px 32px 18px;border-top:1px solid #e2ebf9}
+.mp-clinic-store .mp-store-offers-title>span{color:#2476d5;letter-spacing:.1em;font-size:10px;font-weight:900}
+.mp-clinic-store .mp-store-offers-title h2{font-size:23px;color:#123966;margin:7px 0 6px;font-weight:900;letter-spacing:-.04em}
+.mp-clinic-store .mp-store-offers-title p{font-size:12px;line-height:1.7;color:#6480a0;margin:0 0 16px}
+.mp-clinic-store .mp-store-offers-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mp-clinic-store .mp-store-offers-grid article{min-width:0;display:flex;flex-direction:column;border-radius:14px;border:1px solid #dbe8f9;padding:17px;background:#fcfdff}
+.mp-clinic-store .mp-store-offer-tag{font-size:10px;color:#146fdd;font-weight:900;letter-spacing:.1em}
+.mp-clinic-store .mp-store-offers-grid h3{font-size:18px;color:#143d73;font-weight:900;margin:9px 0}
+.mp-clinic-store .mp-store-offers-grid p{font-size:12px;line-height:1.8;color:#5e7797;flex:1;margin:0 0 14px}
+.mp-clinic-store .mp-store-offers-grid a{min-height:43px;display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:9px;border-radius:10px;background:#eaf4ff;border:1px solid #bfdbff;color:#145ab6;font-size:12px;font-weight:850;text-decoration:none}
+.mp-clinic-store .mp-store-offers-grid article:nth-child(2){border-color:#9ac6ff;box-shadow:0 8px 22px #0a6ee515}
+@media(max-width:860px){.mp-clinic-store .mp-store-offers{padding:17px}.mp-clinic-store .mp-store-offers-grid{grid-template-columns:1fr}}
