@@ -10,3 +10,34 @@ $('#blogItems').querySelectorAll('button').forEach(bt=>bt.onclick=async()=>{try{
 for(let id of ['subForm','locForm'])$('#'+id).onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target);let d=Object.fromEntries(f.entries());if(id==='subForm'){d.provider_id=+d.provider_id;d.paid=f.has('paid');d.compliance_approved=f.has('compliance_approved')}else{d.provider_id=+d.provider_id;d.lat=+d.lat;d.lng=+d.lng;d.place_reviewed=false}try{let r=await api(id==='subForm'?'/api/admin/subscriptions':'/api/admin/locations',d);feedback('저장 완료'+(r.eligible!==undefined?` · 광고노출 적격 ${r.eligible?'예':'아니오'}`:''));load()}catch(e){feedback(e.message)}};
 $('#placeCheckForm').onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target);try{let r=await api('/api/admin/google-place/verify',{provider_id:+f.get('provider_id'),google_place_id:f.get('google_place_id')});feedback('Places 대조 성공: '+r.google_name+' / 거리 '+r.distance_km+'km');load()}catch(e){feedback('장소 대조 실패: '+e.message)}};
 load();
+
+const storeForm=$('#catalogStoreForm');
+if(storeForm) storeForm.addEventListener('submit',async(event)=>{
+ event.preventDefault();
+ const target=$('#catalogStoreResult');
+ const data=new FormData(storeForm);
+ const id=Number(data.get('catalog_id'));
+ if(!Number.isSafeInteger(id)||id<1){target.textContent='올바른 공공 주소록 병원 ID가 필요합니다.';return;}
+ if(!$('#storeAdminCompliance')?.checked){target.textContent='구독·광고 준수·Blogger 소유권을 확인한 경우에만 활성화할 수 있습니다.';return;}
+ const blog=String(data.get('google_blog_url')||'').trim();
+ if(blog){try{const u=new URL(blog);if(u.protocol!=='https:'||!u.hostname.endsWith('.blogspot.com'))throw Error('주소 오류');}catch{target.textContent='자동 글 가져오기는 HTTPS blogspot.com 주소만 허용합니다. URL을 확인해 주세요.';return;}}
+ const enabled=data.has('marketing_active');
+ const body={listing_tier:enabled?'premium':'free',marketing_active:enabled,
+   marketing_expires_at:String(data.get('marketing_expires_at')||''),
+   trade_category:String(data.get('trade_category')||'').trim(),
+   google_blog_url:blog,hero_image_url:String(data.get('hero_image_url')||'').trim(),video_url:String(data.get('video_url')||'').trim(),
+   compliance_ack:true};
+ const button=storeForm.querySelector('button[type=submit]');
+ button.disabled=true;target.textContent='설정 저장 및 승인 상태 확인 중…';
+ try{
+   const result=await api('/api/admin/public-catalog/'+encodeURIComponent(id)+'/marketing',body);
+   target.replaceChildren();
+   const text=document.createElement('span');text.textContent=result.is_premium?'활성 스마트스토어 저장 완료. Google Blogger 공개글은 원문에서 가져옵니다.':'비활성 상태로 저장했습니다. 무료 주소록만 유지됩니다.';
+   target.append(text);
+   if(result.is_premium){
+     const link=document.createElement('a');link.href='/clinic-store?id='+encodeURIComponent(id);
+     link.textContent=' 스마트스토어 미리보기 ↗';link.target='_blank';link.rel='noopener noreferrer';link.style.marginLeft='12px';target.append(link);
+   }
+ }catch(e){target.textContent='저장 실패: '+e.message;}
+ finally{button.disabled=false;}
+});

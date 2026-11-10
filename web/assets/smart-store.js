@@ -30,6 +30,17 @@ let addressSearchSequence = 0;
 let viewMode = 'catalog';
 let partnerItems = [];
 let searchSequence = 0;
+let googlePlacesMarkers=[];
+let placesSearching=false;
+
+let locationMode = 'default'; // 'default' | 'geo' | 'region' (explicit user action only)
+let userLocationMarker = null;
+function setLocationStatus(value) { const el = $('#smartLocationStatus'); if (el) el.textContent = value; }
+function setPinStatus(value) { const el = $('#smartPinCount'); if (el) el.textContent = value; }
+function removeMapMarker(marker) { if (!marker) return; if (typeof marker.setMap === 'function') marker.setMap(null); else marker.map = null; }
+function markerPosition(marker) { const pos = marker?.position || marker?.getPosition?.(); return pos?.toJSON ? pos.toJSON() : pos; }
+function buildMarker(pos,title,exact,premium=false,googleSource=false) { const color=googleSource?'#7651dc':(exact?(premium?'#7453ed':'#1769f8'):'#8391a4'); if (google.maps.marker?.AdvancedMarkerElement && google.maps.marker?.PinElement) { const pin = new google.maps.marker.PinElement({background:color, borderColor:'#fff',glyphColor:'#fff',glyph:googleSource?'G':(exact?'✚':'?'),scale:1.1}); return new google.maps.marker.AdvancedMarkerElement({map,position:pos,title,content:pin.element}); } return new google.maps.Marker({map,position:pos,title,icon:{path:google.maps.SymbolPath.CIRCLE,scale:exact?9:7,fillColor:color,fillOpacity:.92,strokeWeight:2,strokeColor:'#fff'}}); }
+
 
 function defaultCenter() {
   const d = config?.default_map_center;
@@ -47,12 +58,14 @@ function mapReady() {
 function searchAtDefault(reason) {
   const d = defaultCenter();
   if (reason) showToast(reason);
+  locationMode = 'default';
+  setLocationStatus('기본 위치: ' + d.label + ' 주변 (현위치 아님)');
   return searchNearby(d.lat, d.lng);
 }
 
 function loadMaps(cb) {
   const key = config?.google_maps_browser_key;
-  if (!key) return;
+  if (!key) { setPinStatus('지도 API 설정 확인 필요 · 주소록 검색 가능'); const box=$('#smartStoreMap'); if(box&&box.classList.contains('mp-smart-map-empty')){const p=box.querySelector('p');if(p)p.textContent='Google 지도 서비스 키가 연결되지 않아 지도가 표시되지 않습니다. 병원 목록에서 Google 지도 주소 확인 링크를 이용하세요.';} return; }
   if (window.google?.maps) {
     mapsState = 'ready';
     cb?.();
@@ -74,11 +87,11 @@ function loadMaps(cb) {
   scr.src =
     'https://maps.googleapis.com/maps/api/js?key=' +
     encodeURIComponent(key) +
-    '&language=ko&region=KR&loading=async&callback=medipickSmartStoreMapReady';
+    '&language=ko&region=KR&v=weekly&libraries=marker&loading=async&callback=medipickSmartStoreMapReady';
   scr.async = true;
   scr.onerror = () => {
     mapsState = 'error';
-    showToast('Google Maps를 불러오지 못했습니다.');
+    showToast('Google Maps를 불러오지 못했습니다. 병원 주소록은 계속 검색할 수 있습니다.'); setPinStatus('지도 연결 실패 · 주소록 검색 가능');
   };
   document.head.appendChild(scr);
 }
@@ -101,7 +114,7 @@ function popupHtml(x) {
   const summary = x.summary
     ? `<p style="margin:8px 0;color:#486b57">${safe(String(x.summary).slice(0, 160))}${String(x.summary).length > 160 ? '…' : ''}</p>`
     : '';
-  const link = '';
+  const link = x.is_premium ? '<p><a href="/clinic-store?id=' + encodeURIComponent(x.id) + '">병원 스마트스토어·Blogger ↗</a></p>' : '';
   if (ui.variant === 'premium' || x.is_premium) {
     const img = ui.hero_image
       ? `<img src="${safe(ui.hero_image)}" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px">`
@@ -137,15 +150,16 @@ function ensureMap() {
     streetViewControl: false,
     mapTypeControl: false,
     fullscreenControl: true,
+    mapId: config?.google_maps_map_id || 'DEMO_MAP_ID',
   });
   infoWindow = new google.maps.InfoWindow();
   return true;
 }
 
 function clearMarkers() {
-  for (const m of markerById.values()) m.setMap(null);
+  for (const m of markerById.values()) removeMapMarker(m);
   markerById.clear();
-  if (liveAddressMarker) liveAddressMarker.setMap(null);
+  if (liveAddressMarker) removeMapMarker(liveAddressMarker);
   liveAddressMarker = null;
   liveAddressId = null;
   addressSearchSequence += 1;
@@ -160,7 +174,7 @@ function openStore(id, pan = true) {
   showCatalogDetail(x);
   if (!map || !marker) return;
   if (pan) {
-    map.panTo(marker.getPosition());
+    map.panTo(markerPosition(marker));
     map.setZoom(Math.max(map.getZoom(), 14));
   }
   infoWindow.setContent(popupHtml(x));
@@ -204,7 +218,7 @@ async function locateStoreAddress(id) {
     return;
   }
   if (liveAddressId === id && liveAddressMarker) {
-    map.panTo(liveAddressMarker.getPosition());
+    map.panTo(markerPosition(liveAddressMarker));
     map.setZoom(16);
     return;
   }
@@ -219,16 +233,7 @@ async function locateStoreAddress(id) {
       return;
     }
     if (liveAddressMarker) liveAddressMarker.setMap(null);
-    liveAddressMarker = new google.maps.Marker({
-      map,
-      position: found.geometry.location,
-      title: x.name + ' · Google 주소 검색 위치(병원 운영 여부 미검증)',
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE, scale: 11,
-        fillColor: '#2563eb', fillOpacity: 0.95,
-        strokeWeight: 2, strokeColor: '#fff',
-      },
-    });
+    liveAddressMarker = buildMarker(found.geometry.location,'Google 주소 검색 위치(병원 운영 여부 미검증) · '+x.name,true,false);
     liveAddressId = id;
     const popup = '<div class="mp-store-popup"><strong>' + safe(x.name) + '</strong>' +
       '<p>Google 주소 검색 결과: 도로명·건물번호 일치</p>' +
@@ -280,6 +285,7 @@ function showCatalogDetail(item) {
     (hasAddress ? '<button type="button" class="mp-smart-detail-geocode">◎ Google 주소 위치 조회</button>' : '') +
     (address ? '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery +
       '" rel="noopener noreferrer" target="_blank">Google 지도에서 확인 ↗</a>' : '') +
+    (pro ? '<a href="/clinic-store?id=' + encodeURIComponent(item.id) + '">입점 병원 스마트스토어 ↗</a>' : '') +
     '</div>' +
     (pro ? '<p class="mp-smart-paid">유료 구독 정보창 · 진료 품질 또는 실력 순위가 아닙니다.</p>' : '') +
     '<p class="mp-smart-detail-note">' + safe(disclosure) + '</p>';
@@ -344,38 +350,53 @@ function renderList() {
   const list = $('#smartList');
   const meta = $('#smartListMeta');
   if (!list) return;
+  const compact = document.body.classList.contains('mp-reference-home');
   const title = $('#smartListTitle');
-  if (title) title.textContent = '전국 병원 주소록 · 개별 확인 필요';
+  if (title) title.textContent = compact ? (locationMode === 'geo' ? '현재 위치 주변 병원' : '병원 주소록 검색 결과') : '전국 병원 주소록 · 개별 확인 필요';
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">조건에 맞는 병원 주소록이 없습니다. 지역·진료과 검색 조건을 바꿔 보세요. 실제 지도 핀은 검증된 좌표에만 표시됩니다.</div>';
-    if (meta) meta.textContent = '검증된 핀 0건';
+    list.innerHTML = '<div class="empty-state">조건에 맞는 병원 주소록이 없습니다. 지역·진료과를 변경하거나 Google 지도 장소 검색을 선택해 주세요. 실제 병원 핀은 검증 좌표만 표시됩니다.</div>';
+    if (meta) meta.textContent = '확인된 병원 핀 0건';
     return;
   }
-  if (meta) meta.textContent = items.length + '건 지역 주소록 · ' + items.filter((item) => item.geocode_status === 'exact').length + '건 검증된 좌표';
-  list.innerHTML = items
-    .map(
-      (x) => {
-        const pro = x.is_premium ? ' mp-smart-item--pro' : '';
-        const badge = x.ui?.badge || '병원 정보';
-        const distLabel = x.distance_km == null ? '전국 목록 검색 · 거리 미산정' :
-          (x.geocode_status === 'exact' ? '직선거리' : '좌표상 추정거리(실거리 아님)') + ' 약 ' + Number(x.distance_km).toFixed(2) + ' km';
-        const lookup = x.address && x.district
-          ? `<button type="button" class="mp-smart-geocode" data-geocode-id="${x.id}">◎ Google 주소 위치 조회 · 임시 핀</button>`
-          : '<span class="mp-smart-no-address">주소 미등록 · 위치 조회 불가</span>';
-        return `<article class="mp-smart-item${pro}" data-id="${x.id}"><button type="button" class="mp-smart-item-main" data-open-id="${x.id}"><small>${safe(badge)}</small><h3>${safe(x.name)}</h3><p>${safe(x.trade_category || '의료기관')} · ${safe(x.region)} ${safe(x.district)}</p><p>${safe(x.address || '주소 정보 없음')}</p><div class="dist">${safe(distLabel)}</div></button><div class="mp-smart-actions">${lookup}</div></article>`;
-      },
-    )
-    .join('');
-  list.querySelectorAll('[data-open-id]').forEach((btn) => {
-    btn.onclick = () => {
-      openStore(+btn.dataset.openId, true);
-      if (matchMedia('(max-width:900px)').matches) {
-        $('#smartDetail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    };
+  if (meta) meta.textContent = items.length + '건 주소록 후보 · 정확좌표 '+items.filter(item=>item.geocode_status === 'exact').length+'건';
+  const safeTel=(value)=>{const tel=String(value||'').replace(/[^+0-9]/g,'');return /^\+?\d{8,15}$/.test(tel)?tel:'';};
+  list.innerHTML = items.map(x=>{
+    const pro=x.is_premium?' mp-smart-item--pro':'';
+    const badge=x.ui?.badge||'병원 주소록';
+    const distLabel=x.distance_km==null?'실제 거리 미확인':
+      (x.geocode_status==='exact'?'직선거리 약 ':'추정 좌표 거리 약 ')+Number(x.distance_km).toFixed(2)+' km';
+    const lookup=x.address&&x.district
+      ? '<button type="button" class="mp-smart-geocode" data-geocode-id="'+x.id+'">◎ Google 주소 위치 확인</button>'
+      : '<span class="mp-smart-no-address">주소 확인 필요</span>';
+    if(compact){
+      // Blue outline artwork is deliberately illustrative, not an actual hospital facade.
+      const call=safeTel(x.phone);
+      const contact=call?'<a href="tel:'+safe(call)+'" class="mp-ref-list-cta" aria-label="'+safe(x.name)+' 전화">☎</a>':'';
+      return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
+        '<button class="mp-smart-item-main" type="button" data-open-id="'+x.id+'">'+
+          '<span class="mp-ref-list-icon" aria-hidden="true">✚</span>'+
+          '<span class="mp-ref-list-copy"><span class="mp-ref-list-title">'+safe(x.name)+'</span>'+
+          '<small>'+safe(badge)+' · '+safe(x.trade_category||'의료기관')+'</small>'+
+          '<p>'+safe([x.region,x.district].filter(Boolean).join(' '))+' · '+safe(x.address||'주소 미등록')+'</p>'+
+          '<p>'+safe(distLabel)+'</p></span></button>'+
+          '<div class="mp-smart-actions">'+contact+'<button type="button" class="mp-ref-list-cta" data-open-id="'+x.id+'">상세보기</button>'+lookup+
+            (x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':'')+
+          '</div></article>';
+    }
+    return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
+      '<button type="button" class="mp-smart-item-main" data-open-id="'+x.id+'"><small>'+safe(badge)+'</small>'+
+      '<h3>'+safe(x.name)+'</h3><p>'+safe(x.trade_category||'의료기관')+' · '+safe(x.region)+' '+safe(x.district)+'</p>'+
+      '<p>'+safe(x.address||'주소 정보 없음')+'</p><div class="dist">'+safe(distLabel)+'</div></button>'+
+      '<div class="mp-smart-actions">'+lookup+(x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':'')+'</div></article>';
+  }).join('');
+  list.querySelectorAll('[data-open-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      openStore(+btn.dataset.openId,true);
+      if(matchMedia('(max-width:700px)').matches) $('#smartDetail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
   });
-  list.querySelectorAll('[data-geocode-id]').forEach((btn) => {
-    btn.onclick = () => locateStoreAddress(+btn.dataset.geocodeId);
+  list.querySelectorAll('[data-geocode-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>locateStoreAddress(+btn.dataset.geocodeId));
   });
 }
 
@@ -393,24 +414,19 @@ function renderMapMarkers() {
     const pos = { lat, lng };
     const precise = x.geocode_status === 'exact';
     if (!precise && !$('#smartEstimated')?.checked) continue;
-    const marker = new google.maps.Marker({
-      map,
-      position: pos,
-      title: x.name + (precise ? '' : ' · 추정 위치'),
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: x.is_premium ? 9 : 8,
-        fillColor: precise ? (x.is_premium ? '#ff2d6a' : '#167764') : '#7d8c9b',
-        fillOpacity: precise ? 0.92 : 0.62,
-        strokeWeight: precise ? 2 : 1,
-        strokeColor: '#fff',
-      },
-    });
+    const marker = buildMarker(pos, x.name + (precise ? ' · 검증좌표' : ' · 추정 위치 (실주소 아님)'), precise, x.is_premium);
     marker.addListener('click', () => openStore(x.id, false));
     markerById.set(x.id, marker);
     bounds.extend(pos);
   }
   if (center) bounds.extend(center);
+  const exactCount = items.filter(x=>x.geocode_status==='exact' && markerById.has(x.id)).length;
+  setPinStatus(exactCount+'개 검증 병원 핀' + (markerById.size > exactCount ? ' · 추정 '+(markerById.size-exactCount)+'개' : ''));
+  if (locationMode==='geo' && center) {
+    removeMapMarker(userLocationMarker);
+    userLocationMarker=buildMarker(center,'내 현위치 (브라우저 제공)',true,false);
+    if (userLocationMarker.content?.querySelector) { const glyph=userLocationMarker.content.querySelector('.gm-pin-glyph'); if(glyph) glyph.textContent='●'; }
+  } else { removeMapMarker(userLocationMarker); userLocationMarker=null; }
   if (markerById.size) map.fitBounds(bounds, 48);
   else if (center) {
     map.setCenter(center);
@@ -419,12 +435,13 @@ function renderMapMarkers() {
 }
 
 async function searchNearby(lat, lng) {
+  clearGooglePlacesResults();
   center = { lat, lng };
   const requestId = ++searchSequence;
   const q = ($('#smartQ')?.value || '').trim();
   const trade = ($('#smartTrade')?.value || '').trim();
   const region = $('#smartRegion')?.value || '';
-  const radius = $('#smartRadius')?.value || '20';
+  const radius = $('#smartRadius')?.value || '3';
   const usingEstimates = Boolean($('#smartEstimated')?.checked);
   const notice = $('#smartNotice');
   if (viewMode === 'partners') {
@@ -445,14 +462,23 @@ async function searchNearby(lat, lng) {
 
   partnerItems = [];
   resetDetail();
-  const radiusMode = usingEstimates && !q;
+  // Nearby must work even when estimated pins are OFF; the old condition incorrectly ran nationwide search.
+  const radiusMode = locationMode === 'geo' || (locationMode === 'default' && !q);
   const endpoint = radiusMode ? '/api/public-catalog/nearby' : '/api/public-catalog/search';
   const searchParams = radiusMode
-    ? new URLSearchParams({ lat, lng, radius, limit: '120', include_estimated: '1', trade })
+    ? new URLSearchParams({ lat, lng, radius, limit: '120', include_estimated: usingEstimates?'1':'0', q, trade })
     : new URLSearchParams({ q, region, trade, limit: '80' });
   const res = await api(endpoint + '?' + searchParams.toString());
   if (requestId !== searchSequence) return;
   items = Array.isArray(res.items) ? res.items : [];
+  // Exact nearby records can be empty; never fill a map with unverified proxy coordinates.
+  if (radiusMode && items.length === 0) {
+    setPinStatus('주변 검증 좌표 0개 · 주소록 목록으로 확인');
+    const fall = await api('/api/public-catalog/search?' + new URLSearchParams({ q, region:locationMode==='geo'?'':region, trade, limit:'24' }));
+    if (requestId !== searchSequence) return;
+    items = Array.isArray(fall.items) ? fall.items : [];
+    showToast('반경 내 검증 좌표가 없어 주소록 후보를 표시합니다. 이 목록은 주변 거리순이 아닙니다.');
+  }
   if (!radiusMode && items.length === 80) {
     showToast('첫 80건의 병원 주소록 후보입니다. 지역·병원명·진료과를 구체화해 주세요.');
   }
@@ -463,8 +489,8 @@ async function searchNearby(lat, lng) {
   renderList();
   loadMaps(() => renderMapMarkers());
   if (notice) notice.textContent = radiusMode
-    ? '※ 선택해 표시한 회색 추정핀은 시·도 중심에 편차를 준 가상 좌표입니다. 실제 병원 위치·직선거리·운영 여부를 뜻하지 않습니다.'
-    : '※ 전국 병원 주소록 검색 결과입니다. 주소록에 있는 좌표는 아직 검증되지 않았습니다. 실제 병원 핀은 검증 좌표만 표시하며 Google 주소 위치 조회는 사용자가 선택한 병원 한 건에 대해서만 실행합니다.';
+    ? (usingEstimates ? '주의: 직접 켠 회색 추정핀은 실제 병원 위치가 아닙니다.' : '반경 검색은 검증된 정확좌표만 사용합니다. 주변 검증 병원이 없으면 주소록 후보를 별도로 표시하며 거리를 표시하지 않습니다.')
+    : '전국 주소록 검색 결과입니다. 지도 핀은 정확좌표가 검증된 병원만 표시하며 병원 운영·진료 여부를 보증하지 않습니다.';
 }
 
 async function initStats() {
@@ -483,6 +509,8 @@ async function initStats() {
 }
 
 function bindUi() {
+  $('#smartGooglePlaces')?.addEventListener('click', searchGooglePlacesOnDemand);
+  $('#clearGooglePlaces')?.addEventListener('click',clearGooglePlacesResults);
   $('#smartSearchForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
     const at = center || defaultCenter();
@@ -493,15 +521,16 @@ function bindUi() {
       searchAtDefault('위치 기능을 지원하지 않아 가락시장역 기준으로 조회합니다.').catch((e) => showToast(e.message));
       return;
     }
+    setLocationStatus('현위치 권한을 확인하는 중…');
     navigator.geolocation.getCurrentPosition(
-      (pos) => searchNearby(pos.coords.latitude, pos.coords.longitude).catch((e) => showToast(e.message)),
-      () => searchAtDefault('현위치를 확인할 수 없어 가락시장역 기준으로 조회합니다.').catch((e) => showToast(e.message)),
-      { timeout: 12000, maximumAge: 60000 },
+      (pos) => { locationMode='geo'; if($('#smartRegion')) $('#smartRegion').value=''; setLocationStatus('현위치 검색 · 브라우저 제공 위치 (약 '+Number(pos.coords.accuracy||0).toFixed(0)+'m 정확도)'); searchNearby(pos.coords.latitude,pos.coords.longitude).catch(e=>showToast(e.message)); },
+      () => searchAtDefault('현위치 권한을 얻지 못해 가락시장역 기준으로 검색합니다.').catch((e) => showToast(e.message)),
+      { enableHighAccuracy:true, timeout: 12000, maximumAge: 60000 },
     );
   });
   $('#smartDemo')?.addEventListener('click', () => {
     const at = defaultCenter();
-    searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
+    locationMode='default';setLocationStatus('기본 위치: '+at.label+' 주변 (현위치 아님)');searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
   });
   const updateMode = () => {
     viewMode = document.querySelector('input[name="smartMode"]:checked')?.value === 'partners'
@@ -521,6 +550,7 @@ function bindUi() {
   });
   ['smartRadius', 'smartEstimated', 'smartRegion'].forEach((id) => {
     $('#' + id)?.addEventListener('change', () => {
+      if(id==='smartRegion'){ locationMode='region';setLocationStatus('선택 지역 주소록 검색 · 위치 기반 거리 검색 아님'); }
       const at = center || defaultCenter();
       searchNearby(at.lat, at.lng).catch((e) => showToast(e.message));
     });
@@ -577,6 +607,136 @@ async function init() {
     }
   } catch (e) {
     showToast('초기화 실패: ' + e.message);
+  }
+}
+
+/**
+ * Google Places API (New) — explicit on-demand place search. Billing may apply.
+ * Results are separate, non-persistent Google places, NOT verified MediPick hospitals.
+ * Never write Google Place details or temporary positions into the local catalog.
+ */
+function clearGooglePlacesResults(){
+  googlePlacesMarkers.forEach(removeMapMarker);
+  googlePlacesMarkers=[];
+  const panel=$('#googlePlacesSection');
+  if(panel)panel.hidden=true;
+  const list=$('#googlePlacesResults');
+  if(list)list.replaceChildren();
+  const sidebar=$('#smartList');
+  if(sidebar?.dataset.source==='google-places'){
+    sidebar.dataset.source='catalog';
+    if(viewMode==='catalog') renderList();
+  }
+}
+function googlePlaceLink(p){
+  try{
+    const u=new URL(String(p.googleMapsURI||''));
+    if(u.protocol==='https:' && (u.hostname==='maps.google.com'||u.hostname==='www.google.com'||u.hostname==='google.com')) return u.toString();
+  }catch{}
+  return '';
+}
+function googlePlaceCard(place,marker){
+  const name=String(place.displayName||'의료기관 장소 정보').slice(0,120);
+  const address=String(place.formattedAddress||'주소를 Google 지도에서 확인하세요').slice(0,180);
+  const card=document.createElement('article');
+  card.className='mp-google-place-card';
+  const heading=document.createElement('strong');heading.textContent=name;
+  const where=document.createElement('p');where.textContent=address;
+  const actions=document.createElement('div');actions.className='mp-google-place-actions';
+  const pin=document.createElement('button');pin.type='button';pin.textContent='지도에서 위치 보기';pin.onclick=()=>{
+    if(marker&&map&&place.location){
+      map.panTo(place.location);
+      map.setZoom(Math.max(Number(map.getZoom()||12),15));
+      infoWindow?.setContent('<div class="mp-store-popup"><strong>'+safe(name)+'</strong><p>'+safe(address)+'</p><small>Google Places 검색 결과 · 진료·운영 여부 확인 필요</small></div>');
+      if(infoWindow)infoWindow.open({map,anchor:marker});
+      document.getElementById('smartStoreMap')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  };
+  actions.appendChild(pin);
+  const uri=googlePlaceLink(place);
+  if(uri){const a=document.createElement('a');a.href=uri;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Google 지도 원문 ↗';actions.appendChild(a);}
+  card.append(heading,where,actions);
+  return card;
+}
+async function searchGooglePlacesOnDemand(){
+  const button=$('#smartGooglePlaces'),panel=$('#googlePlacesSection'),holder=$('#googlePlacesResults');
+  if(!button||!panel||!holder||placesSearching)return;
+  clearGooglePlacesResults();
+  panel.hidden=false;
+  holder.textContent='Google Places 지도 검색을 불러오고 있습니다. 사용자 요청에 의한 조회이며 API 사용량에 과금될 수 있습니다.';
+  button.disabled=true;placesSearching=true;
+  try{
+    if(!config?.google_maps_browser_key)throw new Error('Google Maps 브라우저 키가 구성되지 않았습니다.');
+    if(!mapReady()){
+      await new Promise((resolve,reject)=>{
+        loadMaps(resolve);
+        window.setTimeout(()=>mapReady()?resolve():reject(new Error('Google 지도 초기화 실패')),8500);
+      });
+    }
+    if(!ensureMap())throw new Error('Google 지도 화면을 준비할 수 없습니다.');
+    if(!google.maps.importLibrary)throw new Error('현재 Google 지도 SDK가 Places API (New)를 지원하지 않습니다.');
+    const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
+    if(!Place?.searchNearby)throw new Error('Google Places API (New) 이용이 활성화되지 않았습니다.');
+    const point=center||defaultCenter();
+    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
+    const query={
+      fields:['displayName','location','formattedAddress','googleMapsURI'],
+      locationRestriction:{center:{lat:Number(point.lat),lng:Number(point.lng)},radius},
+      includedTypes:['hospital','doctor','dentist'],
+      maxResultCount:15,
+      rankPreference:SearchNearbyRankPreference?.DISTANCE||'DISTANCE'
+    };
+    const result=await Place.searchNearby(query);
+    const places=(Array.isArray(result?.places)?result.places:[]).filter(p=>p?.location&&p?.displayName);
+    holder.replaceChildren();
+    if(!places.length){
+      const empty=document.createElement('p');empty.className='mp-google-places-empty';
+      empty.textContent='선택한 범위에서 Google Places 의료기관 장소 검색 결과가 없습니다. 반경이나 위치를 변경해 다시 검색해 주세요.';
+      holder.appendChild(empty);
+      return;
+    }
+    const bounds=new google.maps.LatLngBounds();
+    for(const place of places){
+      const name=String(place.displayName||'병원 장소');
+      const marker=buildMarker(place.location,'Google Places 장소 · '+name,true,false,true);
+      googlePlacesMarkers.push(marker);
+      marker.addListener?.('click',()=>{
+        const card=googlePlaceCard(place,marker);
+        const button=card.querySelector('button');
+        button?.click();
+      });
+      bounds.extend(place.location);
+      holder.appendChild(googlePlaceCard(place,marker));
+    }
+    bounds.extend(point);
+    if(map)map.fitBounds(bounds,50);
+    const count=document.createElement('p');count.className='mp-google-places-attribution';
+    count.textContent='Google Maps Platform Places 검색 결과 '+places.length+'곳 · 자체 의료기관 인증이나 영업 여부 확인이 아닙니다. 출처: Google 지도.';
+    holder.prepend(count);
+    if(document.body.classList.contains('mp-reference-home')){
+      // The reference design's right-side list must follow the same Google markers.
+      const sidebar=$('#smartList'),label=$('#smartListTitle'),meta=$('#smartListMeta');
+      if(sidebar){
+        sidebar.dataset.source='google-places';
+        const back=document.createElement('button');back.type='button';back.className='mp-ref-places-back';
+        back.textContent='← 메디픽 주소록 목록으로 돌아가기';
+        back.addEventListener('click',clearGooglePlacesResults);
+        const attribution=document.createElement('p');attribution.className='mp-google-places-attribution';
+        attribution.textContent='Google 지도 검색 결과 · 의료기관 운영/진료 확인 필요';
+        sidebar.replaceChildren(back,attribution,...places.map((p,i)=>googlePlaceCard(p,googlePlacesMarkers[i])));
+      }
+      if(label)label.textContent='Google 지도 주변 의료기관';
+      if(meta)meta.textContent=places.length+'곳 · 외부 Places 검색';
+      panel.hidden=true; // Prevent a redundant long list below the map.
+    } else {
+      panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  }catch(error){
+    clearGooglePlacesResults();
+    panel.hidden=false;
+    holder.textContent='Google Places 검색을 표시하지 못했습니다: '+String(error?.message||'API 사용 불가')+' · Google Cloud에서 Places API (New) 활성화 및 브라우저 키 권한을 확인하세요. 기존 병원 주소록과 개별 지도 확인 링크는 계속 이용할 수 있습니다.';
+  }finally{
+    button.disabled=false;placesSearching=false;
   }
 }
 

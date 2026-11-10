@@ -1,0 +1,30 @@
+name: MEDIPICK map + Blogger storefront contract
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'app/api/clinic-store/**'
+      - 'tests/map-first-contract.test.mjs'
+      - 'next.config.ts'
+      - '.github/workflows/medipick-map-store-contract.yml'
+  push:
+    branches:
+      - 'chatgpt/map-first-*'
+    paths:
+      - 'web/**'
+      - 'app/api/clinic-store/**'
+      - 'tests/map-first-contract.test.mjs'
+      - 'next.config.ts'
+      - '.github/workflows/medipick-map-store-contract.yml'
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Check map, listing, Blogger and storefront contracts
+        run: node --test tests/map-first-contract.test.mjs
