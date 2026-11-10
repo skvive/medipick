@@ -359,7 +359,7 @@ function renderList() {
     return;
   }
   if (meta) meta.textContent = items.length + '건 주소록 후보 · 정확좌표 '+items.filter(item=>item.geocode_status === 'exact').length+'건';
-  const safeTel=(value)=>/^\\+?[0-9-]{8,20}$/.test(String(value||'').trim())?String(value).trim().replace(/-/g,''):'';
+  const safeTel=(value)=>{const tel=String(value||'').replace(/[^+0-9]/g,'');return /^\+?\d{8,15}$/.test(tel)?tel:'';};
   list.innerHTML = items.map(x=>{
     const pro=x.is_premium?' mp-smart-item--pro':'';
     const badge=x.ui?.badge||'병원 주소록';
