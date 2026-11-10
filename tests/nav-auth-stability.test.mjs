@@ -71,3 +71,13 @@ test('My Page reads real session and links only to existing services',()=>{
  assert.match(page,/서버 동기화 전/);
  assert.match(page,/별도 기관 승인 필요/);
 });
+
+test('same-origin Neon Auth proxy rejects non-Google login methods',()=>{
+ const route=read('app/api/auth/[...path]/route.ts');
+ assert.match(route,/sign-in\\/email/);
+ assert.match(route,/sign-up\\/email/);
+ assert.match(route,/sign-in\\/social/);
+ assert.match(route,/data\\?\\.provider !== 'google'/);
+ assert.match(route,/return handlers\.POST\(request\)/);
+ assert.match(route,/status: 403/);
+});
