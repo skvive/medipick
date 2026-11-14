@@ -195,9 +195,13 @@ with sync_playwright() as pw:
                             if native_menu.evaluate("(el) => el.open"):
                                 page.locator("#mpRefHeroTitle").click(timeout=3000)
                             outside_closed = not native_menu.evaluate("(el) => el.open")
-                            row["reference_menu"] = "passed" if all(
-                                (opened, open_label, links_available, closed, focus_returned, outside_closed)
-                            ) else "failed"
+                            row["reference_menu_assertions"] = {
+                                "opened": opened, "open_label": open_label,
+                                "links_available": links_available, "closed_on_escape": closed,
+                                "focus_returned": focus_returned,
+                                "closed_on_outside_click": outside_closed,
+                            }
+                            row["reference_menu"] = "passed" if all(row["reference_menu_assertions"].values()) else "failed"
                 rows.append(row)
                 if width in (390, 1440):
                     page.screenshot(path=str(OUT / (file.stem + "-" + str(width) + ".png")), timeout=20000)
