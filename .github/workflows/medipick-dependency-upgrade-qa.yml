@@ -1,0 +1,63 @@
+name: MEDIPICK dependency upgrade build and audit gate
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/medipick-dependency-upgrade-qa.yml
+  push:
+    branches:
+      - 'chatgpt/medipick-dependency-upgrade-*'
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/medipick-dependency-upgrade-qa.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEON_AUTH_BASE_URL: https://example.invalid/neondb/auth
+      NEON_AUTH_COOKIE_SECRET: build-only-never-used-for-production-1234567890
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install committed lockfile without lifecycle scripts
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit all dependencies and block moderate/high/critical
+        shell: bash
+        run: |
+          npm audit --json > npm-audit-dependencies.json || true
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const a=JSON.parse(fs.readFileSync('npm-audit-dependencies.json','utf8'));
+          if(!a.metadata?.vulnerabilities)throw Error('npm audit did not return metadata');
+          const v=a.metadata.vulnerabilities;
+          console.log(JSON.stringify({low:v.low||0,moderate:v.moderate||0,high:v.high||0,critical:v.critical||0}));
+          if((v.moderate||0)+(v.high||0)+(v.critical||0)>0)process.exit(1);
+          NODE
+      - name: Ensure deployment build has no DB writes
+        run: node scripts/check-deploy-build-safety.mjs
+      - name: Run authentication, location and UI contract regressions
+        run: |
+          node --test tests/admin-auth-security.test.mjs tests/privileged-key-security.test.mjs
+          node --test tests/geo2km-hira-pharmacy.test.mjs tests/map-first-contract.test.mjs tests/unified-navigation-hira.test.mjs tests/nav-auth-stability.test.mjs
+      - name: Build full current v10 application on upgraded Next.js
+        run: npm run build
+      - name: Upload nonsecret dependency audit JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICK-v10-Dependency-Audit-Next16
+          path: npm-audit-dependencies.json
+          if-no-files-found: warn
+          retention-days: 14
