@@ -172,6 +172,45 @@ with sync_playwright() as pw:
                         page.keyboard.press("Escape")
                         focus_return = page.evaluate("document.activeElement?.id === 'mpMenuToggle'")
                         row["keyboard_focus"] = "passed" if (focus_open and wrapped_to_last and wrapped_to_first and focus_return) else "failed"
+                    # The public site uses dynamically injected unified navigation.
+                    # Legacy <details> in the reference home is inert and intentionally
+                    # hidden; only test what a visitor can actually interact with.
+                    unified_menu = page.locator("#mpUnifiedMenuToggle")
+                    unified_drawer = page.locator("#mpUnifiedDrawer")
+                    if file.name == "index.html" and (
+                        unified_menu.count() != 1 or not unified_menu.is_visible()
+                    ):
+                        row["unified_menu"] = "failed"
+                    if unified_menu.count() == 1 and unified_menu.is_visible():
+                        bounds = unified_menu.bounding_box()
+                        row["unified_menu_right_inset_px"] = (
+                            round(width - bounds["x"] - bounds["width"], 2) if bounds else -1
+                        )
+                        unified_menu.click(timeout=3000)
+                        opened = unified_drawer.evaluate("(el) => !el.hidden")
+                        expanded = unified_menu.get_attribute("aria-expanded") == "true"
+                        close_focused = page.evaluate(
+                            "document.activeElement?.classList.contains('mp-u-close') === true"
+                        )
+                        links_available = unified_drawer.locator(".mp-u-panel a[href]").count() >= 7
+                        page.keyboard.press("Escape")
+                        closed = unified_drawer.evaluate("(el) => el.hidden")
+                        focus_returned = unified_menu.evaluate("(el) => document.activeElement === el")
+                        unified_menu.click(timeout=3000)
+                        # Click the backdrop's exposed left edge rather than its center;
+                        # the drawer panel intentionally overlays the center of the screen.
+                        page.mouse.click(5, height // 2)
+                        backdrop_closed = unified_drawer.evaluate("(el) => el.hidden")
+                        row["unified_menu_assertions"] = {
+                            "opened": opened, "aria_expanded": expanded,
+                            "close_focused": close_focused, "links_available": links_available,
+                            "closed_on_escape": closed, "focus_returned": focus_returned,
+                            "closed_on_backdrop": backdrop_closed,
+                            "safe_inset": row["unified_menu_right_inset_px"] >= 8,
+                        }
+                        row["unified_menu"] = (
+                            "passed" if all(row["unified_menu_assertions"].values()) else "failed"
+                        )
                 rows.append(row)
                 if width in (390, 1440):
                     page.screenshot(path=str(OUT / (file.stem + "-" + str(width) + ".png")), timeout=20000)
@@ -185,9 +224,9 @@ with sync_playwright() as pw:
 failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) > 6 or
             row.get("duplicate_ids") or row.get("missing_alt") or
             row.get("broken_assets") or row.get("brokenLocalImages", 0) > 0 or
-            row.get("menu_check") == "failed" or row.get("menu_safe_area") == "failed" or row.get("keyboard_focus") == "failed" or row.get("errors")]
+            row.get("menu_check") == "failed" or row.get("menu_safe_area") == "failed" or row.get("keyboard_focus") == "failed" or row.get("unified_menu") == "failed" or row.get("errors")]
 report = {
-    "mode": "offline actual HTML/CSS across Chromium/Firefox/WebKit, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
+    "mode": "offline actual HTML/CSS and real unified navigation open/close/Escape/backdrop/focus across Chromium/Firefox/WebKit; live APIs and authenticated buttons excluded",
     "browser": BROWSER_NAME,
     "pages": len(PAGES), "sizes": [x[0] for x in SIZES],
     "cases": len(rows), "failures": len(failures), "failed_cases": failures, "rows": rows,
