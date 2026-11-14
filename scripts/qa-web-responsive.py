@@ -197,7 +197,9 @@ with sync_playwright() as pw:
                         closed = unified_drawer.evaluate("(el) => el.hidden")
                         focus_returned = unified_menu.evaluate("(el) => document.activeElement === el")
                         unified_menu.click(timeout=3000)
-                        page.locator("#mpUnifiedDrawer .mp-u-backdrop").click(timeout=3000)
+                        # Click the backdrop's exposed left edge rather than its center;
+                        # the drawer panel intentionally overlays the center of the screen.
+                        page.mouse.click(5, height // 2)
                         backdrop_closed = unified_drawer.evaluate("(el) => el.hidden")
                         row["unified_menu_assertions"] = {
                             "opened": opened, "aria_expanded": expanded,
