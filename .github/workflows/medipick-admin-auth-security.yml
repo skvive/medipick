@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'lib/medipick/auth.ts'
+      - 'lib/medipick/helpers.ts'
+      - 'tests/privileged-key-security.test.mjs'
       - 'web/admin.html'
       - 'tests/admin-auth-security.test.mjs'
       - '.github/workflows/medipick-admin-auth-security.yml'
@@ -32,6 +34,6 @@ jobs:
       - name: Install pinned dependencies without lifecycle scripts
         run: npm ci --ignore-scripts
       - name: Verify admin fail-closed behavior and cookie integrity
-        run: node --test tests/admin-auth-security.test.mjs
+        run: node --test tests/admin-auth-security.test.mjs tests/privileged-key-security.test.mjs
       - name: Verify build does not mutate database
         run: node scripts/check-deploy-build-safety.mjs
