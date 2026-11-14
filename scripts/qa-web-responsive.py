@@ -24,6 +24,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 SIZES = [(320, 720), (390, 844), (768, 1024), (1024, 768), (1440, 900)]
 PAGES = sorted(WEB.glob("*.html"))
 CHROME = (WEB / "assets/site-chrome.js").read_text(encoding="utf-8") if (WEB / "assets/site-chrome.js").is_file() else ""
+HOME_JS = (WEB / "assets/medipick-reference-home.js").read_text(encoding="utf-8") if (WEB / "assets/medipick-reference-home.js").is_file() else ""
 rows = []
 
 def embed_asset(src):
@@ -69,6 +70,11 @@ def prepare_html(file):
         script = soup.new_tag("script")
         script.string = CHROME
         if soup.body: soup.body.append(script)
+    if file.name == "index.html" and HOME_JS and soup.body:
+        # Enable only the actual mobile menu interaction script, not live map/API calls.
+        script = soup.new_tag("script")
+        script.string = HOME_JS
+        soup.body.append(script)
     return str(soup), {"duplicate_ids": duplicate_ids, "missing_alt": missing_alt,
                         "broken_assets": sorted(set(broken_assets))}
 
@@ -172,6 +178,26 @@ with sync_playwright() as pw:
                         page.keyboard.press("Escape")
                         focus_return = page.evaluate("document.activeElement?.id === 'mpMenuToggle'")
                         row["keyboard_focus"] = "passed" if (focus_open and wrapped_to_last and wrapped_to_first and focus_return) else "failed"
+                    if file.name == "index.html":
+                        native_menu = page.locator("details.mp-ref-mobile-menu")
+                        native_summary = page.locator("details.mp-ref-mobile-menu summary")
+                        if native_menu.count() != 1 or not native_summary.is_visible():
+                            row["reference_menu"] = "failed"
+                        else:
+                            native_summary.click(timeout=3000)
+                            opened = native_menu.evaluate("(el) => el.open")
+                            open_label = native_summary.get_attribute("aria-label") == "전체 메뉴 닫기"
+                            links_available = native_menu.locator("nav a[href]").count() >= 7
+                            page.keyboard.press("Escape")
+                            closed = not native_menu.evaluate("(el) => el.open")
+                            focus_returned = native_summary.evaluate("(el) => document.activeElement === el")
+                            native_summary.click(timeout=3000)
+                            if native_menu.evaluate("(el) => el.open"):
+                                page.locator("#mpRefHeroTitle").click(timeout=3000)
+                            outside_closed = not native_menu.evaluate("(el) => el.open")
+                            row["reference_menu"] = "passed" if all(
+                                (opened, open_label, links_available, closed, focus_returned, outside_closed)
+                            ) else "failed"
                 rows.append(row)
                 if width in (390, 1440):
                     page.screenshot(path=str(OUT / (file.stem + "-" + str(width) + ".png")), timeout=20000)
@@ -185,9 +211,9 @@ with sync_playwright() as pw:
 failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) > 6 or
             row.get("duplicate_ids") or row.get("missing_alt") or
             row.get("broken_assets") or row.get("brokenLocalImages", 0) > 0 or
-            row.get("menu_check") == "failed" or row.get("menu_safe_area") == "failed" or row.get("keyboard_focus") == "failed" or row.get("errors")]
+            row.get("menu_check") == "failed" or row.get("menu_safe_area") == "failed" or row.get("keyboard_focus") == "failed" or row.get("reference_menu") == "failed" or row.get("errors")]
 report = {
-    "mode": "offline actual HTML/CSS across Chromium/Firefox/WebKit, only site-chrome.js for drawer; live APIs and authenticated buttons excluded",
+    "mode": "offline actual HTML/CSS, site-chrome.js drawer and v10 home disclosure open/close/Escape/outside-click across Chromium/Firefox/WebKit; live APIs and authenticated buttons excluded",
     "browser": BROWSER_NAME,
     "pages": len(PAGES), "sizes": [x[0] for x in SIZES],
     "cases": len(rows), "failures": len(failures), "failed_cases": failures, "rows": rows,
