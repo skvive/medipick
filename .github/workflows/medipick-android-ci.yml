@@ -48,7 +48,7 @@ jobs:
 
   emulator-smoke:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -56,12 +56,19 @@ jobs:
         with:
           name: MEDIPICK-Android-v5-debug-apk
           path: emulator-input
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Initialize Android SDK and command-line tools
+        uses: android-actions/setup-android@v3
       - name: Check SDK
         run: |
           command -v sdkmanager
           command -v avdmanager
           command -v adb
-          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          echo "Android SDK command-line tools available"
           ls /dev/kvm || true
       - name: Install emulator
         run: |
