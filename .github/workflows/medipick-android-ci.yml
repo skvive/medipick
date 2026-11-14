@@ -67,7 +67,9 @@ jobs:
           SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
           SDK_BIN="$(find "$SDK_ROOT/cmdline-tools" -maxdepth 3 -type f -name sdkmanager -print -quit)"
           test -x "$SDK_BIN"
-          printf '%s\\n' "$(dirname "$SDK_BIN")" "$SDK_ROOT/platform-tools" "$SDK_ROOT/emulator" >> "$GITHUB_PATH"
+          echo "$(dirname "$SDK_BIN")" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/emulator" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
       - name: Check SDK
         run: |
