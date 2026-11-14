@@ -41,7 +41,26 @@ function sortHospitals(value){
   } else {items.sort((a,b)=>Number(a.id)-Number(b.id));}
   if(typeof renderList==='function')renderList();
 }
+function setupMobileDisclosure(){
+  const details=qs('.mp-ref-mobile-menu');
+  const summary=details?.querySelector('summary');
+  if(!summary)return;
+  const syncLabel=()=>summary.setAttribute('aria-label', details.open?'전체 메뉴 닫기':'전체 메뉴 열기');
+  details.addEventListener('toggle',syncLabel);
+  document.addEventListener('keydown',(event)=>{
+    if(event.key==='Escape'&&details.open){
+      event.preventDefault();
+      details.open=false;
+      summary.focus();
+    }
+  });
+  document.addEventListener('pointerdown',(event)=>{
+    if(details.open&&!details.contains(event.target))details.open=false;
+  });
+  syncLabel();
+}
 document.addEventListener('DOMContentLoaded',()=>{
+  setupMobileDisclosure();
   qs('#refMapRoad')?.addEventListener('click',()=>setMapView('roadmap'));
   qs('#refMapSatellite')?.addEventListener('click',()=>setMapView('satellite'));
   qs('#refSort')?.addEventListener('change',(e)=>sortHospitals(e.target.value));
