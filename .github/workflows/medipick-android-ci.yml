@@ -1,0 +1,129 @@
+name: MEDIPICK Android v5 build and emulator smoke
+
+on:
+  pull_request:
+    paths:
+      - 'android/**'
+      - '.github/workflows/medipick-android-ci.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-android-v5-*'
+    paths:
+      - 'android/**'
+      - '.github/workflows/medipick-android-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore audited Android Studio source
+        run: |
+          unzip -oq android/medipick-android-v5-source.zip 'android/*' -d .
+          test -f android/app/build.gradle
+          test -f android/app/src/main/java/site/medipick/mobile/MainActivity.java
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile signed debug APK
+        run: gradle -p android :app:assembleDebug --no-daemon --stacktrace
+      - name: Verify APK ZIP and record SHA-256
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          unzip -t android/app/build/outputs/apk/debug/app-debug.apk | tail -1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICK-Android-v5-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+  emulator-smoke:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: MEDIPICK-Android-v5-debug-apk
+          path: emulator-input
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Expose preinstalled Android SDK 16.0 command-line tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDK_BIN="$(find "$SDK_ROOT/cmdline-tools" -maxdepth 3 -type f -name sdkmanager -print -quit)"
+          test -x "$SDK_BIN"
+          echo "$(dirname "$SDK_BIN")" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/emulator" >> "$GITHUB_PATH"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_AVD_HOME=$RUNNER_TEMP/medipick-avd" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/medipick-avd"
+      - name: Check SDK
+        run: |
+          command -v sdkmanager
+          command -v avdmanager
+          command -v adb
+          test -d "$ANDROID_HOME"
+          echo "Android SDK command-line tools available"
+          ls /dev/kvm || true
+      - name: Install emulator
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager --install 'platforms;android-35' 'system-images;android-35;google_apis;x86_64' 'emulator'
+          echo no | avdmanager create avd --force -n medipick_api35 -k 'system-images;android-35;google_apis;x86_64'
+          echo "AVD_HOME=$ANDROID_AVD_HOME"
+          ls -la "$ANDROID_AVD_HOME"
+          emulator -list-avds | grep -Fx medipick_api35
+      - name: Boot, install, launch, screenshot, logcat
+        timeout-minutes: 17
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; accel='on'; else accel='off'; fi
+          nohup emulator -avd medipick_api35 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel "$accel" > emulator.log 2>&1 &
+          if ! timeout 120 adb wait-for-device; then
+            echo "ADB_DEVICE_UNAVAILABLE"
+            tail -70 emulator.log
+            exit 1
+          fi
+          booted=0
+          for i in $(seq 1 105); do
+            if [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; then booted=1; break; fi
+            sleep 5
+          done
+          test "$booted" = 1 || { echo EMULATOR_BOOT_FAILED; tail -100 emulator.log; exit 1; }
+          adb install -r emulator-input/app-debug.apk
+          adb shell am start -W -n site.medipick.mobile/.MainActivity
+          sleep 8
+          adb shell pidof site.medipick.mobile
+          adb logcat -d > logcat.txt
+          if grep -A8 'FATAL EXCEPTION' logcat.txt | grep -q 'site.medipick.mobile'; then echo APK_CRASH; exit 1; fi
+          adb shell screencap -p /sdcard/medipick.png
+          adb pull /sdcard/medipick.png medipick-emulator-screenshot.png
+          echo EMULATOR_SMOKE_PASS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MEDIPICK-Android-v5-emulator-evidence
+          path: |
+            medipick-emulator-screenshot.png
+            logcat.txt
+            emulator.log
+          if-no-files-found: warn
+          retention-days: 30
