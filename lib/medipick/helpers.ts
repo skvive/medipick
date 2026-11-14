@@ -1,7 +1,13 @@
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 export function medipickSecret(): Buffer {
-  return Buffer.from(process.env.MEDIPICK_SECRET || 'dev-only-change-me', 'utf8');
+  const configured = process.env.MEDIPICK_SECRET?.trim();
+  // Avoid signing clinic, doctor and advertiser credentials with public demo secrets.
+  // This must fail closed in development too: callers need an explicit local test key.
+  if (!configured || configured === 'dev-only-change-me') {
+    throw new Error('MEDIPICK_SECRET must be explicitly configured before issuing or verifying privileged API keys.');
+  }
+  return Buffer.from(configured, 'utf8');
 }
 
 export function field(v: unknown, name: string, maxLen: number, required = false, pattern?: RegExp): string {
