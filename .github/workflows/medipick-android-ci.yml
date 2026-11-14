@@ -60,8 +60,15 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Initialize Android SDK and command-line tools
-        uses: android-actions/setup-android@v3
+      - name: Expose preinstalled Android SDK 16.0 command-line tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDK_BIN="$(find "$SDK_ROOT/cmdline-tools" -maxdepth 3 -type f -name sdkmanager -print -quit)"
+          test -x "$SDK_BIN"
+          printf '%s\\n' "$(dirname "$SDK_BIN")" "$SDK_ROOT/platform-tools" "$SDK_ROOT/emulator" >> "$GITHUB_PATH"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
       - name: Check SDK
         run: |
           command -v sdkmanager
