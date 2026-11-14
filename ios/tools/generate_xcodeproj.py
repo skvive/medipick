@@ -11,11 +11,13 @@ import json
 BASE = pathlib.Path(__file__).resolve().parents[1]
 APP = BASE / 'MEDIPICKiOS'
 TESTS = BASE / 'MEDIPICKiOSTests'
+UI_TESTS = BASE / 'MEDIPICKiOSUITests'
 SOURCE_GROUPS = ['App', 'Models', 'Services', 'Views']
 SOURCES = [path for group in SOURCE_GROUPS for path in sorted((APP/group).glob('*.swift'))]
 TEST_SOURCE = sorted(TESTS.glob('*.swift'))
+UI_TEST_SOURCE = sorted(UI_TESTS.glob('*.swift'))
 ASSETS = APP / 'Assets.xcassets'
-assert SOURCES and TEST_SOURCE and ASSETS.is_dir()
+assert SOURCES and TEST_SOURCE and UI_TEST_SOURCE and ASSETS.is_dir()
 
 class Raw(str): pass
 
@@ -44,7 +46,7 @@ def add(name,content):
 
 file_ids={}
 build_files={}
-for path in SOURCES+TEST_SOURCE:
+for path in SOURCES+TEST_SOURCE+UI_TEST_SOURCE:
     rel=path.relative_to(BASE)
     name=str(rel)
     file_ids[path]=add('file '+name,dict(isa=Raw('PBXFileReference'),lastKnownFileType='sourcecode.swift',path=path.name,sourceTree='<group>'))
@@ -54,20 +56,24 @@ asset_build=add('build app assets',dict(isa=Raw('PBXBuildFile'),fileRef=file_ico
 file_plist=add('file info plist',dict(isa=Raw('PBXFileReference'),lastKnownFileType='text.plist.xml',path='Info.plist',sourceTree='<group>'))
 app_product=add('product app',dict(isa=Raw('PBXFileReference'),explicitFileType='wrapper.application',includeInIndex='0',path='MEDIPICKiOS.app',sourceTree=Raw('BUILT_PRODUCTS_DIR')))
 test_product=add('product tests',dict(isa=Raw('PBXFileReference'),explicitFileType='wrapper.cfbundle',includeInIndex='0',path='MEDIPICKiOSTests.xctest',sourceTree=Raw('BUILT_PRODUCTS_DIR')))
+ui_test_product=add('product ui tests',dict(isa=Raw('PBXFileReference'),explicitFileType='wrapper.cfbundle',includeInIndex='0',path='MEDIPICKiOSUITests.xctest',sourceTree=Raw('BUILT_PRODUCTS_DIR')))
 
 group_ids={}
 for group in SOURCE_GROUPS:
     group_ids[group]=add('group '+group,dict(isa=Raw('PBXGroup'),children=[file_ids[p] for p in SOURCES if p.parent.name==group],path=group,sourceTree='<group>'))
 app_group=add('group app',dict(isa=Raw('PBXGroup'),children=[group_ids[g] for g in SOURCE_GROUPS]+[file_icon,file_plist],path='MEDIPICKiOS',sourceTree='<group>'))
 test_group=add('group tests',dict(isa=Raw('PBXGroup'),children=[file_ids[p] for p in TEST_SOURCE],path='MEDIPICKiOSTests',sourceTree='<group>'))
-products=add('group products',dict(isa=Raw('PBXGroup'),children=[app_product,test_product],name='Products',sourceTree='<group>'))
-root=add('group root',dict(isa=Raw('PBXGroup'),children=[app_group,test_group,products],sourceTree='<group>'))
+ui_test_group=add('group ui tests',dict(isa=Raw('PBXGroup'),children=[file_ids[p] for p in UI_TEST_SOURCE],path='MEDIPICKiOSUITests',sourceTree='<group>'))
+products=add('group products',dict(isa=Raw('PBXGroup'),children=[app_product,test_product,ui_test_product],name='Products',sourceTree='<group>'))
+root=add('group root',dict(isa=Raw('PBXGroup'),children=[app_group,test_group,ui_test_group,products],sourceTree='<group>'))
 
 app_sources=add('phase app sources',dict(isa=Raw('PBXSourcesBuildPhase'),buildActionMask=2147483647,files=[build_files[p] for p in SOURCES],runOnlyForDeploymentPostprocessing=0))
 app_resources=add('phase app resources',dict(isa=Raw('PBXResourcesBuildPhase'),buildActionMask=2147483647,files=[asset_build],runOnlyForDeploymentPostprocessing=0))
 app_frameworks=add('phase app frameworks',dict(isa=Raw('PBXFrameworksBuildPhase'),buildActionMask=2147483647,files=[],runOnlyForDeploymentPostprocessing=0))
 test_sources=add('phase test sources',dict(isa=Raw('PBXSourcesBuildPhase'),buildActionMask=2147483647,files=[build_files[p] for p in TEST_SOURCE],runOnlyForDeploymentPostprocessing=0))
 test_frameworks=add('phase test frameworks',dict(isa=Raw('PBXFrameworksBuildPhase'),buildActionMask=2147483647,files=[],runOnlyForDeploymentPostprocessing=0))
+ui_test_sources=add('phase ui test sources',dict(isa=Raw('PBXSourcesBuildPhase'),buildActionMask=2147483647,files=[build_files[p] for p in UI_TEST_SOURCE],runOnlyForDeploymentPostprocessing=0))
+ui_test_frameworks=add('phase ui test frameworks',dict(isa=Raw('PBXFrameworksBuildPhase'),buildActionMask=2147483647,files=[],runOnlyForDeploymentPostprocessing=0))
 icon_script='''set -euo pipefail
 ASSET="$SRCROOT/MEDIPICKiOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png"
 if [ ! -s "$ASSET" ]; then
@@ -79,18 +85,21 @@ icon_phase=add('phase app icon',dict(isa=Raw('PBXShellScriptBuildPhase'),alwaysO
 
 app_target=oid('target app')
 test_target=oid('target tests')
+ui_test_target=oid('target ui tests')
 proj_id=oid('project')
 app_config_list=oid('config list app')
 test_config_list=oid('config list test')
+ui_test_config_list=oid('config list ui test')
 project_config_list=oid('config list project')
 proxy=add('test product proxy',dict(isa=Raw('PBXContainerItemProxy'),containerPortal=proj_id,proxyType=1,remoteGlobalIDString=app_target,remoteInfo='MEDIPICKiOS'))
 dependency=add('test app dependency',dict(isa=Raw('PBXTargetDependency'),target=app_target,targetProxy=proxy))
 
 objects[app_target] = dict(isa=Raw('PBXNativeTarget'),buildConfigurationList=app_config_list,buildPhases=[icon_phase,app_sources,app_frameworks,app_resources],buildRules=[],dependencies=[],name='MEDIPICKiOS',productName='MEDIPICKiOS',productReference=app_product,productType='com.apple.product-type.application')
 objects[test_target] = dict(isa=Raw('PBXNativeTarget'),buildConfigurationList=test_config_list,buildPhases=[test_sources,test_frameworks],buildRules=[],dependencies=[dependency],name='MEDIPICKiOSTests',productName='MEDIPICKiOSTests',productReference=test_product,productType='com.apple.product-type.bundle.unit-test')
+objects[ui_test_target] = dict(isa=Raw('PBXNativeTarget'),buildConfigurationList=ui_test_config_list,buildPhases=[ui_test_sources,ui_test_frameworks],buildRules=[],dependencies=[dependency],name='MEDIPICKiOSUITests',productName='MEDIPICKiOSUITests',productReference=ui_test_product,productType='com.apple.product-type.bundle.ui-testing')
 
-project_attrs=dict(BuildIndependentTargetsInParallel='YES',LastUpgradeCheck='1600',TargetAttributes={str(app_target):dict(CreatedOnToolsVersion='16.0'),str(test_target):dict(CreatedOnToolsVersion='16.0',TestTargetID=app_target)})
-objects[proj_id] = dict(isa=Raw('PBXProject'),attributes=project_attrs,buildConfigurationList=project_config_list,compatibilityVersion='Xcode 15.0',developmentRegion='ko',hasScannedForEncodings=0,knownRegions=['ko','en','Base'],mainGroup=root,productRefGroup=products,projectDirPath='',projectRoot='',targets=[app_target,test_target])
+project_attrs=dict(BuildIndependentTargetsInParallel='YES',LastUpgradeCheck='1600',TargetAttributes={str(app_target):dict(CreatedOnToolsVersion='16.0'),str(test_target):dict(CreatedOnToolsVersion='16.0',TestTargetID=app_target),str(ui_test_target):dict(CreatedOnToolsVersion='16.0',TestTargetID=app_target)})
+objects[proj_id] = dict(isa=Raw('PBXProject'),attributes=project_attrs,buildConfigurationList=project_config_list,compatibilityVersion='Xcode 15.0',developmentRegion='ko',hasScannedForEncodings=0,knownRegions=['ko','en','Base'],mainGroup=root,productRefGroup=products,projectDirPath='',projectRoot='',targets=[app_target,test_target,ui_test_target])
 
 def conf(label, settings):
     return add('configuration '+label,dict(isa=Raw('XCBuildConfiguration'),buildSettings=settings,name='Debug' if label.endswith('debug') else 'Release'))
@@ -103,9 +112,13 @@ ar=conf('app release',dict(app_common,SWIFT_OPTIMIZATION_LEVEL='-O'))
 test_common=dict(CODE_SIGN_STYLE='Automatic',GENERATE_INFOPLIST_FILE='YES',PRODUCT_BUNDLE_IDENTIFIER='site.lexid.medipick.tests',PRODUCT_NAME='$(TARGET_NAME)',SWIFT_VERSION='5.9',IPHONEOS_DEPLOYMENT_TARGET='17.0',TARGETED_DEVICE_FAMILY='1,2',TEST_HOST='$(BUILT_PRODUCTS_DIR)/MEDIPICKiOS.app/MEDIPICKiOS',BUNDLE_LOADER='$(TEST_HOST)')
 td=conf('test debug',dict(test_common,SWIFT_OPTIMIZATION_LEVEL='-Onone'))
 tr=conf('test release',dict(test_common,SWIFT_OPTIMIZATION_LEVEL='-O'))
+ui_test_common=dict(CODE_SIGN_STYLE='Automatic',GENERATE_INFOPLIST_FILE='YES',PRODUCT_BUNDLE_IDENTIFIER='site.lexid.medipick.uitests',PRODUCT_NAME='$(TARGET_NAME)',SWIFT_VERSION='5.9',IPHONEOS_DEPLOYMENT_TARGET='17.0',TARGETED_DEVICE_FAMILY='1,2',TEST_TARGET_NAME='MEDIPICKiOS')
+utd=conf('ui test debug',dict(ui_test_common,SWIFT_OPTIMIZATION_LEVEL='-Onone'))
+utr=conf('ui test release',dict(ui_test_common,SWIFT_OPTIMIZATION_LEVEL='-O'))
 objects[project_config_list]=dict(isa=Raw('XCConfigurationList'),buildConfigurations=[pd,pr],defaultConfigurationIsVisible=0,defaultConfigurationName='Release')
 objects[app_config_list]=dict(isa=Raw('XCConfigurationList'),buildConfigurations=[ad,ar],defaultConfigurationIsVisible=0,defaultConfigurationName='Release')
 objects[test_config_list]=dict(isa=Raw('XCConfigurationList'),buildConfigurations=[td,tr],defaultConfigurationIsVisible=0,defaultConfigurationName='Release')
+objects[ui_test_config_list]=dict(isa=Raw('XCConfigurationList'),buildConfigurations=[utd,utr],defaultConfigurationIsVisible=0,defaultConfigurationName='Release')
 
 pbx={'archiveVersion':'1','classes':{},'objectVersion':'56','objects':{str(k):v for k,v in sorted(objects.items(),key=lambda item:str(item[0]))},'rootObject':proj_id}
 folder=BASE/'MEDIPICKiOS.xcodeproj'
@@ -123,6 +136,7 @@ scheme.write_text(f'''<?xml version="1.0" encoding="UTF-8"?>
   </BuildAction>
   <TestAction buildConfiguration="Debug" shouldUseLaunchSchemeArgsEnv="YES"><Testables>
     <TestableReference skipped="NO"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{test_target}" BuildableName="MEDIPICKiOSTests.xctest" BlueprintName="MEDIPICKiOSTests" ReferencedContainer="container:MEDIPICKiOS.xcodeproj"/></TestableReference>
+    <TestableReference skipped="NO"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{ui_test_target}" BuildableName="MEDIPICKiOSUITests.xctest" BlueprintName="MEDIPICKiOSUITests" ReferencedContainer="container:MEDIPICKiOS.xcodeproj"/></TestableReference>
   </Testables></TestAction>
   <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.Posix" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES"><BuildableProductRunnable runnableDebuggingMode="0"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{app_target}" BuildableName="MEDIPICKiOS.app" BlueprintName="MEDIPICKiOS" ReferencedContainer="container:MEDIPICKiOS.xcodeproj"/></BuildableProductRunnable></LaunchAction>
   <ProfileAction buildConfiguration="Release" shouldUseLaunchSchemeArgsEnv="YES" savedToolIdentifier="" useCustomWorkingDirectory="NO" debugDocumentVersioning="YES"><BuildableProductRunnable runnableDebuggingMode="0"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{app_target}" BuildableName="MEDIPICKiOS.app" BlueprintName="MEDIPICKiOS" ReferencedContainer="container:MEDIPICKiOS.xcodeproj"/></BuildableProductRunnable></ProfileAction>

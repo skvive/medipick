@@ -82,7 +82,43 @@ jobs:
             -scheme MEDIPICKiOS -configuration Debug \
             -destination "platform=iOS Simulator,id=$SIM_ID" \
             -parallel-testing-enabled NO \
+            -resultBundlePath "$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult" \
             CODE_SIGNING_ALLOWED=NO test
+
+      - name: Archive native UI test evidence
+        if: always()
+        run: |
+          RESULT="$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult"
+          if [ -d "$RESULT" ]; then
+            ditto -c -k --sequesterRsrc --keepParent "$RESULT" "$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult.zip"
+          fi
+      - name: Export actual in-app XCTest screenshots
+        if: always()
+        run: |
+          RESULT="$RUNNER_TEMP/MEDIPICKiOS-InteractiveTests.xcresult"
+          OUT="$RUNNER_TEMP/MEDIPICKiOS-Interaction-Screens"
+          if [ -d "$RESULT" ]; then
+            mkdir -p "$OUT"
+            xcrun xcresulttool export attachments --path "$RESULT" --output-path "$OUT" || true
+            find "$OUT" -type f | head -40
+          fi
+      - name: Upload interactive navigation screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-Interaction-Screens
+          path: ${{ runner.temp }}/MEDIPICKiOS-Interaction-Screens/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload simulator interaction screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICKiOS-InteractiveTests-XCResult
+          path: ${{ runner.temp }}/MEDIPICKiOS-InteractiveTests.xcresult.zip
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Package simulator build
         if: success()
