@@ -5,13 +5,15 @@ const SESSION_MAX_AGE = 8 * 3600;
 // Never mint or validate a privileged admin session with sample/default secrets.
 // Both values must be provided explicitly in every deployed environment.
 function secret(): Buffer | null {
-  const configured = process.env.MEDIPICK_SECRET;
-  return configured ? Buffer.from(configured, 'utf8') : null;
+  const configured = process.env.MEDIPICK_SECRET?.trim();
+  return configured && configured !== 'dev-only-change-me'
+    ? Buffer.from(configured, 'utf8')
+    : null;
 }
 
 export function passwordOk(candidate: string): boolean {
-  const expected = process.env.MEDIPICK_ADMIN_PASSWORD;
-  if (!expected || !secret()) return false;
+  const expected = process.env.MEDIPICK_ADMIN_PASSWORD?.trim();
+  if (!expected || expected === 'medipick-demo-2026' || !secret()) return false;
   const actualBytes = Buffer.from(candidate, 'utf8');
   const expectedBytes = Buffer.from(expected, 'utf8');
   if (actualBytes.length !== expectedBytes.length) return false;
