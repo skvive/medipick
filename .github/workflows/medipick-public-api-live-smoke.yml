@@ -1,0 +1,29 @@
+name: MEDIPICK production public API and authorization contract smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'chatgpt/medipick-live-smoke-*'
+      - main
+    paths:
+      - 'scripts/medipick-live-api-smoke.sh'
+      - '.github/workflows/medipick-public-api-live-smoke.yml'
+      - 'app/api/**'
+      - 'lib/medipick/public-catalog.ts'
+      - 'lib/medipick/handler.ts'
+
+permissions:
+  contents: read
+
+jobs:
+  public-read-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Audit anonymous public catalog, nearby safety and protected endpoints
+        shell: bash
+        run: bash scripts/medipick-live-api-smoke.sh
