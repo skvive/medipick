@@ -33,11 +33,11 @@ async function check(path) {
         !redirect.startsWith('http:') && !redirect.startsWith('//') &&
         (!redirect.startsWith('https://') || redirect.startsWith(base));
       const ok=htmlOk || legitimateRedirect || (!isProtected && cleanRedirect);
-      const title=(body.match(/<title[^>]*>([^<]*)<\\/title>/i)||[])[1]||'';
+      const title=(body.match(new RegExp('<title[^>]*>([^<]*)</title>', 'i'))||[])[1]||'';
       const why=ok?'':[
-        'htmlTag='+/<html\\b/i.test(body),
-        'htmlType='+/text\\/html/.test(type),
-        'has404Marker='+/<title>404\\b|this page could not be found|NEXT_NOT_FOUND/i.test(body),
+        'htmlTag='+body.includes('<html'),
+        'htmlType='+type.includes('text/html'),
+        'has404Marker='+(body.includes('NEXT_NOT_FOUND') || body.includes('This page could not be found')),
         'bytes='+body.length,
         'title='+title.slice(0,90)
       ].join(' ');
