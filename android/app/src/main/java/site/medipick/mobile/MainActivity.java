@@ -154,13 +154,15 @@ public class MainActivity extends Activity {
         panel.addView(heading,new LinearLayout.LayoutParams(-1,dp(58)));
 
         TextView copy=new TextView(this);
-        copy.setText("메디픽 병원·약국 정보는 온라인 연결이 필요합니다.\n네트워크 상태를 확인한 후 다시 시도해 주세요.");
+        copy.setText("병원·약국 정보를 보려면\n인터넷 연결이 필요합니다.\n연결 후 다시 시도해 주세요.");
         copy.setTextSize(14);copy.setGravity(Gravity.CENTER);copy.setTextColor(Color.rgb(79,104,137));
         copy.setLineSpacing(dp(4),1);
         panel.addView(copy,new LinearLayout.LayoutParams(-1,dp(100)));
 
         Button retry=toolbarButton("↻ 다시 연결");
         retry.setTextSize(16);retry.setAllCaps(false);
+        retry.setTextColor(Color.WHITE);
+        retry.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(11,102,223)));
         retry.setOnClickListener(v->{showOfflineState(false);web.reload();});
         LinearLayout.LayoutParams retryParams=new LinearLayout.LayoutParams(-1,dp(52));
         retryParams.setMargins(0,dp(14),0,dp(10));
@@ -168,6 +170,8 @@ public class MainActivity extends Activity {
 
         Button browser=toolbarButton("브라우저에서 열기");
         browser.setTextSize(15);
+        browser.setTextColor(Color.rgb(11,82,180));
+        browser.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(228,240,255)));
         browser.setOnClickListener(v->openExternal(Uri.parse(baseUrl)));
         panel.addView(browser,new LinearLayout.LayoutParams(-1,dp(52)));
         return panel;
