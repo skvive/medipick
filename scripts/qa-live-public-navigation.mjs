@@ -26,17 +26,25 @@ async function check(path) {
         /text\/html/.test(type) && /<html\b/i.test(body) &&
         !/<title>404\b|this page could not be found|NEXT_NOT_FOUND/i.test(body);
       const isProtected=path === '/account';
+      // Next.js can serialize the literal NEXT_NOT_FOUND into an otherwise valid
+      // streamed page. The actual rendered OAuth control and heading are decisive.
+      const authPage=path === '/auth/sign-in' || path === '/auth/sign-up';
+      const authUiVisible=authPage && res.status===200 && type.includes('text/html') &&
+        body.includes('Google로 계속하기') &&
+        body.includes(path==='/auth/sign-in'?'메디픽에 오신 것을 환영합니다.':'Google 계정으로 시작하기');
       const legitimateRedirect=isProtected &&
         [301,302,303,307,308].includes(res.status) &&
         /\/auth\/sign-in/.test(redirect);
       const cleanRedirect=[301,302,303,307,308].includes(res.status) &&
         !redirect.startsWith('http:') && !redirect.startsWith('//') &&
         (!redirect.startsWith('https://') || redirect.startsWith(base));
-      const ok=htmlOk || legitimateRedirect || (!isProtected && cleanRedirect);
+      const ok=htmlOk || authUiVisible || legitimateRedirect || (!isProtected && cleanRedirect);
       const title=(body.match(new RegExp('<title[^>]*>([^<]*)</title>', 'i'))||[])[1]||'';
       const why=ok?'':[
         'htmlTag='+body.includes('<html'),
         'htmlType='+type.includes('text/html'),
+        'authUiVisible='+authUiVisible,
+        'hasGoogleText='+body.includes('Google로 계속하기'),
         'has404Marker='+(body.includes('NEXT_NOT_FOUND') || body.includes('This page could not be found')),
         'bytes='+body.length,
         'title='+title.slice(0,90)
