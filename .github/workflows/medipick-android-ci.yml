@@ -23,9 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Restore audited Android Studio source
         run: |
-          unzip -oq android/medipick-android-v5-source.zip 'android/*' -d .
+          # Preserve the audited ZIP as fallback while preferring the reviewed v5.1
+          # Java source checked in under its canonical Android Studio path.
+          unzip -nq android/medipick-android-v5-source.zip 'android/*' -d .
           test -f android/app/build.gradle
           test -f android/app/src/main/java/site/medipick/mobile/MainActivity.java
+          grep -Fq 'private View createOfflinePanel()' android/app/src/main/java/site/medipick/mobile/MainActivity.java
+          grep -Fq 'showOfflineState(true)' android/app/src/main/java/site/medipick/mobile/MainActivity.java
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -114,6 +118,24 @@ jobs:
           adb shell pidof site.medipick.mobile
           adb logcat -d > logcat.txt
           if grep -A8 'FATAL EXCEPTION' logcat.txt | grep -q 'site.medipick.mobile'; then echo APK_CRASH; exit 1; fi
+          # A running Activity is not proof of rendered content. Inspect UI hierarchy.
+          # An offline emulator must show native retry UI, not the WebView error page.
+          ui_ready=0
+          for i in 1 2 3; do
+            adb shell uiautomator dump /sdcard/medipick-ui.xml >/dev/null 2>&1 || true
+            if adb pull /sdcard/medipick-ui.xml medipick-ui.xml >/dev/null 2>&1; then
+              if grep -q '인터넷 연결을 확인해 주세요' medipick-ui.xml && grep -q '다시 연결' medipick-ui.xml; then
+                echo OFFLINE_FALLBACK_UI_PASS
+                ui_ready=1; break
+              fi
+              if grep -Eq '병원검색|병원 검색|병원찾기|의료기관' medipick-ui.xml && ! grep -q 'Webpage not available' medipick-ui.xml; then
+                echo ONLINE_CATALOG_UI_VISIBLE
+                ui_ready=1; break
+              fi
+            fi
+            sleep 3
+          done
+          test "$ui_ready" = 1 || { echo UI_CONTENT_NOT_VERIFIED; head -c 2500 medipick-ui.xml || true; exit 1; }
           adb shell screencap -p /sdcard/medipick.png
           adb pull /sdcard/medipick.png medipick-emulator-screenshot.png
           echo EMULATOR_SMOKE_PASS
@@ -124,6 +146,7 @@ jobs:
           path: |
             medipick-emulator-screenshot.png
             logcat.txt
+            medipick-ui.xml
             emulator.log
           if-no-files-found: warn
           retention-days: 30
