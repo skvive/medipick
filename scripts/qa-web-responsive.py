@@ -23,6 +23,10 @@ OUT = Path(os.environ.get("MEDIPICK_QA_OUTPUT", ROOT / "docs" / "agency_qa"))
 OUT.mkdir(parents=True, exist_ok=True)
 SIZES = [(320, 720), (390, 844), (768, 1024), (1024, 768), (1440, 900)]
 PAGES = sorted(WEB.glob("*.html"))
+# A passing QA run must not silently omit newly added v10 screens.
+# The baseline is 22 checked-in HTML pages, including the offline state.
+if len(PAGES) < 22:
+    raise SystemExit(f"MEDIPICK v10 page inventory incomplete: {len(PAGES)} < 22")
 CHROME = (WEB / "assets/site-chrome.js").read_text(encoding="utf-8") if (WEB / "assets/site-chrome.js").is_file() else ""
 rows = []
 
@@ -228,7 +232,7 @@ failures = [row for row in rows if row.get("error") or row.get("overflow_px",0) 
 report = {
     "mode": "offline actual HTML/CSS and real unified navigation open/close/Escape/backdrop/focus across Chromium/Firefox/WebKit; live APIs and authenticated buttons excluded",
     "browser": BROWSER_NAME,
-    "pages": len(PAGES), "sizes": [x[0] for x in SIZES],
+    "pages": len(PAGES), "expected_min_pages": 22, "sizes": [x[0] for x in SIZES],
     "cases": len(rows), "failures": len(failures), "failed_cases": failures, "rows": rows,
 }
 (OUT/"report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
