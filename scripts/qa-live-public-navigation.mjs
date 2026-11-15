@@ -33,8 +33,16 @@ async function check(path) {
         !redirect.startsWith('http:') && !redirect.startsWith('//') &&
         (!redirect.startsWith('https://') || redirect.startsWith(base));
       const ok=htmlOk || legitimateRedirect || (!isProtected && cleanRedirect);
+      const title=(body.match(/<title[^>]*>([^<]*)<\\/title>/i)||[])[1]||'';
+      const why=ok?'':[
+        'htmlTag='+/<html\\b/i.test(body),
+        'htmlType='+/text\\/html/.test(type),
+        'has404Marker='+/<title>404\\b|this page could not be found|NEXT_NOT_FOUND/i.test(body),
+        'bytes='+body.length,
+        'title='+title.slice(0,90)
+      ].join(' ');
       return {path,status:res.status,type:type.slice(0,48),redirect:redirect.slice(0,200),
-        html:htmlOk,ok,error:ok?'':('Unexpected response for public page')};
+        html:htmlOk,ok,error:why};
     }catch(e){
       if(attempt===2)return {path,status:0,ok:false,error:String(e?.name || e).slice(0,120)};
       await defer(800);
