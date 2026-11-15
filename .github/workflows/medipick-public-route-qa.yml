@@ -1,0 +1,39 @@
+name: MEDIPICK read-only production route QA
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/qa-live-public-navigation.mjs'
+      - '.github/workflows/medipick-public-route-qa.yml'
+  push:
+    branches:
+      - 'chatgpt/medipick-*'
+    paths:
+      - 'scripts/qa-live-public-navigation.mjs'
+      - '.github/workflows/medipick-public-route-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  public-route-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify 22 public pages, Google sign-in shell, and protected account redirect
+        env:
+          MEDIPICK_PUBLIC_BASE: https://medipick.lexid.site
+          MEDIPICK_QA_OUTPUT: ${{ runner.temp }}/medipick-route-qa
+        run: node scripts/qa-live-public-navigation.mjs
+      - name: Preserve route-level results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDIPICK-public-route-evidence
+          path: ${{ runner.temp }}/medipick-route-qa
+          if-no-files-found: warn
+          retention-days: 14
