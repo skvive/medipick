@@ -523,16 +523,27 @@ async function searchNearby(lat, lng) {
   const searchParams = radiusMode
     ? new URLSearchParams({ lat, lng, radius, limit: '120', include_estimated: usingEstimates?'1':'0', q, trade })
     : new URLSearchParams({ q, region, trade, limit: '80' });
-  const res = await api(endpoint + '?' + searchParams.toString());
+  let res;
+  try { res = await api(endpoint + '?' + searchParams.toString()); }
+  catch(error){
+    if(requestId !== searchSequence)return;
+    items=[];renderList();
+    loadMaps(()=>renderMapMarkers());
+    if(viewMode==='catalog' && locationMode!=='region')void searchHiraOnDemand({automatic:true});
+    showToast('일반 주소록 조회 실패: HIRA 공식 병원 검색을 별도로 확인합니다.');
+    return;
+  }
   if (requestId !== searchSequence) return;
   items = Array.isArray(res.items) ? res.items : [];
   // Exact nearby records can be empty; never fill a map with unverified proxy coordinates.
   if (radiusMode && items.length === 0 && locationMode !== 'geo') {
     setPinStatus('주변 검증 좌표 0개 · 주소록 목록으로 확인');
-    const fall = await api('/api/public-catalog/search?' + new URLSearchParams({ q, region:locationMode==='geo'?'':region, trade, limit:'24' }));
-    if (requestId !== searchSequence) return;
-    items = Array.isArray(fall.items) ? fall.items : [];
-    showToast('반경 내 검증 좌표가 없어 주소록 후보를 표시합니다. 이 목록은 주변 거리순이 아닙니다.');
+    try{
+      const fall = await api('/api/public-catalog/search?' + new URLSearchParams({ q, region:locationMode==='geo'?'':region, trade, limit:'24' }));
+      if (requestId !== searchSequence) return;
+      items = Array.isArray(fall.items) ? fall.items : [];
+      showToast('반경 내 검증 좌표가 없어 주소록 후보를 표시합니다. 이 목록은 주변 거리순이 아닙니다.');
+    }catch{items=[];showToast('주소록 추가 조회가 실패했습니다. HIRA 공식 좌표 검색을 이용합니다.');}
   }
   if (!radiusMode && items.length === 80) {
     showToast('첫 80건의 병원 주소록 후보입니다. 지역·병원명·진료과를 구체화해 주세요.');
@@ -641,7 +652,7 @@ function bindUi() {
 async function init() {
   try {
     config = await api('/api/config');
-    await initStats();
+    void initStats().catch(()=>showToast('주소록 통계가 지연되지만 HIRA 지도 검색은 계속 이용할 수 있습니다.'));
     bindUi();
     loadMaps();
     renderHiraReviewQueue();
