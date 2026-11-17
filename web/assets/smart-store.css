@@ -445,3 +445,43 @@
 .mp-map-home .mp-google-places-results{width:min(1360px,calc(100% - 40px));max-width:1360px}
 @media(max-width:900px){#googlePlacesResults{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.mp-google-search-option{align-items:stretch;flex-direction:column}.mp-google-search-option button{width:100%}#googlePlacesResults{grid-template-columns:minmax(0,1fr)}.mp-google-search-option,.mp-google-places-results,.mp-map-home .mp-google-search-option,.mp-map-home .mp-google-places-results{width:calc(100% - 28px)}}
+
+/* Official after-hours emergency finder — distinct from unverified hospital directory. */
+.mp-emergency-finder{max-width:1200px;margin:18px auto;padding:22px 24px;box-sizing:border-box;background:linear-gradient(115deg,#fff5f5,#fff);border:1px solid #f3b7b7;border-radius:18px;display:flex;justify-content:space-between;align-items:center;gap:24px}
+.mp-emergency-finder>div:first-child{flex:1;min-width:0}
+.mp-emergency-eyebrow{font-size:11px;font-weight:900;letter-spacing:.08em;color:#b42333}
+.mp-emergency-finder h2{font-size:clamp(21px,2.3vw,28px);margin:6px 0 8px;line-height:1.3;color:#7f1d2d}
+.mp-emergency-finder p{font-size:13px;line-height:1.7;color:#5e4450;max-width:74ch;margin:0 0 8px}
+.mp-emergency-finder small{font-size:11px;line-height:1.5;color:#80616d}
+.mp-emergency-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;flex:0 0 236px}
+.mp-emergency-actions a{display:flex;justify-content:center;align-items:center;min-height:42px;text-decoration:none;text-align:center;padding:9px 13px;border-radius:10px;box-sizing:border-box;font-size:13px;font-weight:800}
+.mp-emergency-primary{background:#be2438;color:white}
+.mp-emergency-secondary{background:white;color:#991c2d;border:1px solid #e7b6bc}
+.mp-emergency-actions a:focus-visible{outline:3px solid #f697a3;outline-offset:2px}
+@media(max-width:760px){.mp-emergency-finder{margin:12px 16px;padding:18px;flex-direction:column;align-items:stretch}.mp-emergency-actions{flex:none;width:100%}}
+
+/* HIRA verified map results and optional private review list. */
+.mp-hira-review-queue{box-sizing:border-box;width:min(100% - 40px,1280px);margin:10px auto;padding:14px 16px;border:1px solid #b9d2f0;border-radius:15px;background:white;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mp-hira-review-queue[hidden]{display:none}
+.mp-hira-review-queue h2{font-size:15px;color:#17487f;margin:0 0 5px}
+.mp-hira-review-queue p{font-size:11px;color:#627994;margin:0;line-height:1.5}
+.mp-hira-review-queue>div:first-child{flex:1 1 260px}
+#hiraReviewQueueCount{font-size:12px;font-weight:800;color:#205a9a}
+.mp-hira-queue-items{width:100%;display:flex;gap:7px;flex-wrap:wrap}
+.mp-hira-queue-item{display:inline-flex;align-items:center;gap:6px;border:1px solid #c2d8f1;background:#edf5ff;border-radius:99px;padding:5px 9px;color:#1b4e89;font-size:12px}
+.mp-hira-queue-item button{border:0;background:transparent;color:#285a95;cursor:pointer;font-weight:900;min-width:24px;min-height:24px}
+.mp-hira-place-card{border-left:4px solid #159966}
+.mp-hira-source-label{font-size:11px;color:#137655;font-weight:800}
+.mp-hira-detail-summary{color:#486581;line-height:1.5;font-size:12px}
+.mp-hira-medical-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.mp-hira-medical-details section{border:1px solid #d7e6f6;background:#f8fbff;padding:11px;border-radius:11px;min-width:0}
+.mp-hira-medical-details strong{color:#135080;font-size:13px}
+.mp-hira-medical-details ul{margin:7px 0 0;padding-left:18px;font-size:12px;line-height:1.6;max-height:220px;overflow:auto}
+.mp-hira-medical-details p{font-size:12px;line-height:1.5}
+.mp-hira-queue-add{color:#135692;background:#e9f4ff;border:1px solid #c3dcf7;border-radius:8px;min-height:36px;padding:7px 11px;font-size:12px;font-weight:750;cursor:pointer}
+@media(max-width:650px){.mp-hira-review-queue{width:calc(100% - 26px)}.mp-hira-medical-details{grid-template-columns:minmax(0,1fr)}}
+
+.mp-hira-phone-warning{color:#963e27;background:#fff3e8;border:1px solid #efc2a4;border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.55}
+.mp-hira-external-clinician{font-size:12px;line-height:1.65;color:#58718a;background:#f7fafd;border-radius:8px;padding:8px}
+.mp-hira-external-clinician a{color:#165baf;font-weight:800;overflow-wrap:anywhere}
+.mp-hira-catalog-note{font-size:11px;padding:8px 0;color:#6b7a8d}
