@@ -480,3 +480,8 @@
 .mp-hira-medical-details p{font-size:12px;line-height:1.5}
 .mp-hira-queue-add{color:#135692;background:#e9f4ff;border:1px solid #c3dcf7;border-radius:8px;min-height:36px;padding:7px 11px;font-size:12px;font-weight:750;cursor:pointer}
 @media(max-width:650px){.mp-hira-review-queue{width:calc(100% - 26px)}.mp-hira-medical-details{grid-template-columns:minmax(0,1fr)}}
+
+.mp-hira-phone-warning{color:#963e27;background:#fff3e8;border:1px solid #efc2a4;border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.55}
+.mp-hira-external-clinician{font-size:12px;line-height:1.65;color:#58718a;background:#f7fafd;border-radius:8px;padding:8px}
+.mp-hira-external-clinician a{color:#165baf;font-weight:800;overflow-wrap:anywhere}
+.mp-hira-catalog-note{font-size:11px;padding:8px 0;color:#6b7a8d}
