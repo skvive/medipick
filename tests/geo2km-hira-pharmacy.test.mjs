@@ -19,15 +19,31 @@ test('main, full directory and pharmacy default to actual 2km search radius',()=
  assert.match(pharmacy,/id="phGeo"/);
 });
 
-test('consented current location triggers official HIRA and nearby Google fallback',()=>{
+test('nearby search automatically prioritizes HIRA coordinates, without relabeling Google pins',()=>{
  const src=read('web/assets/smart-store.js');
  assert.match(src,/getCurrentPosition/);
  assert.match(src,/locationMode='geo'/);
- assert.match(src,/\.then\(\(\)=>searchHiraOnDemand\(\)\)/);
- assert.match(src,/locationMode !== 'geo'/);
- assert.match(src,/await searchGooglePlacesOnDemand\(\)/);
+ assert.match(src,/void searchHiraOnDemand\(\{automatic:true\}\)/);
+ assert.match(src,/hiraActivePlaces=places/);
+ assert.match(src,/renderHiraMarkers\(\)/);
+ assert.match(src,/locationMode!=='region'/);
  assert.match(src,/Number\(\$\('#smartRadius'\)\?\.value\|\|2\)\*1000/);
  assert.match(src,/HIRA 공식 좌표/);
+});
+test('catalog details verify exact HIRA identity and doctor counts are from official detail API',()=>{
+ const client=read('web/assets/smart-store.js');
+ const resolve=read('app/api/hira/resolve/route.ts');
+ const details=read('app/api/hira/details/route.ts');
+ const source=read('lib/medipick/hira-client.ts');
+ assert.match(client,/enrichCatalogWithHira\(item,detail\)/);
+ assert.match(client,/openHiraDetail\(hospital,null,\{catalogPhone:item.phone\}\)/);
+ assert.match(client,/개인 확인 대기목록/);
+ assert.match(resolve,/queryHira/);
+ assert.match(resolve,/roadKey\(x.address\)===road/);
+ assert.match(details,/queryHiraDetails/);
+ assert.match(source,/getDgsbjtInfo2\.8/);
+ assert.match(source,/getSpcSbjtSdrInfo2\.8/);
+ assert.match(source,/physicianNamesAvailable:false/);
 });
 test('server does not return hospital locations beyond selected official 2km radius',()=>{
  const src=read('app/api/hira/hospitals/route.ts');
