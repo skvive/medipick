@@ -296,10 +296,12 @@ function showCatalogDetail(item) {
     '<p class="mp-smart-detail-note">' + safe(disclosure) + '</p>';
   detail.querySelector('.mp-smart-detail-close')?.addEventListener('click', resetDetail);
   detail.querySelector('.mp-smart-detail-geocode')?.addEventListener('click', () => locateStoreAddress(item.id));
+  // Resolve by the exact registered name + street number, never by catalog phone or fuzzy name alone.
+  void enrichCatalogWithHira(item,detail);
   // Reuse the existing detailed catalog API on explicit user selection.
   const selectedId = item.id;
   api('/api/public-catalog/store/' + encodeURIComponent(selectedId)).then((full) => {
-    if (activeId !== selectedId || detail.hidden || viewMode !== 'catalog') return;
+    if (activeId !== selectedId || detail.hidden || viewMode !== 'catalog' || detail.dataset.source==='hira') return;
     const ui = full.ui || {};
     const valid = (url) => /^https:\/\//i.test(String(url || ''));
     const refs = [
@@ -320,6 +322,45 @@ function showCatalogDetail(item) {
     }
     detail.appendChild(group);
   }).catch(() => { /* summary card is still useful if detail API is unavailable */ });
+}
+
+function knownExternalClinicians(p){
+  // Small, explicitly attributed case from two current public medical profile listings.
+  // This is NOT an HIRA physician roster and is not assumed current without re-verification.
+  const name=String(p.name||'').replace(/\s/g,'');
+  const addr=String(p.address||'');
+  if(name==='10년전당신의오늘의원' && /도산대로\s*452/.test(addr)){
+    return [{
+      name:'한충희',title:'대표원장',source:'강남언니 의료진 공개 프로필',
+      url:'https://www.gangnamunni.com/doctors/12142',reviewed:'2026-11-17'
+    }];
+  }
+  return [];
+}
+async function enrichCatalogWithHira(item,detail){
+  const id=item.id,notice=document.createElement('p');
+  notice.className='mp-smart-detail-note mp-hira-catalog-note';
+  notice.textContent='HIRA 공식 병원명·도로명주소를 대조하고 있습니다. 주소록 연락처의 실제 통화 연결은 미검증입니다.';
+  detail.append(notice);
+  if(!item.name||!item.address){notice.textContent='공식 매칭에 필요한 병원명·도로명주소가 없어 주소록 자료만 표시합니다. 전화 연결 여부는 미검증입니다.';return;}
+  try{
+    const qs=new URLSearchParams({name:String(item.name),address:String(item.address)});
+    const response=await fetch('/api/hira/resolve?'+qs,{cache:'no-store'});
+    const data=await response.json();
+    if(activeId!==id||detail.hidden||detail.dataset.source==='hira')return;
+    if(!response.ok||!data.matched||!data.match){
+      notice.textContent='HIRA 병원명·도로명주소 일치 여부 미확인. 현재 자료는 외부 주소록 후보이며 0508 등 전화 연결은 보장하지 않습니다.';
+      return;
+    }
+    const hospital=data.match;
+    hiraActivePlaces=[hospital];
+    loadMaps(()=>renderHiraMarkers());
+    void openHiraDetail(hospital,null,{catalogPhone:item.phone});
+  }catch{
+    if(activeId===id && !detail.hidden && detail.dataset.source!=='hira'){
+      notice.textContent='HIRA 공식 대조를 할 수 없습니다. 주소록 번호는 실제 연결 여부가 검증되지 않았습니다.';
+    }
+  }
 }
 
 function renderPartnerList() {
@@ -821,10 +862,10 @@ function queueHiraFacility(p){
   try{sessionStorage.setItem(HIRA_QUEUE_KEY,JSON.stringify(list.slice(0,20)));renderHiraReviewQueue();showToast('개인 확인 대기목록에 담았습니다. 실제 진료·예약 대기 신청은 아닙니다.');}
   catch{showToast('이 브라우저에서 확인 목록을 저장할 수 없습니다.');}
 }
-async function openHiraDetail(p,marker=null){
+async function openHiraDetail(p,marker=null,context={}){
   const detail=$('#smartDetail');if(!detail)return;
   const detailId=++hiraDetailVersion;
-  detail.hidden=false;detail.replaceChildren();
+  detail.hidden=false;detail.replaceChildren();detail.dataset.source='hira';
   const title=document.createElement('h3');title.textContent=String(p.name||'의료기관');
   const label=document.createElement('div');label.className='mp-hira-source-label';label.textContent='건강보험심사평가원 · 의료기관 신고 정보';
   const head=document.createElement('div');head.className='mp-smart-detail-top';
@@ -834,12 +875,29 @@ async function openHiraDetail(p,marker=null){
   summary.textContent=String(p.category||'의료기관')+' · '+String(p.address||'주소 미확인');detail.append(summary);
   const phone=document.createElement('p');phone.textContent='신고 연락처: '+String(p.phone||'미등록')+' (실제 통화 연결 여부 미확인)';
   detail.append(phone);
+  if(context.catalogPhone && String(context.catalogPhone).replace(/\D/g,'')!==String(p.phone||'').replace(/\D/g,'')){
+    const discrepancy=document.createElement('p');
+    discrepancy.className='mp-hira-phone-warning';
+    discrepancy.textContent='기존 주소록 번호 '+String(context.catalogPhone)+'와 HIRA 신고 연락처가 다릅니다. 실제 전화 연결은 별도 확인해 주세요.';
+    detail.append(discrepancy);
+  }
+  const clinicians=knownExternalClinicians(p);
+  if(clinicians.length){
+    const label=document.createElement('h4');label.textContent='공개 의료진 이름 (외부 출처)';detail.append(label);
+    for(const doctor of clinicians){
+      const row=document.createElement('p');row.className='mp-hira-external-clinician';
+      const a=document.createElement('a');a.href=doctor.url;a.target='_blank';a.rel='noopener noreferrer';
+      a.textContent=doctor.name+' '+doctor.title+' · '+doctor.source+' ↗';
+      row.append(a,document.createTextNode(' · '+doctor.reviewed+' 확인 · HIRA 제공 정보 아님 · 재직 여부는 병원 확인'));
+      detail.append(row);
+    }
+  }
   const actions=document.createElement('div');actions.className='mp-smart-detail-actions';
   const mapLink=document.createElement('a');mapLink.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(String(p.name||'')+' '+String(p.address||''));mapLink.target='_blank';mapLink.rel='noopener noreferrer';mapLink.textContent='Google 지도에서 주소 확인';actions.append(mapLink);
   if(/^\d[\d-]{7,16}$/.test(String(p.phone||''))){
     const call=document.createElement('a');call.href='tel:'+String(p.phone).replace(/[^\d+]/g,'');call.textContent='☎ 신고번호 전화';actions.append(call);
   }
-  try{const url=new URL(String(p.officialUrl||''));if(url.protocol==='https:'){
+  try{const url=new URL(String(p.officialUrl||''));if(['https:','http:'].includes(url.protocol)){
     const site=document.createElement('a');site.href=url.href;site.target='_blank';site.rel='noopener noreferrer';site.textContent='병원 웹사이트 ↗';actions.append(site);
   }}catch{}
   const queue=document.createElement('button');queue.type='button';queue.className='mp-hira-queue-add';queue.textContent='＋ 내 확인 대기목록에 추가';
@@ -863,7 +921,7 @@ async function openHiraDetail(p,marker=null){
       const box=document.createElement('section');const h=document.createElement('strong');h.textContent=name;box.append(h);
       if(!entries.length){const note=document.createElement('p');note.textContent='HIRA 제공 정보 없음';box.append(note);}
       else{const ul=document.createElement('ul');for(const x of entries){
-        const li=document.createElement('li');const n=Number(x[countKey]);
+        const li=document.createElement('li');const raw=x[countKey];const n=raw===null||raw===undefined?NaN:Number(raw);
         li.textContent=String(x.name||'과목 미상')+' · '+(Number.isInteger(n)&&n>=0?n+'명':'인원 미제공');ul.append(li);
       }box.append(ul);}
       content.append(box);
