@@ -81,3 +81,61 @@ export async function queryHira(opts:{q?:string;lat?:number;lng?:number;radius?:
     total:0,items:[],checkedAt:new Date().toISOString()};
  }
 }
+
+/** HIRA detailed facility data (separate public API from the basic hospital list).
+ * Never expose the API credential or treat counts as named physician rosters.
+ * Official source: https://www.data.go.kr/data/15001699/openapi.do
+ */
+export type HiraDepartment={name:string;doctorCount:number|null};
+export type HiraSpecialty={name:string;specialistCount:number|null};
+export type HiraDetails={
+ ok:boolean;code:string;message:string;departments:HiraDepartment[];
+ specialties:HiraSpecialty[];physicianNamesAvailable:false;
+ checkedAt:string;source:string;officialSourceUrl:string;
+};
+const DETAIL_ENDPOINT='https://apis.data.go.kr/B551182/MadmDtlInfoService2.8';
+export function isHiraDetailsConfigured():boolean {
+ return Boolean((process.env.HIRA_DETAIL_SERVICE_KEY||process.env.HIRA_HOSPITAL_SERVICE_KEY||'').trim());
+}
+function xmlItems(xml:string):string[]{
+ return [...xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)].slice(0,60).map(x=>x[1]);
+}
+function safeCount(value:string):number|null {
+ if(!/^\d{1,6}$/.test(value.trim()))return null;
+ const n=Number(value);return Number.isSafeInteger(n)&&n>=0?n:null;
+}
+async function fetchHiraDetailPart(name:'getDgsbjtInfo2.8'|'getSpcSbjtSdrInfo2.8',id:string,key:string){
+ const u=new URL(DETAIL_ENDPOINT+'/'+name);
+ u.searchParams.set('serviceKey',key);
+ u.searchParams.set('ykiho',id);
+ u.searchParams.set('pageNo','1');
+ u.searchParams.set('numOfRows','60');
+ u.searchParams.set('_type','xml');
+ const res=await fetch(u.toString(),{headers:{Accept:'application/xml,text/xml;q=0.9'},signal:AbortSignal.timeout(14500),cache:'no-store',redirect:'error'});
+ const raw=await res.text();
+ if(!res.ok||raw.length>900000)throw Error('UPSTREAM_FAILURE');
+ const code=get(raw,'resultCode')||get(raw,'returnReasonCode');
+ if(!['00','0','NORMAL_SERVICE','NORMAL_CODE'].includes(code))throw Error(code?'UPSTREAM_RESULT':'INVALID_FORMAT');
+ return xmlItems(raw);
+}
+export async function queryHiraDetails(id:string):Promise<HiraDetails> {
+ const source='건강보험심사평가원 의료기관별상세정보서비스';
+ const officialSourceUrl='https://www.data.go.kr/data/15001699/openapi.do';
+ const checkedAt=new Date().toISOString();
+ const empty=(code:string,message:string):HiraDetails=>({ok:false,code,message,departments:[],specialties:[],physicianNamesAvailable:false,checkedAt,source,officialSourceUrl});
+ if(!/^[A-Za-z0-9+\/_=-]{16,160}$/.test(id))return empty('INVALID_ID','병원 식별정보가 유효하지 않습니다.');
+ const key=(process.env.HIRA_DETAIL_SERVICE_KEY||process.env.HIRA_HOSPITAL_SERVICE_KEY||'').trim();
+ if(!key)return empty('NOT_CONFIGURED','HIRA 기관별 상세정보 API 인증이 설정되지 않았습니다.');
+ const [departmentsResult,specialtiesResult]=await Promise.allSettled([
+   fetchHiraDetailPart('getDgsbjtInfo2.8',id,key),
+   fetchHiraDetailPart('getSpcSbjtSdrInfo2.8',id,key)
+ ]);
+ const dept=departmentsResult.status==='fulfilled'?departmentsResult.value:[];
+ const spec=specialtiesResult.status==='fulfilled'?specialtiesResult.value:[];
+ if(departmentsResult.status==='rejected' && specialtiesResult.status==='rejected'){
+   return empty('DETAIL_UNAVAILABLE','진료과목·전문의 수를 확인하지 못했습니다. 별도 API 이용권한 또는 제공기관 응답을 점검해 주세요.');
+ }
+ const departments=dept.map(row=>({name:get(row,'dgsbjtCdNm').slice(0,60),doctorCount:safeCount(get(row,'dgsbjtPrSdrCnt'))})).filter(x=>x.name);
+ const specialties=spec.map(row=>({name:get(row,'dgsbjtCdNm').slice(0,60),specialistCount:safeCount(get(row,'dtlSdrCnt'))})).filter(x=>x.name);
+ return {ok:true,code:'OK',message:departmentsResult.status==='rejected'||specialtiesResult.status==='rejected'?'일부 상세정보만 조회되었습니다.':'공식 상세정보 조회 완료',departments,specialties,physicianNamesAvailable:false,checkedAt:new Date().toISOString(),source,officialSourceUrl};
+}
