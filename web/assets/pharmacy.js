@@ -16,14 +16,33 @@ function addPin(pos,name){
  }
  const m=new google.maps.Marker({map,position:pos,title:'Google Places 약국 · '+name});markers.push(m);return m;
 }
+function isRegistered24h(p){
+ const periods=p?.regularOpeningHours?.periods;
+ if(!Array.isArray(periods)||periods.length!==1)return false;
+ const slot=periods[0],start=slot?.open;
+ return Boolean(start && Number(start.day)===0 && Number(start.hour)===0 && Number(start.minute)===0 && !slot.close);
+}
 function drawCards(){
- const list=$('phResults');list.replaceChildren();
- if(!places.length){const p=document.createElement('p');p.className='mp-ph-empty';p.textContent='선택한 지역에 Google 지도 약국 검색 결과가 없습니다. 반경을 넓혀 다시 검색해 주세요.';list.appendChild(p);return;}
- for(let i=0;i<places.length;i++){
-  const place=places[i],name=String(place.displayName||'약국 장소'),card=document.createElement('article');
-  card.className='mp-ph-item';const title=document.createElement('strong');title.textContent=name;
+ const list=$('phResults'), filter=$('phHoursFilter')?.value||'all';
+ const visible=filter==='24h'?places.filter(isRegistered24h):places;
+ list.replaceChildren();
+ clearMarkers();
+ if(mapReady && map && visible.length){
+  const bounds=new google.maps.LatLngBounds();
+  visible.forEach(p=>{if(!p.location)return;addPin(p.location,String(p.displayName||'약국'));bounds.extend(p.location);});
+  bounds.extend(point);map.fitBounds(bounds,45);
+ }
+ setCount(filter==='24h'?visible.length+'곳 · 24시간 등록 후보 / 조회 '+places.length+'곳':visible.length+'곳 · Google Places');
+ if(!visible.length){
+  const p=document.createElement('p');p.className='mp-ph-empty';
+  p.textContent=filter==='24h'?'검색된 '+places.length+'곳 중 Google Places에 24시간 정규 영업시간이 등록된 약국을 확인하지 못했습니다. 운영시간 정보가 미등록인 약국도 있을 수 있습니다. 아래 E-Gen 공식 검색을 확인하세요.':'이 지역에 Google 지도 약국 검색 결과가 없습니다. 반경을 넓혀 다시 검색해 주세요.';
+  list.appendChild(p);return;
+ }
+ for(const place of visible){
+  const name=String(place.displayName||'약국 장소'),card=document.createElement('article');card.className='mp-ph-item';
+  const title=document.createElement('strong');title.textContent=name;
   const address=document.createElement('p');address.textContent=String(place.formattedAddress||'주소를 Google 지도에서 확인하세요');
-  const caution=document.createElement('p');caution.textContent='운영시간·현재 조제 가능 여부 확인 필요 · Google Places 검색 결과';
+  const caution=document.createElement('p');caution.textContent=isRegistered24h(place)?'Google Places 24시간 영업 등록 · 실제 운영·조제 가능 여부는 전화 확인 필수':'24시간 여부 미확인 · 운영시간은 약국에 전화로 확인';
   const row=document.createElement('div');row.className='mp-ph-actions';
   const mapBtn=document.createElement('button');mapBtn.type='button';mapBtn.textContent='지도에서 보기';
   mapBtn.addEventListener('click',()=>{if(map&&place.location){map.panTo(place.location);map.setZoom(16);}});
@@ -61,17 +80,13 @@ async function search(){
   if(!Place?.searchNearby)throw Error('Google Places API (New)가 활성화되지 않았습니다');
   const radius=Math.max(1000,Math.min(20000,Number($('phRadius').value||2)*1000));
   const {places:returned}=await Place.searchNearby({
-   fields:['displayName','formattedAddress','location','googleMapsURI'],
+   fields:['displayName','formattedAddress','location','googleMapsURI','regularOpeningHours'],
    locationRestriction:{center:point,radius},
    includedTypes:['pharmacy'],
    rankPreference:SearchNearbyRankPreference?.DISTANCE||'DISTANCE',
    maxResultCount:20
   });
   places=(returned||[]).filter(x=>x.location&&x.displayName);
-  clearMarkers();const bounds=new google.maps.LatLngBounds();
-  places.forEach(p=>{addPin(p.location,String(p.displayName||'약국'));bounds.extend(p.location)});
-  if(places.length){bounds.extend(point);map.fitBounds(bounds,45);}
-  setCount(places.length+'곳 · Google Places');
   drawCards();
  }catch(e){
   places=[];clearMarkers();setCount('연동 확인 필요');
@@ -81,6 +96,7 @@ async function search(){
  }finally{busy=false;$('phSearch').disabled=false;}
 }
 $('phSearch').addEventListener('click',search);
+$('phHoursFilter').addEventListener('change',()=>{if(mapReady)drawCards();});
 $('phGeo').addEventListener('click',()=>{
  if(!navigator.geolocation){setStatus('현재 위치 기능을 지원하지 않습니다. 서울시청 기본 위치를 사용합니다.');return;}
  setStatus('현위치 사용 권한을 요청하고 있습니다…');
