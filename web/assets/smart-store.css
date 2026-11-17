@@ -445,3 +445,17 @@
 .mp-map-home .mp-google-places-results{width:min(1360px,calc(100% - 40px));max-width:1360px}
 @media(max-width:900px){#googlePlacesResults{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.mp-google-search-option{align-items:stretch;flex-direction:column}.mp-google-search-option button{width:100%}#googlePlacesResults{grid-template-columns:minmax(0,1fr)}.mp-google-search-option,.mp-google-places-results,.mp-map-home .mp-google-search-option,.mp-map-home .mp-google-places-results{width:calc(100% - 28px)}}
+
+/* Official after-hours emergency finder — distinct from unverified hospital directory. */
+.mp-emergency-finder{max-width:1200px;margin:18px auto;padding:22px 24px;box-sizing:border-box;background:linear-gradient(115deg,#fff5f5,#fff);border:1px solid #f3b7b7;border-radius:18px;display:flex;justify-content:space-between;align-items:center;gap:24px}
+.mp-emergency-finder>div:first-child{flex:1;min-width:0}
+.mp-emergency-eyebrow{font-size:11px;font-weight:900;letter-spacing:.08em;color:#b42333}
+.mp-emergency-finder h2{font-size:clamp(21px,2.3vw,28px);margin:6px 0 8px;line-height:1.3;color:#7f1d2d}
+.mp-emergency-finder p{font-size:13px;line-height:1.7;color:#5e4450;max-width:74ch;margin:0 0 8px}
+.mp-emergency-finder small{font-size:11px;line-height:1.5;color:#80616d}
+.mp-emergency-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;flex:0 0 236px}
+.mp-emergency-actions a{display:flex;justify-content:center;align-items:center;min-height:42px;text-decoration:none;text-align:center;padding:9px 13px;border-radius:10px;box-sizing:border-box;font-size:13px;font-weight:800}
+.mp-emergency-primary{background:#be2438;color:white}
+.mp-emergency-secondary{background:white;color:#991c2d;border:1px solid #e7b6bc}
+.mp-emergency-actions a:focus-visible{outline:3px solid #f697a3;outline-offset:2px}
+@media(max-width:760px){.mp-emergency-finder{margin:12px 16px;padding:18px;flex-direction:column;align-items:stretch}.mp-emergency-actions{flex:none;width:100%}}
