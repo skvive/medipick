@@ -272,6 +272,8 @@ function resetDetail() {
 function showCatalogDetail(item) {
   const detail = $('#smartDetail');
   if (!detail || !item || viewMode !== 'catalog') return;
+  ++hiraDetailVersion;
+  detail.dataset.source='catalog';
   detail.hidden = false;
   const address = String(item.address || '').trim();
   const mapQuery = encodeURIComponent([item.name, address].filter(Boolean).join(' '));
