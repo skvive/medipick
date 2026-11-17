@@ -49,9 +49,13 @@
 <div class="mp-emergency-actions"><a class="mp-emergency-primary" href="https://www.e-gen.or.kr/egen/search_emergency_room.do" target="_blank" rel="noopener noreferrer">공식 실시간 응급실 찾기 ↗</a><a class="mp-emergency-secondary" href="tel:119">긴급상황 119 신고</a><a class="mp-emergency-secondary" href="/pharmacy">심야·24시간 약국 찾기</a></div>
 </section>
 <section class="mp-google-search-option mp-google-directory" aria-label="Google Maps 실제 장소 검색">
- <div><strong>검증된 내부 병원 핀이 없나요?</strong><small>사용자가 요청하면 Google Places API (New)로 주변 의료기관 장소를 조회합니다. 검색 결과는 별도 정보이며 의료기관 인증·진료 가능 여부를 보증하지 않습니다.</small></div><button type="button" id="smartHiraSearch">HIRA 공식 병원 좌표 검색</button><button type="button" id="smartGooglePlaces">Google 지도 병원 핀 검색</button><span id="hiraStatus" role="status" aria-live="polite"></span>
+ <div><strong>HIRA 공식 병원 핀 자동 표시</strong><small>주변 지도는 건강보험심사평가원이 제공한 정확좌표를 우선 표시합니다. 핀 또는 병원 상세보기를 누르면 진료과목과 전문의 현황을 조회합니다. 실제 진료·전화 연결 여부는 별도 확인하세요.</small></div><button type="button" id="smartHiraSearch">HIRA 공식 병원 좌표 검색</button><button type="button" id="smartGooglePlaces">Google 지도 병원 핀 검색</button><span id="hiraStatus" role="status" aria-live="polite"></span>
  </section>
  <section class="mp-google-places-results mp-google-directory" id="googlePlacesSection" hidden aria-label="Google Places 병원 검색 결과"><div class="mp-google-places-header"><strong>Google 지도 검색 결과 · 독립 확인 필요</strong><button type="button" id="clearGooglePlaces">결과 지우기</button></div><div id="googlePlacesResults" role="status" aria-live="polite"></div></section>
+ <section class="mp-hira-review-queue" id="hiraReviewQueue" hidden aria-labelledby="hiraReviewQueueHeading">
+   <div><h2 id="hiraReviewQueueHeading">개인 확인 대기목록</h2><p>확인하고 싶은 병원을 임시로 담는 목록입니다. 병원 접수·진료·예약 대기 신청이 아닙니다. 현재 브라우저 세션에서만 유지됩니다.</p></div>
+   <span id="hiraReviewQueueCount" aria-live="polite"></span><div id="hiraReviewQueueItems" class="mp-hira-queue-items"></div>
+ </section>
  <div class="mp-smart-layout">
 <aside class="mp-smart-list-panel" aria-label="주변 병원 목록">
 <div class="mp-smart-list-head"><b id="smartListTitle">병원 주소록 · 지역 검색</b><span id="smartListMeta">목록을 불러오는 중</span></div>
