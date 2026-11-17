@@ -34,6 +34,12 @@ let googlePlacesMarkers=[];
 let hiraMarkers=[];
 let hiraSearching=false;
 let placesSearching=false;
+let hiraActivePlaces=null; // Official HIRA map layer, never inferred catalog coordinates.
+let hiraSearchVersion=0;
+let hiraAbortController=null;
+let hiraDetailVersion=0;
+const mapCallbacks=[];
+
 
 let locationMode = 'default'; // 'default' | 'geo' | 'region' (explicit user action only)
 let userLocationMarker = null;
@@ -66,36 +72,33 @@ function searchAtDefault(reason) {
 }
 
 function loadMaps(cb) {
-  const key = config?.google_maps_browser_key;
-  if (!key) { setPinStatus('지도 API 설정 확인 필요 · 주소록 검색 가능'); const box=$('#smartStoreMap'); if(box&&box.classList.contains('mp-smart-map-empty')){const p=box.querySelector('p');if(p)p.textContent='Google 지도 서비스 키가 연결되지 않아 지도가 표시되지 않습니다. 병원 목록에서 Google 지도 주소 확인 링크를 이용하세요.';} return; }
-  if (window.google?.maps) {
-    mapsState = 'ready';
-    cb?.();
+  if(typeof cb==='function') mapCallbacks.push(cb);
+  const flush=()=>{ for(const fn of mapCallbacks.splice(0)) try{fn();}catch(e){console.error('Map callback failed',e);} };
+  const key=config?.google_maps_browser_key;
+  if(!key) {
+    setPinStatus('Google 지도 키 설정 필요 · HIRA 병원 목록은 이용 가능');
+    const box=$('#smartStoreMap');
+    if(box&&box.classList.contains('mp-smart-map-empty')) {
+      const p=box.querySelector('p');
+      if(p)p.textContent='지도 키가 연결되지 않았습니다. HIRA 공식 병원 목록에서 주소를 확인할 수 있습니다.';
+    }
+    mapCallbacks.length=0;
     return;
   }
-  if (mapsState === 'loading') {
-    window.medipickSmartStoreMapReady = () => {
-      mapsState = 'ready';
-      cb?.();
-    };
-    return;
-  }
-  mapsState = 'loading';
-  window.medipickSmartStoreMapReady = () => {
-    mapsState = 'ready';
-    cb?.();
+  if(window.google?.maps){mapsState='ready';flush();return;}
+  if(mapsState==='loading')return;
+  mapsState='loading';
+  window.medipickSmartStoreMapReady=()=>{mapsState='ready';flush();};
+  const script=document.createElement('script');
+  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&language=ko&region=KR&v=weekly&libraries=marker&loading=async&callback=medipickSmartStoreMapReady';
+  script.async=true;
+  script.onerror=()=>{
+    mapsState='error';
+    mapCallbacks.length=0;
+    showToast('Google Maps를 불러오지 못했습니다. HIRA 병원 목록은 계속 검색할 수 있습니다.');
+    setPinStatus('지도 연결 실패 · HIRA 목록 이용 가능');
   };
-  const scr = document.createElement('script');
-  scr.src =
-    'https://maps.googleapis.com/maps/api/js?key=' +
-    encodeURIComponent(key) +
-    '&language=ko&region=KR&v=weekly&libraries=marker&loading=async&callback=medipickSmartStoreMapReady';
-  scr.async = true;
-  scr.onerror = () => {
-    mapsState = 'error';
-    showToast('Google Maps를 불러오지 못했습니다. 병원 주소록은 계속 검색할 수 있습니다.'); setPinStatus('지도 연결 실패 · 주소록 검색 가능');
-  };
-  document.head.appendChild(scr);
+  document.head.appendChild(script);
 }
 
 function popupHtml(x) {
@@ -408,6 +411,7 @@ function renderList() {
 }
 
 function renderMapMarkers() {
+  if (Array.isArray(hiraActivePlaces) && hiraActivePlaces.length) { renderHiraMarkers(); return; }
   if (!ensureMap()) return;
   clearMarkers();
   const bounds = new google.maps.LatLngBounds();
@@ -496,6 +500,10 @@ async function searchNearby(lat, lng) {
   }
   renderList();
   loadMaps(() => renderMapMarkers());
+  if(viewMode==='catalog' && locationMode!=='region'){
+    // HIRA is the preferred verified map layer for nearby search, not a separate forgotten button.
+    void searchHiraOnDemand({automatic:true});
+  }
   if (notice) notice.textContent = radiusMode
     ? (usingEstimates ? '주의: 직접 켠 회색 추정핀은 실제 병원 위치가 아닙니다.' : '반경 검색은 검증된 정확좌표만 사용합니다. 주변 검증 병원이 없으면 주소록 후보를 별도로 표시하며 거리를 표시하지 않습니다.')
     : '전국 주소록 검색 결과입니다. 지도 핀은 정확좌표가 검증된 병원만 표시하며 병원 운영·진료 여부를 보증하지 않습니다.';
@@ -532,7 +540,7 @@ function bindUi() {
     }
     setLocationStatus('현위치 권한을 확인하는 중…');
     navigator.geolocation.getCurrentPosition(
-      (pos) => { locationMode='geo'; if($('#smartRegion')) $('#smartRegion').value=''; setLocationStatus('현위치 검색 · 브라우저 제공 위치 (약 '+Number(pos.coords.accuracy||0).toFixed(0)+'m 정확도)'); searchNearby(pos.coords.latitude,pos.coords.longitude).then(()=>searchHiraOnDemand()).catch(e=>showToast(e.message)); },
+      (pos) => { locationMode='geo'; if($('#smartRegion')) $('#smartRegion').value=''; setLocationStatus('현위치 검색 · 브라우저 제공 위치 (약 '+Number(pos.coords.accuracy||0).toFixed(0)+'m 정확도)'); searchNearby(pos.coords.latitude,pos.coords.longitude).catch(e=>showToast(e.message)); },
       () => searchAtDefault('현위치 권한을 얻지 못해 가락시장역 기준으로 검색합니다.').catch((e) => showToast(e.message)),
       { enableHighAccuracy:true, timeout: 12000, maximumAge: 60000 },
     );
@@ -593,6 +601,7 @@ async function init() {
     await initStats();
     bindUi();
     loadMaps();
+    renderHiraReviewQueue();
     const params = new URLSearchParams(location.search);
     if (params.get('q') && $('#smartQ')) $('#smartQ').value = params.get('q').slice(0, 80);
     if (params.get('trade') && $('#smartTrade')) $('#smartTrade').value = params.get('trade').slice(0,40);
@@ -752,96 +761,181 @@ async function searchGooglePlacesOnDemand(){
 }
 
 
-/* Official HIRA v2 hospitals (server proxy; caller never sees the API key).
- * Green H pins are official source coordinates. The database's synthetic/approximate
- * coordinates are never promoted to verified accuracy. */
+/* HIRA-only verified pin layer. Never substitute fabricated/approximate catalog pins. */
 function clearHiraResults(){
+  ++hiraSearchVersion;
+  hiraAbortController?.abort();
+  hiraAbortController=null;
+  hiraActivePlaces=null;
   hiraMarkers.forEach(removeMapMarker);hiraMarkers=[];
   const sidebar=$('#smartList');
   if(sidebar?.dataset.source==='hira'){
-    sidebar.dataset.source='catalog';
-    renderList();
-    renderMapMarkers();
+    sidebar.dataset.source='catalog';renderList();renderMapMarkers();
+  }
+  if($('#smartDetail')){$('#smartDetail').hidden=true;$('#smartDetail').replaceChildren();}
+}
+function renderHiraMarkers(){
+  if(!Array.isArray(hiraActivePlaces)||!ensureMap())return;
+  for(const m of markerById.values())removeMapMarker(m);
+  markerById.clear();
+  hiraMarkers.forEach(removeMapMarker);hiraMarkers=[];
+  const bounds=new google.maps.LatLngBounds();
+  for(const p of hiraActivePlaces){
+    if(!Number.isFinite(p.latitude)||!Number.isFinite(p.longitude)||p.coordinateSource!=='HIRA_API')continue;
+    const marker=buildMarker({lat:p.latitude,lng:p.longitude},'HIRA 신고 좌표 · '+String(p.name||'병원'),true,false,false,true);
+    marker.addListener('click',()=>{
+      openHiraDetail(p,marker);
+      if(infoWindow){
+        infoWindow.setContent('<div class="mp-store-popup"><b>'+safe(p.name||'병원')+'</b><p>'+safe(p.address||'')+'</p><small>HIRA 좌표 · 진료 여부 미확인 · 아래 상세창 확인</small></div>');
+        infoWindow.open({map,anchor:marker});
+      }
+    });
+    hiraMarkers.push(marker);bounds.extend({lat:p.latitude,lng:p.longitude});
+  }
+  if(hiraMarkers.length){bounds.extend(center||defaultCenter());map.fitBounds(bounds,45);}
+  setPinStatus('HIRA 공식 좌표 '+hiraMarkers.length+'개');
+}
+const HIRA_QUEUE_KEY='mp_hira_review_queue_session_v1';
+function getHiraReviewQueue(){
+  try{
+    const data=JSON.parse(sessionStorage.getItem(HIRA_QUEUE_KEY)||'[]');
+    return Array.isArray(data)?data.filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string').slice(0,20):[];
+  }catch{return [];}
+}
+function renderHiraReviewQueue(){
+  const panel=$('#hiraReviewQueue'),list=$('#hiraReviewQueueItems'),count=$('#hiraReviewQueueCount');
+  if(!panel||!list)return;
+  const entries=getHiraReviewQueue();panel.hidden=entries.length===0;list.replaceChildren();
+  if(count)count.textContent=entries.length+'개 병원';
+  for(const item of entries){
+    const tag=document.createElement('span');tag.className='mp-hira-queue-item';
+    tag.append(document.createTextNode(item.name+' '));
+    const remove=document.createElement('button');remove.type='button';remove.textContent='×';remove.setAttribute('aria-label',item.name+' 확인 목록에서 제거');
+    remove.addEventListener('click',()=>{try{sessionStorage.setItem(HIRA_QUEUE_KEY,JSON.stringify(getHiraReviewQueue().filter(x=>x.id!==item.id)));}catch{}renderHiraReviewQueue();});
+    tag.append(remove);list.append(tag);
   }
 }
-async function searchHiraOnDemand(){
+function queueHiraFacility(p){
+  const list=getHiraReviewQueue();
+  if(!list.some(x=>x.id===p.id))list.unshift({id:String(p.id||''),name:String(p.name||'병원').slice(0,120)});
+  try{sessionStorage.setItem(HIRA_QUEUE_KEY,JSON.stringify(list.slice(0,20)));renderHiraReviewQueue();showToast('개인 확인 대기목록에 담았습니다. 실제 진료·예약 대기 신청은 아닙니다.');}
+  catch{showToast('이 브라우저에서 확인 목록을 저장할 수 없습니다.');}
+}
+async function openHiraDetail(p,marker=null){
+  const detail=$('#smartDetail');if(!detail)return;
+  const detailId=++hiraDetailVersion;
+  detail.hidden=false;detail.replaceChildren();
+  const title=document.createElement('h3');title.textContent=String(p.name||'의료기관');
+  const label=document.createElement('div');label.className='mp-hira-source-label';label.textContent='건강보험심사평가원 · 의료기관 신고 정보';
+  const head=document.createElement('div');head.className='mp-smart-detail-top';
+  const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','상세창 닫기');close.onclick=()=>{++hiraDetailVersion;detail.hidden=true;};
+  head.append(label,close);detail.append(head,title);
+  const summary=document.createElement('p');summary.className='mp-hira-detail-summary';
+  summary.textContent=String(p.category||'의료기관')+' · '+String(p.address||'주소 미확인');detail.append(summary);
+  const phone=document.createElement('p');phone.textContent='신고 연락처: '+String(p.phone||'미등록')+' (실제 통화 연결 여부 미확인)';
+  detail.append(phone);
+  const actions=document.createElement('div');actions.className='mp-smart-detail-actions';
+  const mapLink=document.createElement('a');mapLink.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(String(p.name||'')+' '+String(p.address||''));mapLink.target='_blank';mapLink.rel='noopener noreferrer';mapLink.textContent='Google 지도에서 주소 확인';actions.append(mapLink);
+  if(/^\d[\d-]{7,16}$/.test(String(p.phone||''))){
+    const call=document.createElement('a');call.href='tel:'+String(p.phone).replace(/[^\d+]/g,'');call.textContent='☎ 신고번호 전화';actions.append(call);
+  }
+  try{const url=new URL(String(p.officialUrl||''));if(url.protocol==='https:'){
+    const site=document.createElement('a');site.href=url.href;site.target='_blank';site.rel='noopener noreferrer';site.textContent='병원 웹사이트 ↗';actions.append(site);
+  }}catch{}
+  const queue=document.createElement('button');queue.type='button';queue.className='mp-hira-queue-add';queue.textContent='＋ 내 확인 대기목록에 추가';
+  queue.onclick=()=>queueHiraFacility(p);actions.append(queue);detail.append(actions);
+  const docTitle=document.createElement('h4');docTitle.textContent='진료과목 및 전문의 현황';detail.append(docTitle);
+  const content=document.createElement('div');content.className='mp-hira-medical-details';content.textContent='HIRA 공식 진료과목 상세정보 조회 중…';detail.append(content);
+  const caution=document.createElement('p');caution.className='mp-smart-detail-note';caution.textContent='개별 의사 성명 및 진료일정은 HIRA 상세 API에서 확인되지 않습니다. 병원 공식 홈페이지·전화로 확인하세요. 진료과목별 의사 수와 전문의 수는 동일하지 않을 수 있습니다.';detail.append(caution);
+  if(map&&p.latitude!=null&&p.longitude!=null){map.panTo({lat:p.latitude,lng:p.longitude});map.setZoom(15);}
+  if(marker&&infoWindow){infoWindow.setContent('<b>'+safe(p.name||'병원')+'</b><p>HIRA 공식 지도 좌표 · 진료 여부 직접 확인</p>');infoWindow.open({map,anchor:marker});}
+  if(matchMedia('(max-width:700px)').matches)detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(!p.id){content.textContent='의료기관 식별정보가 없어 공식 진료과목을 조회하지 못했습니다.';return;}
+  try{
+    const res=await fetch('/api/hira/details?id='+encodeURIComponent(String(p.id)),{cache:'no-store'});
+    const data=await res.json();
+    if(detailId!==hiraDetailVersion||detail.hidden)return;
+    content.replaceChildren();
+    if(!res.ok||!data.ok)throw Error(String(data.message||'상세정보 연동 확인 필요'));
+    const depts=Array.isArray(data.departments)?data.departments:[];
+    const specs=Array.isArray(data.specialties)?data.specialties:[];
+    const group=(name,entries,countKey)=>{
+      const box=document.createElement('section');const h=document.createElement('strong');h.textContent=name;box.append(h);
+      if(!entries.length){const note=document.createElement('p');note.textContent='HIRA 제공 정보 없음';box.append(note);}
+      else{const ul=document.createElement('ul');for(const x of entries){
+        const li=document.createElement('li');const n=Number(x[countKey]);
+        li.textContent=String(x.name||'과목 미상')+' · '+(Number.isInteger(n)&&n>=0?n+'명':'인원 미제공');ul.append(li);
+      }box.append(ul);}
+      content.append(box);
+    };
+    group('진료과목별 의사',depts,'doctorCount');
+    group('전문과목별 전문의',specs,'specialistCount');
+    if(data.message&&data.message!=='공식 상세정보 조회 완료'){
+      const note=document.createElement('p');note.textContent=String(data.message);content.append(note);
+    }
+  }catch(err){
+    if(detailId!==hiraDetailVersion||detail.hidden)return;
+    content.textContent='HIRA 진료과목 상세정보를 불러오지 못했습니다: '+String(err?.message||'제공정보 확인 필요')+'. 공식 사이트에서 별도 확인하세요.';
+  }
+}
+async function searchHiraOnDemand(options={}){
+  const automatic=options?.automatic===true;
   const button=$('#smartHiraSearch'),status=$('#hiraStatus');
-  if(!button||hiraSearching)return;
+  if(!button||viewMode!=='catalog')return;
   clearGooglePlacesResults();clearHiraResults();
+  const requestId=++hiraSearchVersion;
+  const controller=new AbortController();hiraAbortController=controller;
   hiraSearching=true;button.disabled=true;
-  if(status)status.textContent='HIRA 공식 병원정보 조회 중…';
+  if(status)status.textContent=automatic?'HIRA 공식 병원 좌표 자동 검색 중…':'HIRA 공식 병원정보 조회 중…';
   try{
     const point=center||defaultCenter();
     const q=($('#smartQ')?.value||'').trim().slice(0,80);
-    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
+    const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||2)*1000));
     const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius)});
     if(q)qs.set('q',q);
-    const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store'});
+    const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store',signal:controller.signal});
     const data=await res.json();
-    if(!res.ok||data.ok!==true)throw new Error(String(data.message||data.code||'공식 API 사용 권한을 확인해 주세요'));
-    const places=Array.isArray(data.items)?data.items.slice(0,20):[];
-    if(locationMode==='geo' && places.length===0){
-      if(status)status.textContent='HIRA 2km 반경 내 검증 병원 0건 · Google 장소 검색으로 확인';
-      await searchGooglePlacesOnDemand();
+    if(requestId!==hiraSearchVersion)return;
+    if(!res.ok||data.ok!==true)throw Error(String(data.message||data.code||'HIRA 기관 서비스 연결 확인 필요'));
+    const results=Array.isArray(data.items)?data.items.slice(0,20):[];
+    const places=results.filter(p=>p&&Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&p.coordinateSource==='HIRA_API');
+    if(!places.length){
+      if(status)status.textContent='선택한 반경 내 HIRA 검증 좌표 0건 · 병원명 또는 검색 반경 변경';
+      if(!automatic)showToast('HIRA 공식 좌표가 확인되지 않았습니다. 지도에 임의의 병원 핀을 만들지 않습니다.');
       return;
     }
+    hiraActivePlaces=places;
     const sidebar=$('#smartList'),label=$('#smartListTitle'),meta=$('#smartListMeta');
-    if(!sidebar)throw new Error('병원 결과 영역을 찾지 못했습니다');
-    const selected=places.filter(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&p.coordinateSource==='HIRA_API');
+    if(!sidebar)return;
     const cards=places.map(p=>{
-      const card=document.createElement('article');card.className='mp-google-place-card';
-      const title=document.createElement('strong');title.textContent=p.name||'병원';
+      const card=document.createElement('article');card.className='mp-google-place-card mp-hira-place-card';
+      const title=document.createElement('strong');title.textContent=String(p.name||'병원');
       const address=document.createElement('p');address.textContent=String(p.address||'주소 정보 없음');
-      const type=document.createElement('p');type.textContent=String(p.category||'의료기관')+' · HIRA 공식 공개정보 · 진료/영업상태 별도 확인';
+      const category=document.createElement('p');category.textContent=String(p.category||'의료기관')+' · HIRA 공식 좌표'+(p.distanceKm!==null?' · '+p.distanceKm+'km':'');
       const actions=document.createElement('div');actions.className='mp-google-place-actions';
-      if(Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)){
-        const view=document.createElement('button');view.type='button';view.textContent='지도 핀 보기';
-        view.addEventListener('click',()=>{
-          if(map){map.panTo({lat:p.latitude,lng:p.longitude});map.setZoom(15);}
-          $('#smartStoreMap')?.scrollIntoView({behavior:'smooth',block:'nearest'});
-        });actions.appendChild(view);
-      }
-      const link=document.createElement('a');link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((p.name||'병원')+' '+(p.address||''));
-      link.target='_blank';link.rel='noopener noreferrer';link.textContent='Google 지도에서 확인 ↗';
-      actions.appendChild(link);card.append(title,address,type,actions);return card;
+      const more=document.createElement('button');more.type='button';more.textContent='전문과목·의사 현황';
+      more.addEventListener('click',()=>openHiraDetail(p));actions.append(more);
+      const mapBtn=document.createElement('button');mapBtn.type='button';mapBtn.textContent='지도 핀 보기';
+      mapBtn.addEventListener('click',()=>{openHiraDetail(p);$('#smartStoreMap')?.scrollIntoView({behavior:'smooth',block:'nearest'});});actions.append(mapBtn);
+      card.append(title,address,category,actions);return card;
     });
     const back=document.createElement('button');back.className='mp-ref-places-back';back.type='button';
-    back.textContent='← 기존 주소록 결과로 돌아가기';back.addEventListener('click',clearHiraResults);
+    back.textContent='← 주소록 결과 보기';back.addEventListener('click',clearHiraResults);
     const source=document.createElement('p');source.className='mp-google-places-attribution';
-    source.textContent='HIRA 병원정보서비스 v2 · 공식 등록 좌표에 한해 녹색 H 핀 · 의료기관 운영 여부 별도 확인';
+    source.textContent='HIRA 공식 병원정보 v2 · 녹색 H 핀만 사용 · 현재 운영·통화 연결 미검증';
     sidebar.dataset.source='hira';sidebar.replaceChildren(back,source,...cards);
-    if(label)label.textContent='HIRA 공식 병원 검색 결과';
-    if(meta)meta.textContent=places.length+'건 · 정확좌표 '+selected.length+'건';
-    // The HIRA response may arrive before Google Maps initializes.
-    // Wait briefly for the already-loading SDK, so official pins are not silently skipped.
-    if(!mapReady() && config?.google_maps_browser_key){
-      await new Promise(resolve=>{
-        let attempts=0;
-        const check=setInterval(()=>{
-          if(mapReady() || ++attempts>=40){clearInterval(check);resolve();}
-        },200);
-      });
-    }
-    if(mapReady()&&ensureMap()){
-      for(const marker of markerById.values())removeMapMarker(marker);
-      markerById.clear();
-      const bounds=new google.maps.LatLngBounds();let n=0;
-      for(const p of selected){
-        const pin=buildMarker({lat:p.latitude,lng:p.longitude},'HIRA 등록 병원 · '+p.name,true,false,false,true);
-        hiraMarkers.push(pin);bounds.extend({lat:p.latitude,lng:p.longitude});n++;
-      }
-      if(n){bounds.extend(point);map.fitBounds(bounds,45);}
-    }
-    setPinStatus('HIRA 공식 좌표 '+selected.length+'개');
-    if(status)status.textContent='조회 완료 · '+places.length+'건 · 출처 HIRA · 진료 여부 직접 확인';
-  }catch(e){
-    if(status)status.textContent='HIRA 연동 확인 필요: '+String(e?.message||'API 응답 실패');
-    if(locationMode==='geo'){
-      showToast('공식 HIRA 검색을 표시하지 못해 Google 주변 장소를 확인합니다.');
-      await searchGooglePlacesOnDemand();
-    }else{
-      showToast('HIRA API 응답을 확인할 수 없습니다. Google 장소 검색을 선택해 주세요.');
-    }
-  }finally{hiraSearching=false;button.disabled=false;}
+    if(label)label.textContent='HIRA 공식 병원 위치·진료과목';
+    if(meta)meta.textContent=places.length+'개 검증 핀 · 원본 전체 '+Number(data.total||0)+'건';
+    loadMaps(()=>{if(requestId===hiraSearchVersion)renderHiraMarkers();});
+    if(mapReady())renderHiraMarkers();
+    if(status)status.textContent='HIRA 조회 완료 · '+places.length+'개 공식 병원 핀 · 선택하면 전문과목 조회';
+  }catch(error){
+    if(requestId!==hiraSearchVersion || error?.name==='AbortError')return;
+    if(status)status.textContent='HIRA 연동 확인 필요: '+String(error?.message||'API 요청 실패');
+    if(!automatic)showToast('HIRA 공식 검색을 표시하지 못했습니다. 주소록은 유지하고, 미검증 핀은 생성하지 않습니다.');
+  }finally{
+    if(requestId===hiraSearchVersion){hiraSearching=false;button.disabled=false;hiraAbortController=null;}
+  }
 }
+
 init();
