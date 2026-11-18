@@ -1,6 +1,6 @@
 import {allowRequest,isHiraConfigured,queryHira} from '@/lib/medipick/hira-client';
 export const runtime='nodejs';
-export const maxDuration=25; // HIRA government API occasionally exceeds the former 8.5-second budget.
+export const maxDuration=35; // HIRA government API occasionally exceeds the former 8.5-second budget.
 export const preferredRegion='icn1'; // Keep HIRA government API calls in Seoul, not default US iad1.
 export const dynamic='force-dynamic';
 export async function GET(request:Request){
@@ -17,8 +17,8 @@ export async function GET(request:Request){
  // follows hasMore until the requested search window is covered.
  const requestedPage=Number(u.searchParams.get('page')||1);
  const page=Number.isSafeInteger(requestedPage)?Math.min(100,Math.max(1,requestedPage)):1;
- const requestedSize=Number(u.searchParams.get('size')||100);
- const size=Number.isSafeInteger(requestedSize)?Math.min(100,Math.max(10,requestedSize)):100;
+ const requestedSize=Number(u.searchParams.get('size')||500);
+ const size=Number.isSafeInteger(requestedSize)?Math.min(500,Math.max(10,requestedSize)):500;
  const data=await queryHira({q,lat:coord?lat:undefined,lng:coord?lng:undefined,radius,pageNo:page,numOfRows:size});
  // HIRA response coordinate radius must also be verified server-side;
  // upstream filtering can be incomplete and unverified records must never become map pins.

@@ -35,7 +35,7 @@ function parse(xml:string,origin?:{lat:number;lng:number}):Result{
  const code=get(xml,'resultCode')||get(xml,'returnReasonCode')||'UNKNOWN';
  const responseText=get(xml,'resultMsg')||get(xml,'returnAuthMsg')||get(xml,'errMsg')||'';
  const ok=code==='00'||code==='0'||code==='NORMAL_SERVICE'||code==='NORMAL_CODE';
- const items=Array.from(xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)).slice(0,100).map(m=>{
+ const items=Array.from(xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)).slice(0,500).map(m=>{
   const row=m[1],ykiho=get(row,'ykiho'),name=get(row,'yadmNm').slice(0,150);
   const lat=numberOrNull(get(row,'YPos')||get(row,'yPos'));
   const lng=numberOrNull(get(row,'XPos')||get(row,'xPos'));
@@ -58,13 +58,13 @@ export async function queryHira(opts:{q?:string;lat?:number;lng?:number;radius?:
  if(!key)return {ok:false,code:'NOT_CONFIGURED',message:'서버 환경변수 미설정',total:0,items:[],checkedAt:new Date().toISOString()};
  const u=new URL(ENDPOINT);u.searchParams.set('serviceKey',key);
  u.searchParams.set('pageNo',String(Math.min(100,Math.max(1,Math.trunc(Number(opts.pageNo)||1)))));
- u.searchParams.set('numOfRows',String(Math.min(100,Math.max(1,Math.trunc(Number(opts.numOfRows)||10)))));
+ u.searchParams.set('numOfRows',String(Math.min(500,Math.max(1,Math.trunc(Number(opts.numOfRows)||10)))));
  const q=(opts.q||'').trim().slice(0,80);if(q)u.searchParams.set('yadmNm',q);
  const lat=opts.lat,lng=opts.lng;
  const point=lat!==undefined&&lng!==undefined&&Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=32&&lat<=39&&lng>=124&&lng<=132?{lat,lng}:undefined;
  if(point){u.searchParams.set('xPos',String(point.lng));u.searchParams.set('yPos',String(point.lat));u.searchParams.set('radius',String(Math.min(30000,Math.max(500,opts.radius||3000))));}
  try{
-  const res=await fetch(u.toString(),{headers:{Accept:'application/xml,text/xml;q=0.9,*/*;q=0.8'},signal:AbortSignal.timeout(17500),cache:'no-store',redirect:'error'});
+  const res=await fetch(u.toString(),{headers:{Accept:'application/xml,text/xml;q=0.9,*/*;q=0.8'},signal:AbortSignal.timeout(24000),cache:'no-store',redirect:'error'});
   const raw=await res.text();
   if(raw.length>1_500_000)return {ok:false,code:'RESPONSE_TOO_LARGE',message:'제공기관 응답 크기 제한',total:0,items:[],checkedAt:new Date().toISOString()};
   const parsed=parse(raw,point);
