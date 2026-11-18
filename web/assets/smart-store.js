@@ -38,16 +38,14 @@ function clinicPhotoSource(value,identity) {
 }
 function clinicPhotoMarkup(realImage,identity) {
   const picture=clinicPhotoSource(realImage,identity);
-  const desc=picture.ai?'AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님':'병원 등록 이미지';
-  return '<span class="mp-clinic-thumb"><img src="'+safe(picture.src)+'" data-fallback="'+safe(clinicFallbackImage(identity))+'" alt="'+desc+'" width="96" height="76" loading="lazy" decoding="async">'+(picture.ai?'<span class="mp-clinic-photo-label">AI 연출</span>':'')+'</span>';
+  return '<span class="mp-clinic-thumb"><img src="'+safe(picture.src)+'" data-fallback="'+safe(clinicFallbackImage(identity))+'" alt="" width="96" height="76" loading="lazy" decoding="async"></span>';
 }
 function createClinicPhoto(identity) {
   const media=document.createElement('span');media.className='mp-clinic-card-visual';
   const picture=document.createElement('img');picture.src=clinicFallbackImage(identity);
-  picture.alt='AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님';
+  picture.alt='';
   picture.width=96;picture.height=88;picture.loading='lazy';picture.decoding='async';
-  const label=document.createElement('span');label.className='mp-clinic-photo-label';label.textContent='AI 연출';
-  media.append(picture,label);
+  media.append(picture);
   return media;
 }
 
@@ -427,10 +425,7 @@ function renderList() {
       const fallback=img.dataset.fallback;
       if(!fallback||img.getAttribute('src')===fallback)return;
       img.src=fallback;
-      img.alt='AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님';
-      const label=document.createElement('span');
-      label.className='mp-clinic-photo-label';label.textContent='AI 연출';
-      img.parentElement?.appendChild(label);
+      img.alt='';
     },{once:true});
   });
   list.querySelectorAll('[data-open-id]').forEach(btn=>{
