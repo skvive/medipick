@@ -14,12 +14,16 @@ test('five reusable Korean clinic photo fallback assets exist as compact WebP fi
     assert.ok(raw.byteLength>1000&&raw.byteLength<50000,name);
   }
 });
-test('hospital, HIRA and Google Places cards use a stable illustrative fallback with source labelling',()=>{
+test('hospital, HIRA and Google Places cards use a stable illustrative fallback without photo labels',()=>{
   const js=read('web/assets/smart-store.js');
   assert.match(js,/function clinicFallbackImage\(identity\)/);
   assert.match(js,/Math\.imul\(hash,31\)/);
   assert.match(js,/clinicPhotoMarkup\(x\.ui\?\.hero_image,x\.id\|\|x\.name\)/);
   assert.match(js,/createClinicPhoto\(p\.id\|\|p\.name\)/);
   assert.match(js,/createClinicPhoto\(place\.id\|\|place\.displayName\)/);
-  assert.match(js,/AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님/);
+  assert.doesNotMatch(js,/AI 연출|mp-clinic-photo-label/);
+  assert.match(js,/<img src=/);
+  assert.match(js,/alt=""/);
+  const css=read('web/assets/smart-store.css');
+  assert.doesNotMatch(css,/mp-clinic-photo-label/);
 });
