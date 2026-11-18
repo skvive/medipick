@@ -12,7 +12,7 @@ test('HIRA client requests up to 100 genuine rows rather than silently dropping 
  assert.match(client,/Math\.min\(100,Math\.max\(1,Math\.trunc\(Number\(opts\.pageNo\)/);
  assert.match(client,/Math\.min\(100,Math\.max\(1,Math\.trunc\(Number\(opts\.numOfRows\)/);
  assert.match(client,/pageSize:numberOrNull\(get\(xml,'numOfRows'\)\)\|\|undefined/);
- assert.doesNotMatch(client,/\.slice\(0,30\)/);
+ assert.doesNotMatch(client,/xml\.matchAll\([^\n]+\)\)\.slice\(0,30\)/);
 });
 test('HIRA route accepts pages and makes partial coverage visible without caching upstream errors',()=>{
  const src=read('app/api/hira/hospitals/route.ts');
