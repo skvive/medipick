@@ -6,7 +6,7 @@ export type HiraHospital = {
   latitude:number|null; longitude:number|null; distanceKm:number|null;
   officialUrl:string|null; source:'HIRA'; coordinateSource:'HIRA_API'|'missing';
 };
-type Result = {ok:boolean;code:string;message:string;total:number;items:HiraHospital[];checkedAt:string};
+type Result = {ok:boolean;code:string;message:string;total:number;items:HiraHospital[];checkedAt:string;pageSize?:number};
 const ENDPOINT='https://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList';
 const rate=new Map<string,{n:number;t:number}>();
 const REQ_LIMIT=12;
@@ -35,7 +35,7 @@ function parse(xml:string,origin?:{lat:number;lng:number}):Result{
  const code=get(xml,'resultCode')||get(xml,'returnReasonCode')||'UNKNOWN';
  const responseText=get(xml,'resultMsg')||get(xml,'returnAuthMsg')||get(xml,'errMsg')||'';
  const ok=code==='00'||code==='0'||code==='NORMAL_SERVICE'||code==='NORMAL_CODE';
- const items=Array.from(xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)).slice(0,30).map(m=>{
+ const items=Array.from(xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)).slice(0,100).map(m=>{
   const row=m[1],ykiho=get(row,'ykiho'),name=get(row,'yadmNm').slice(0,150);
   const lat=numberOrNull(get(row,'YPos')||get(row,'yPos'));
   const lng=numberOrNull(get(row,'XPos')||get(row,'xPos'));
@@ -51,14 +51,14 @@ function parse(xml:string,origin?:{lat:number;lng:number}):Result{
    officialUrl,source:'HIRA' as const,coordinateSource:coordinateValid?'HIRA_API' as const:'missing' as const,
   };
  }).filter(x=>x.name);
- return {ok,code,message:ok?'정상 응답':responseText.slice(0,140)||'HIRA 인증 또는 서버 응답 확인 필요',total:Number(get(xml,'totalCount')||0),items:ok?items:[],checkedAt:new Date().toISOString()};
+ return {ok,code,message:ok?'정상 응답':responseText.slice(0,140)||'HIRA 인증 또는 서버 응답 확인 필요',total:Number(get(xml,'totalCount')||0),items:ok?items:[],checkedAt:new Date().toISOString(),pageSize:numberOrNull(get(xml,'numOfRows'))||undefined};
 }
 export async function queryHira(opts:{q?:string;lat?:number;lng?:number;radius?:number;pageNo?:number;numOfRows?:number}={}):Promise<Result> {
  const key=process.env.HIRA_HOSPITAL_SERVICE_KEY?.trim();
  if(!key)return {ok:false,code:'NOT_CONFIGURED',message:'서버 환경변수 미설정',total:0,items:[],checkedAt:new Date().toISOString()};
  const u=new URL(ENDPOINT);u.searchParams.set('serviceKey',key);
- u.searchParams.set('pageNo',String(Math.min(5,Math.max(1,Number(opts.pageNo)||1))));
- u.searchParams.set('numOfRows',String(Math.min(30,Math.max(1,Number(opts.numOfRows)||10))));
+ u.searchParams.set('pageNo',String(Math.min(100,Math.max(1,Math.trunc(Number(opts.pageNo)||1)))));
+ u.searchParams.set('numOfRows',String(Math.min(100,Math.max(1,Math.trunc(Number(opts.numOfRows)||10)))));
  const q=(opts.q||'').trim().slice(0,80);if(q)u.searchParams.set('yadmNm',q);
  const lat=opts.lat,lng=opts.lng;
  const point=lat!==undefined&&lng!==undefined&&Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=32&&lat<=39&&lng>=124&&lng<=132?{lat,lng}:undefined;

@@ -61,6 +61,7 @@ let searchSequence = 0;
 let googlePlacesMarkers=[];
 let hiraMarkers=[];
 let hiraSearching=false;
+let hiraSearchVersion=0;
 let placesSearching=false;
 
 let locationMode = 'default'; // 'default' | 'geo' | 'region' (explicit user action only)
@@ -536,6 +537,9 @@ async function searchNearby(lat, lng) {
   if (notice) notice.textContent = radiusMode
     ? (usingEstimates ? '주의: 직접 켠 회색 추정핀은 실제 병원 위치가 아닙니다.' : '반경 검색은 검증된 정확좌표만 사용합니다. 주변 검증 병원이 없으면 주소록 후보를 별도로 표시하며 거리를 표시하지 않습니다.')
     : '전국 주소록 검색 결과입니다. 지도 핀은 정확좌표가 검증된 병원만 표시하며 병원 운영·진료 여부를 보증하지 않습니다.';
+  // On the initial map / default search, ask HIRA for verified hospital pins,
+  // then fall back to clearly-attributed Google Places if upstream is unavailable.
+  if(locationMode==='default'&&viewMode==='catalog')searchHiraOnDemand().catch(e=>showToast(String(e?.message||e)));
 }
 
 async function initStats() {
@@ -794,6 +798,7 @@ async function searchGooglePlacesOnDemand(){
  * Green H pins are official source coordinates. The database's synthetic/approximate
  * coordinates are never promoted to verified accuracy. */
 function clearHiraResults(){
+  ++hiraSearchVersion;
   hiraMarkers.forEach(removeMapMarker);hiraMarkers=[];
   const sidebar=$('#smartList');
   if(sidebar?.dataset.source==='hira'){
@@ -812,12 +817,35 @@ async function searchHiraOnDemand(){
     const point=center||defaultCenter();
     const q=($('#smartQ')?.value||'').trim().slice(0,80);
     const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
-    const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius)});
+    const requestId=hiraSearchVersion;
+    const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius),size:'100'});
     if(q)qs.set('q',q);
-    const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store'});
-    const data=await res.json();
-    if(!res.ok||data.ok!==true)throw new Error(String(data.message||data.code||'공식 API 사용 권한을 확인해 주세요'));
-    const places=Array.isArray(data.items)?data.items.slice(0,20):[];
+    const pages=[];
+    const seen=new Set();
+    let officialTotal=0, more=true, partial=false, fetchedPages=0;
+    // Bound the first map paint to 500 official records; never silently
+    // claim coverage beyond the fetched HIRA pages.
+    for(let page=1;page<=5&&more;page++){
+      qs.set('page',String(page));
+      if(status)status.textContent='HIRA 공식 병원정보 조회 중 · '+page+'/5페이지';
+      const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store'});
+      const data=await res.json();
+      if(requestId!==hiraSearchVersion)return;
+      if(!res.ok||data.ok!==true){
+        if(page===1)throw new Error(String(data.message||data.code||'공식 API 사용 권한을 확인해 주세요'));
+        partial=true;break;
+      }
+      officialTotal=Number(data.total)||0;
+      fetchedPages++;
+      for(const p of (Array.isArray(data.items)?data.items:[])){
+        const id=String(p.id||'')||String(p.name||'')+'|'+String(p.address||'');
+        if(!seen.has(id)){seen.add(id);pages.push(p);}
+      }
+      more=Boolean(data.hasMore);
+    }
+    if(requestId!==hiraSearchVersion)return;
+    const places=pages;
+    const incomplete=more||partial;
     if(locationMode==='geo' && places.length===0){
       if(status)status.textContent='HIRA 2km 반경 내 검증 병원 0건 · Google 장소 검색으로 확인';
       await searchGooglePlacesOnDemand();
@@ -850,7 +878,7 @@ async function searchHiraOnDemand(){
     source.textContent='HIRA 병원정보서비스 v2 · 공식 등록 좌표에 한해 녹색 H 핀 · 의료기관 운영 여부 별도 확인';
     sidebar.dataset.source='hira';sidebar.replaceChildren(back,source,...cards);
     if(label)label.textContent='HIRA 공식 병원 검색 결과';
-    if(meta)meta.textContent=places.length+'건 · 정확좌표 '+selected.length+'건';
+    if(meta)meta.textContent=places.length+'건 표시 · 정확좌표 '+selected.length+'건 · 공식 검색 '+officialTotal.toLocaleString()+'건'+(incomplete?' · 일부만 조회':'');
     // The HIRA response may arrive before Google Maps initializes.
     // Wait briefly for the already-loading SDK, so official pins are not silently skipped.
     if(!mapReady() && config?.google_maps_browser_key){
@@ -872,10 +900,10 @@ async function searchHiraOnDemand(){
       if(n){bounds.extend(point);map.fitBounds(bounds,45);}
     }
     setPinStatus('HIRA 공식 좌표 '+selected.length+'개');
-    if(status)status.textContent='조회 완료 · '+places.length+'건 · 출처 HIRA · 진료 여부 직접 확인';
+    if(status)status.textContent=(incomplete?'일부만 조회됨 · ':'조회 완료 · ')+places.length+'건 표시 / HIRA '+officialTotal.toLocaleString()+'건 · '+fetchedPages+'페이지 조회 · 진료 여부 직접 확인';
   }catch(e){
     if(status)status.textContent='HIRA 연동 확인 필요: '+String(e?.message||'API 응답 실패');
-    if(locationMode==='geo'){
+    if(locationMode==='geo' || locationMode==='default'){
       showToast('공식 HIRA 검색을 표시하지 못해 Google 주변 장소를 확인합니다.');
       await searchGooglePlacesOnDemand();
     }else{

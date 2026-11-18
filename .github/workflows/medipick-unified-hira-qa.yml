@@ -29,4 +29,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate 22 pages, HIRA secret protection, new routes and JS syntax
-        run: node --test tests/unified-navigation-hira.test.mjs tests/map-first-contract.test.mjs
+        run: node --test tests/unified-navigation-hira.test.mjs tests/map-first-contract.test.mjs tests/hira-pagination-contract.test.mjs
