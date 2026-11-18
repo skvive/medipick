@@ -5,6 +5,7 @@ on:
       - 'web/**'
       - 'app/api/clinic-store/**'
       - 'tests/map-first-contract.test.mjs'
+      - 'tests/clinic-fallback-images.test.mjs'
       - 'next.config.ts'
       - '.github/workflows/medipick-map-store-contract.yml'
   push:
@@ -14,6 +15,7 @@ on:
       - 'web/**'
       - 'app/api/clinic-store/**'
       - 'tests/map-first-contract.test.mjs'
+      - 'tests/clinic-fallback-images.test.mjs'
       - 'next.config.ts'
       - '.github/workflows/medipick-map-store-contract.yml'
 permissions:
@@ -27,4 +29,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Check map, listing, Blogger and storefront contracts
-        run: node --test tests/map-first-contract.test.mjs
+        run: node --test tests/map-first-contract.test.mjs tests/clinic-fallback-images.test.mjs
