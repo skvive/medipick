@@ -21,6 +21,36 @@ let mapsState = 'idle';
 let map = null;
 let infoWindow = null;
 const markerById = new Map();
+
+/* Shared illustrative thumbnails for listings without a registered image.
+ * Stable 1-5 cycle; never imply that AI-generated faces represent a facility's staff. */
+function clinicFallbackImage(identity) {
+  const value=String(identity??'medipick');
+  let hash=0;
+  for(let i=0;i<value.length;i++)hash=(Math.imul(hash,31)+value.charCodeAt(i))>>>0;
+  return '/assets/photos/medipick-clinic-fallback-'+String(hash%5+1).padStart(2,'0')+'.webp';
+}
+function clinicPhotoSource(value,identity) {
+  const src=String(value||'').trim();
+  if(/^\/assets\/[a-zA-Z0-9._/-]+$/.test(src))return {src,ai:false};
+  try{const uri=new URL(src);if(uri.protocol==='https:')return {src:uri.href,ai:false};}catch{}
+  return {src:clinicFallbackImage(identity),ai:true};
+}
+function clinicPhotoMarkup(realImage,identity) {
+  const picture=clinicPhotoSource(realImage,identity);
+  const desc=picture.ai?'AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님':'병원 등록 이미지';
+  return '<span class="mp-clinic-thumb"><img src="'+safe(picture.src)+'" data-fallback="'+safe(clinicFallbackImage(identity))+'" alt="'+desc+'" width="96" height="76" loading="lazy" decoding="async">'+(picture.ai?'<span class="mp-clinic-photo-label">AI 연출</span>':'')+'</span>';
+}
+function createClinicPhoto(identity) {
+  const media=document.createElement('span');media.className='mp-clinic-card-visual';
+  const picture=document.createElement('img');picture.src=clinicFallbackImage(identity);
+  picture.alt='AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님';
+  picture.width=96;picture.height=88;picture.loading='lazy';picture.decoding='async';
+  const label=document.createElement('span');label.className='mp-clinic-photo-label';label.textContent='AI 연출';
+  media.append(picture,label);
+  return media;
+}
+
 let items = [];
 let center = null;
 let activeId = null;
@@ -365,6 +395,7 @@ function renderList() {
   list.innerHTML = items.map(x=>{
     const pro=x.is_premium?' mp-smart-item--pro':'';
     const badge=x.ui?.badge||'병원 주소록';
+    const photoThumb=clinicPhotoMarkup(x.ui?.hero_image,x.id||x.name);
     const distLabel=x.distance_km==null?'실제 거리 미확인':
       (x.geocode_status==='exact'?'직선거리 약 ':'추정 좌표 거리 약 ')+Number(x.distance_km).toFixed(2)+' km';
     const lookup=x.address&&x.district
@@ -376,7 +407,7 @@ function renderList() {
       const contact=call?'<a href="tel:'+safe(call)+'" class="mp-ref-list-cta" aria-label="'+safe(x.name)+' 전화">☎</a>':'';
       return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
         '<button class="mp-smart-item-main" type="button" data-open-id="'+x.id+'">'+
-          '<span class="mp-ref-list-icon" aria-hidden="true">✚</span>'+
+          photoThumb+
           '<span class="mp-ref-list-copy"><span class="mp-ref-list-title">'+safe(x.name)+'</span>'+
           '<small>'+safe(badge)+' · '+safe(x.trade_category||'의료기관')+'</small>'+
           '<p>'+safe([x.region,x.district].filter(Boolean).join(' '))+' · '+safe(x.address||'주소 미등록')+'</p>'+
@@ -386,11 +417,22 @@ function renderList() {
           '</div></article>';
     }
     return '<article class="mp-smart-item'+pro+'" data-id="'+x.id+'">'+
-      '<button type="button" class="mp-smart-item-main" data-open-id="'+x.id+'"><small>'+safe(badge)+'</small>'+
+      '<button type="button" class="mp-smart-item-main mp-clinic-row" data-open-id="'+x.id+'">'+photoThumb+'<span class="mp-clinic-list-copy"><small>'+safe(badge)+'</small>'+
       '<h3>'+safe(x.name)+'</h3><p>'+safe(x.trade_category||'의료기관')+' · '+safe(x.region)+' '+safe(x.district)+'</p>'+
-      '<p>'+safe(x.address||'주소 정보 없음')+'</p><div class="dist">'+safe(distLabel)+'</div></button>'+
+      '<p>'+safe(x.address||'주소 정보 없음')+'</p><div class="dist">'+safe(distLabel)+'</div></span></button>'+
       '<div class="mp-smart-actions">'+lookup+(x.is_premium?'<a class="mp-smart-storefront-link" href="/clinic-store?id='+encodeURIComponent(x.id)+'">입점 스마트스토어 ↗</a>':'')+'</div></article>';
   }).join('');
+  list.querySelectorAll('.mp-clinic-thumb img[data-fallback]').forEach(img=>{
+    img.addEventListener('error',()=>{
+      const fallback=img.dataset.fallback;
+      if(!fallback||img.getAttribute('src')===fallback)return;
+      img.src=fallback;
+      img.alt='AI 연출 이미지 · 실제 해당 병원 및 의료진 사진 아님';
+      const label=document.createElement('span');
+      label.className='mp-clinic-photo-label';label.textContent='AI 연출';
+      img.parentElement?.appendChild(label);
+    },{once:true});
+  });
   list.querySelectorAll('[data-open-id]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const id=Number(btn.dataset.openId);
@@ -649,7 +691,8 @@ function googlePlaceCard(place,marker){
   const name=String(place.displayName||'의료기관 장소 정보').slice(0,120);
   const address=String(place.formattedAddress||'주소를 Google 지도에서 확인하세요').slice(0,180);
   const card=document.createElement('article');
-  card.className='mp-google-place-card';
+  card.className='mp-google-place-card mp-clinic-photo-card';
+  const thumb=createClinicPhoto(place.id||place.displayName);
   const heading=document.createElement('strong');heading.textContent=name;
   const where=document.createElement('p');where.textContent=address;
   const actions=document.createElement('div');actions.className='mp-google-place-actions';
@@ -665,7 +708,7 @@ function googlePlaceCard(place,marker){
   actions.appendChild(pin);
   const uri=googlePlaceLink(place);
   if(uri){const a=document.createElement('a');a.href=uri;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Google 지도 원문 ↗';actions.appendChild(a);}
-  card.append(heading,where,actions);
+  card.append(thumb,heading,where,actions);
   return card;
 }
 async function searchGooglePlacesOnDemand(){
@@ -789,7 +832,8 @@ async function searchHiraOnDemand(){
     if(!sidebar)throw new Error('병원 결과 영역을 찾지 못했습니다');
     const selected=places.filter(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&p.coordinateSource==='HIRA_API');
     const cards=places.map(p=>{
-      const card=document.createElement('article');card.className='mp-google-place-card';
+      const card=document.createElement('article');card.className='mp-google-place-card mp-hira-place-card mp-clinic-photo-card';
+      const thumb=createClinicPhoto(p.id||p.name);
       const title=document.createElement('strong');title.textContent=p.name||'병원';
       const address=document.createElement('p');address.textContent=String(p.address||'주소 정보 없음');
       const type=document.createElement('p');type.textContent=String(p.category||'의료기관')+' · HIRA 공식 공개정보 · 진료/영업상태 별도 확인';
@@ -803,7 +847,7 @@ async function searchHiraOnDemand(){
       }
       const link=document.createElement('a');link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((p.name||'병원')+' '+(p.address||''));
       link.target='_blank';link.rel='noopener noreferrer';link.textContent='Google 지도에서 확인 ↗';
-      actions.appendChild(link);card.append(title,address,type,actions);return card;
+      actions.appendChild(link);card.append(thumb,title,address,type,actions);return card;
     });
     const back=document.createElement('button');back.className='mp-ref-places-back';back.type='button';
     back.textContent='← 기존 주소록 결과로 돌아가기';back.addEventListener('click',clearHiraResults);
