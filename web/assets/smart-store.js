@@ -818,16 +818,16 @@ async function searchHiraOnDemand(){
     const q=($('#smartQ')?.value||'').trim().slice(0,80);
     const radius=Math.max(500,Math.min(30000,Number($('#smartRadius')?.value||3)*1000));
     const requestId=hiraSearchVersion;
-    const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius),size:'100'});
+    const qs=new URLSearchParams({lat:String(point.lat),lng:String(point.lng),radius:String(radius),size:'500'});
     if(q)qs.set('q',q);
     const pages=[];
     const seen=new Set();
     let officialTotal=0, more=true, partial=false, fetchedPages=0;
-    // Bound the first map paint to 500 official records; never silently
+    // Bound each map request to 10 source pages; never silently
     // claim coverage beyond the fetched HIRA pages.
-    for(let page=1;page<=5&&more;page++){
+    for(let page=1;page<=10&&more;page++){
       qs.set('page',String(page));
-      if(status)status.textContent='HIRA 공식 병원정보 조회 중 · '+page+'/5페이지';
+      if(status)status.textContent='HIRA 공식 병원정보 조회 중 · '+page+'/10페이지';
       const res=await fetch('/api/hira/hospitals?'+qs.toString(),{cache:'no-store'});
       const data=await res.json();
       if(requestId!==hiraSearchVersion)return;
