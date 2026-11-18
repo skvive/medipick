@@ -903,7 +903,8 @@ async function searchHiraOnDemand(){
     if(status)status.textContent=(incomplete?'일부만 조회됨 · ':'조회 완료 · ')+places.length+'건 표시 / HIRA '+officialTotal.toLocaleString()+'건 · '+fetchedPages+'페이지 조회 · 진료 여부 직접 확인';
   }catch(e){
     if(status)status.textContent='HIRA 연동 확인 필요: '+String(e?.message||'API 응답 실패');
-    if(locationMode==='geo' || locationMode==='default'){
+    if(locationMode==='geo'){
+      // Google Places is billable; only fall back after explicit geolocation consent.
       showToast('공식 HIRA 검색을 표시하지 못해 Google 주변 장소를 확인합니다.');
       await searchGooglePlacesOnDemand();
     }else{
